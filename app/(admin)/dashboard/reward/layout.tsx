@@ -1,0 +1,11 @@
+import React from 'react'
+import RewardNav from '@/components/Admin/reward/RewardNav'
+
+export default function layout({ children }: { children: React.ReactNode }) {
+  return (
+    <div>
+        <RewardNav/>
+        {children}
+    </div>
+  )
+}

@@ -1,10 +1,12 @@
-import DashboardPage from "@/components/Dashboard/DashboardPage";
+import AdminHome from "@/components/Admin/Home/AdminHome";
+
+ 
 
 function page() {
   return (
-    <div>
-      <DashboardPage />
-    </div>
+     
+     <AdminHome/>
+   
   );
 }
 

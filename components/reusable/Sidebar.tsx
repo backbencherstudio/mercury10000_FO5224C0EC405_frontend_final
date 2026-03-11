@@ -1,6 +1,7 @@
 "use client";
 
 import { CookieHelper } from "@/helper/cookie.helper";
+import { ConnectionIcon, ConnectionSecondaryIcon, HomeIcon, LeadIcon, LeadSecondaryIcon, RewardIcon, RewardSecondaryIcon, SecondaryHome, SettingsIcon, SettingsSecondaryIcon, SupportIcon, SupportSecondaryIcon, User, UserSecondary } from "@/public/icons/sidebar/SidebarIcons";
 import {
   DotIcon,
   LayoutDashboardIcon,
@@ -14,6 +15,7 @@ import React from "react";
 
 interface NavItem {
   icon: any;
+  secondaryIcon: any;
   label: string;
   href: string;
   type?: "client" | "admin" | "candidate";
@@ -28,28 +30,52 @@ interface SidebarProps {
 
 const navItems: NavItem[] = [
   {
-    icon: LayoutDashboardIcon,
-    label: "Clients",
-    href: "/clients/admin/list",
+    icon: HomeIcon,
+    secondaryIcon: SecondaryHome,
+    label: "Dashboard",
+    href: "/dashboard",
     type: "admin",
   },
   {
-    icon: UserIcon,
-    label: "Candidates",
-    href: "/candidates",
-    type: "admin",
-  },
-
-  {
-    icon: Settings,
-    label: "Platform settings",
-    href: "/dashboard/platform-settings",
+    icon: User,
+    secondaryIcon: UserSecondary,
+    label: "User",
+    href: "/dashboard/user",
     type: "admin",
   },
   {
-    icon: DotIcon,
-    label: "More",
-    href: "/dashboard/more",
+    icon: LeadIcon,
+    secondaryIcon: LeadSecondaryIcon,
+    label: "Lead",
+    href: "/dashboard/lead",
+    type: "admin",
+  },
+  {
+    icon: ConnectionIcon,
+    secondaryIcon: ConnectionSecondaryIcon,
+    label: "Connection",
+    href: "/dashboard/connection",
+    type: "admin",
+  },
+  {
+    icon: RewardIcon,
+    secondaryIcon: RewardSecondaryIcon,
+    label: "Reward",
+    href: "/dashboard/reward",
+    type: "admin",
+  },
+  {
+    icon: SupportIcon,
+    secondaryIcon: SupportSecondaryIcon,
+    label: "Support",
+    href: "/dashboard/support",
+    type: "admin",
+  },
+  {
+    icon: SettingsIcon,
+    secondaryIcon: SettingsSecondaryIcon,
+    label: "Settings",
+    href: "/dashboard/settings",
     type: "admin",
   },
 ];
@@ -61,24 +87,28 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   const isActive = (href: string): boolean => {
-    if (href === "/") {
-      return pathname === "/";
+    if (href === "/dashboard") {
+      return pathname === "/dashboard";
     }
-    return pathname.startsWith(href);
+    if (pathname === href) {
+      return true;
+    }
+
+
+    return pathname.startsWith(href + "/");
   };
+
   const handleLogout = () => {
     CookieHelper.destroy({ key: "accessToken" });
     router.push("/login");
   };
   return (
-    <div className="h-screen  ">
-      {/* Sidebar container */}
+    <div className="h-screen  " style={{backgroundColor:'#07454B' }}>
       <div
         className={`
-          ${
-            isOpen
-              ? "z-50 h-full w-full overflow-hidden absolute top-0 left-0"
-              : "h-full"
+          ${isOpen
+            ? "z-50 h-full w-full overflow-hidden absolute top-0 left-0"
+            : "h-full"
           }
           flex flex-col
           min-h-[calc(100vh-100px)] 
@@ -89,20 +119,20 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         `}
       >
         {/* Header with Logo and Toggle */}
-        <div className="flex items-center justify-between  mb-4">
+        <div className="flex items-center justify-center   mb-12 ">
           <Link
             href={"/"}
-            className={` flex items-center transition-all duration-300 $`}
+            className={` flex items-center  transition-all duration-300 $`}
           >
-            <h2 className="text-primaryColor text-3xl font-semibold tracking-wide">
-              LOGO
+            <h2 className="text-white text-[32px] font-semibold tracking-wide">
+              Agua Leads
             </h2>
           </Link>
         </div>
 
         {/* Navigation Section */}
-        <div className="flex-1">
-          <div className="space-y-2">
+        <div className="flex-1 mt-12">
+          <div className="space-y-2 ">
             {navItems.map((item, idx) => {
               const active = isActive(item.href);
               return (
@@ -112,22 +142,27 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                   onClick={onClose}
                   className={`
                     flex items-center group gap-3 px-3 py-2.5 lg:py-3 rounded-lg 
-                    hover:text-whiteColor hover:bg-whiteColor text-blackColor transition-all duration-200
-                    ${active ? "bg-white opacity-100 text-blackColor" : ""}
+                    hover:text-whiteColor hover:bg-navActive text-blackColor transition-all duration-200 
+                    ${active ? "bg-navActive opacity-100 text-whiteColor" : ""}
                    
                   `}
                   title={isCollapsed ? item.label : ""}
                 >
                   <div className="flex gap-2 items-center">
-                    <div className="w-[30px] h-[30px] group  flex justify-center items-center flex-shrink-0 text-xl font-medium text-blackColor">
-                      <item.icon
-                        className={`opacity-70 group-hover:opacity-100 transition-opacity duration-200 ${
-                          active ? "opacity-100" : ""
-                        }`}
-                      />
+                    <div className="w-[30px] h-[30px] group  flex justify-center items-center flex-shrink-0 text-xl font-medium text-white">
+                      {
+                        active ? <item.secondaryIcon />
+                          :
+
+                          <item.icon
+                          // className={`  group-hover:opacity-100 transition-opacity duration-200 ${
+                          //   active ? "opacity-100" : ""
+                          // }`}
+                          />
+                      }
                     </div>
                     <span
-                      className={`text-base font-medium text-descriptionColor group-hover:text-blackColor transition-colors duration-200 whitespace-nowrap `}
+                      className={`text-base font-medium text-white group-hover:text-white transition-colors duration-200 whitespace-nowrap `}
                     >
                       {item.label}
                     </span>
