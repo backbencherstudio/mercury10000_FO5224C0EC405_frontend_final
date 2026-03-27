@@ -3,7 +3,7 @@ import Image from 'next/image'
 import onBoardImg from '@/public/images/auth/onboardLogo.png'
  
 import Link from 'next/link'
-import RightIcon from '@/public/icons/auth/RightIcon'
+import RightIcon from '@/components/icons/auth/RightIcon'
 
 export default function OnBoard() {
   return (

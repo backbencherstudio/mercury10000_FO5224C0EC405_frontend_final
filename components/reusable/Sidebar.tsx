@@ -1,7 +1,7 @@
 "use client";
 
 import { CookieHelper } from "@/helper/cookie.helper";
-import { ConnectionIcon, ConnectionSecondaryIcon, HomeIcon, LeadIcon, LeadSecondaryIcon, RewardIcon, RewardSecondaryIcon, SecondaryHome, SettingsIcon, SettingsSecondaryIcon, SupportIcon, SupportSecondaryIcon, User, UserSecondary } from "@/public/icons/sidebar/SidebarIcons";
+import { ConnectionIcon, ConnectionSecondaryIcon, HomeIcon, LeadIcon, LeadSecondaryIcon, RewardIcon, RewardSecondaryIcon, SecondaryHome, SettingsIcon, SettingsSecondaryIcon, SupportIcon, SupportSecondaryIcon, User, UserSecondary } from "@/components/icons/sidebar/SidebarIcons";
 import {
   DotIcon,
   LayoutDashboardIcon,

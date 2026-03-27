@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import Dot3Icon from "@/public/icons/admin/Dot3Icon";
+import Dot3Icon from "@/components/icons/admin/Dot3Icon";
 import {
     DropdownMenu,
     DropdownMenuContent,

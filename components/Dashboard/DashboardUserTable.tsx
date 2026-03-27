@@ -1,7 +1,7 @@
 "use client";
 
 import DynamicTable from "@/components/reusable/DynamicTable";
-import { demoData } from "@/public/demoData/DemoData";
+import { demoData } from "@/public/demoData/SubmittedLeadsData";
 import { useState } from "react";
 
 function DashboardUserTable() {

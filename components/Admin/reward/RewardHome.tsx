@@ -2,9 +2,9 @@
 import { GiftStatusColumn } from '@/components/columns/GiftStatusColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { giftStatusData } from '@/public/demoData/giftStatusData'
-import DownArrowIcon2 from '@/public/icons/admin/DownArrowIcon2'
-import FilterIcon from '@/public/icons/admin/FilterIcon'
-import SearchIcon from '@/public/icons/admin/SearchIcon'
+import DownArrowIcon2 from '@/components/icons/admin/DownArrowIcon2'
+import FilterIcon from '@/components/icons/admin/FilterIcon'
+import SearchIcon from '@/components/icons/admin/SearchIcon'
 import React, { useState } from 'react'
 import { Button } from "@/components/ui/button"
 import {

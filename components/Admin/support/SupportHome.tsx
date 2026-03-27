@@ -2,8 +2,8 @@
 import { ContactRequestColumn } from '@/components/columns/ContactRequestColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { ContactRequestData } from '@/public/demoData/ContactRequestData'
-import FilterIcon from '@/public/icons/admin/FilterIcon'
-import SearchIcon from '@/public/icons/admin/SearchIcon'
+import FilterIcon from '@/components/icons/admin/FilterIcon'
+import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { title } from 'process'
 import React from 'react'
 

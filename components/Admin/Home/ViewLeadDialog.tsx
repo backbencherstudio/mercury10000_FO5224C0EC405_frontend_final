@@ -8,9 +8,9 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import LocationIcon from "@/public/icons/admin/LocationIcon";
-import UserIcon from "@/public/icons/admin/UserIcon";
-import PhoneIcon from "@/public/icons/admin/PhoneIcon";
+import LocationIcon from "@/components/icons/admin/LocationIcon";
+import UserIcon from "@/components/icons/admin/UserIcon";
+import PhoneIcon from "@/components/icons/admin/PhoneIcon";
 
 interface ViewLeadDialogProps {
   isOpen: boolean;

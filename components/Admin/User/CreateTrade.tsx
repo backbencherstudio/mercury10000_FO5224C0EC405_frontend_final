@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
 import DynamicTable from '@/components/reusable/DynamicTable'
-import FilterIcon from '@/public/icons/admin/FilterIcon'
-import SearchIcon from '@/public/icons/admin/SearchIcon'
-import SuccessTik from '@/public/icons/admin/SuccessTik'
+import FilterIcon from '@/components/icons/admin/FilterIcon'
+import SearchIcon from '@/components/icons/admin/SearchIcon'
+import SuccessTik from '@/components/icons/admin/SuccessTik'
 import {TreadData} from '@/public/demoData/TreadData'
 import { TradeColumn } from '@/components/columns/TradeColumn'
 

@@ -1,8 +1,8 @@
-export const demoData = [
+export const SubmittedLeadsData = [
   {
     id: "1234",
     full_name: "Jerome Bell",
-    city: "123 Main St, Los Angeles",
+    homeowners_address: "123 Main St, Los Angeles",
     hmeowners_name: "David",
     hmeowners_phone: "+32 123123",
     trade: "Plumbing",
@@ -11,7 +11,7 @@ export const demoData = [
   {
     id: "1235",
     full_name: "Wade Warren",
-    city: "456 Oak Ave, New York",
+    homeowners_address: "456 Oak Ave, New York",
     hmeowners_name: "Sarah",
     hmeowners_phone: "+32 456789",
     trade: "Electrical",
@@ -20,7 +20,7 @@ export const demoData = [
   {
     id: "1236",
     full_name: "Esther Howard",
-    city: "789 Pine Rd, Chicago",
+    homeowners_address: "789 Pine Rd, Chicago",
     hmeowners_name: "Michael",
     hmeowners_phone: "+32 789012",
     trade: "Carpentry",
@@ -29,7 +29,7 @@ export const demoData = [
   {
     id: "1237",
     full_name: "Cameron Williamson",
-    city: "321 Elm Blvd, Houston",
+    homeowners_address: "321 Elm Blvd, Houston",
     hmeowners_name: "Jennifer",
     hmeowners_phone: "+32 345678",
     trade: "HVAC",
@@ -38,7 +38,7 @@ export const demoData = [
   {
     id: "1238",
     full_name: "Brooklyn Simmons",
-    city: "654 Maple Ln, Phoenix",
+    homeowners_address: "654 Maple Ln, Phoenix",
     hmeowners_name: "Robert",
     hmeowners_phone: "+32 901234",
     trade: "Painting",
@@ -47,7 +47,7 @@ export const demoData = [
   {
     id: "1239",
     full_name: "Leslie Alexander",
-    city: "987 Cedar Dr, Philadelphia",
+    homeowners_address: "987 Cedar Dr, Philadelphia",
     hmeowners_name: "Lisa",
     hmeowners_phone: "+32 567890",
     trade: "Roofing",
@@ -56,7 +56,7 @@ export const demoData = [
   {
     id: "1240",
     full_name: "Jenny Wilson",
-    city: "147 Birch St, San Antonio",
+    homeowners_address: "147 Birch St, San Antonio",
     hmeowners_name: "James",
     hmeowners_phone: "+32 112233",
     trade: "Landscaping",
@@ -65,7 +65,7 @@ export const demoData = [
   {
     id: "1241",
     full_name: "Kristin Watson",
-    city: "258 Spruce Ave, San Diego",
+    homeowners_address: "258 Spruce Ave, San Diego",
     hmeowners_name: "Patricia",
     hmeowners_phone: "+32 445566",
     trade: "Masonry",
@@ -74,7 +74,7 @@ export const demoData = [
   {
     id: "1242",
     full_name: "Guy Hawkins",
-    city: "369 Willow Rd, Dallas",
+    homeowners_address: "369 Willow Rd, Dallas",
     hmeowners_name: "Thomas",
     hmeowners_phone: "+32 778899",
     trade: "Flooring",
@@ -83,7 +83,7 @@ export const demoData = [
   {
     id: "1243",
     full_name: "Floyd Miles",
-    city: "741 Poplar Ln, San Jose",
+    homeowners_address: "741 Poplar Ln, San Jose",
     hmeowners_name: "Linda",
     hmeowners_phone: "+32 990011",
     trade: "Windows",
@@ -92,7 +92,7 @@ export const demoData = [
   {
     id: "1244",
     full_name: "Dianne Russell",
-    city: "852 Ash Ct, Austin",
+    homeowners_address: "852 Ash Ct, Austin",
     hmeowners_name: "Charles",
     hmeowners_phone: "+32 223344",
     trade: "Insulation",
@@ -101,7 +101,7 @@ export const demoData = [
   {
     id: "1245",
     full_name: "Jerome Bell",
-    city: "963 Beech Way, Jacksonville",
+    homeowners_address: "963 Beech Way, Jacksonville",
     hmeowners_name: "Barbara",
     hmeowners_phone: "+32 556677",
     trade: "Drywall",
@@ -110,7 +110,7 @@ export const demoData = [
   {
     id: "1246",
     full_name: "Marvin McKinney",
-    city: "159 Sycamore St, Fort Worth",
+    homeowners_address: "159 Sycamore St, Fort Worth",
     hmeowners_name: "Joseph",
     hmeowners_phone: "+32 889900",
     trade: "Tile",
@@ -119,7 +119,7 @@ export const demoData = [
   {
     id: "1247",
     full_name: "Devon Lane",
-    city: "753 Magnolia Dr, Columbus",
+    homeowners_address: "753 Magnolia Dr, Columbus",
     hmeowners_name: "Margaret",
     hmeowners_phone: "+32 112244",
     trade: "Concrete",
@@ -128,7 +128,7 @@ export const demoData = [
   {
     id: "1248",
     full_name: "Courtney Henry",
-    city: "951 Hickory Blvd, Charlotte",
+    homeowners_address: "951 Hickory Blvd, Charlotte",
     hmeowners_name: "Daniel",
     hmeowners_phone: "+32 335577",
     trade: "Fencing",

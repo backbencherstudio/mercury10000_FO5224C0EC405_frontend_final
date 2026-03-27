@@ -2,8 +2,8 @@
 import { AllUsersColumn } from '@/components/columns/AllUsersColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { AllUsersData } from '@/public/demoData/AllUsersData'
-import FilterIcon from '@/public/icons/admin/FilterIcon'
-import SearchIcon from '@/public/icons/admin/SearchIcon'
+import FilterIcon from '@/components/icons/admin/FilterIcon'
+import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { useRouter } from 'next/navigation'
  
 import React, { useState } from 'react'

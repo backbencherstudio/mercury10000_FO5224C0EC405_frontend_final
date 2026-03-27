@@ -1,5 +1,5 @@
 import React from "react";
-import Dot3Icon from "@/public/icons/admin/Dot3Icon";
+import Dot3Icon from "@/components/icons/admin/Dot3Icon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,7 +14,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import MessageIcon from "@/public/icons/admin/MessageIcon";
+import MessageIcon from "@/components/icons/admin/MessageIcon";
 
 interface ColumnConfig {
   label: React.ReactNode;

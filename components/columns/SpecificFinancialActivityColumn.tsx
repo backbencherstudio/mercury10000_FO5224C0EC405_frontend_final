@@ -1,15 +1,15 @@
 "use client";
 
 import React from "react";
-import Dot3Icon from "@/public/icons/admin/Dot3Icon";
+import Dot3Icon from "@/components/icons/admin/Dot3Icon";
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import DownArrowIcon from "@/public/icons/admin/DownArrowIcon";
-import EditIcon from "@/public/icons/admin/EditIcon";
+import DownArrowIcon from "@/components/icons/admin/DownArrowIcon";
+import EditIcon from "@/components/icons/admin/EditIcon";
 
 // Update the interface to match SpecificFinancialActivityData structure
 interface SpecificFinancialActivity {

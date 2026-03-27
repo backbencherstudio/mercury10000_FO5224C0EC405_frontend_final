@@ -3,8 +3,8 @@ import Image from 'next/image'
 import logo from '@/public/images/auth/auth-logo-2.png'
 import authImg from '@/public/images/auth/sign-up-img.png'
 import Link from 'next/link'
-import GoogleIcon from '@/public/icons/auth/GoogleIcon'
-import AppleIcon from '@/public/icons/auth/AppleIcon'
+import GoogleIcon from '@/components/icons/auth/GoogleIcon'
+import AppleIcon from '@/components/icons/auth/AppleIcon'
 
 export default function SignUp() {
   return (

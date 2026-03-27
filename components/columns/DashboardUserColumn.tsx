@@ -1,7 +1,8 @@
 "use client";
+ 
 
 import React from "react";
-import Dot3Icon from "@/public/icons/admin/Dot3Icon";
+import Dot3Icon from "@/components/icons/admin/Dot3Icon";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { MdOutlineEdit } from "react-icons/md";
+import TopRightArrow from "@/components/icons/admin/TopRightArrow";
+ 
 
 
 interface ColumnConfig {
@@ -24,13 +27,11 @@ interface DashboardUserColumnProps {
   currentData: any[];
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (globalIndex: number, checked: boolean) => void;
- onDecline?:(row:any)=>void
- 
-  
+  onDecline?:(row:any)=>void
   onViewLead?: (row: any) => void;
   onApprove?:(row:any)=>void
+  onArrowClick?: (row: any) => void;
 }
-
 
 interface ActionDropdownProps {
   row: any;
@@ -102,7 +103,8 @@ export function DashboardUserColumn({
   onSelectRow,
   onApprove,
   onViewLead,
-  onDecline
+  onDecline,
+  onArrowClick
  
 }: DashboardUserColumnProps): ColumnConfig[] {
   
@@ -154,7 +156,7 @@ export function DashboardUserColumn({
 
     // 2. ID Column
     {
-      label: "User ID",
+      label: "Lead ID",
       accessor: "id",
       width: "100px",
       formatter: (value: string) => (
@@ -174,8 +176,8 @@ export function DashboardUserColumn({
 
     // 4. City/Address Column
     {
-      label: "City",
-      accessor: "city",
+      label: "Homeowner Address",
+      accessor: "homeowners_address",
       width: "170px",
       formatter:(value:string)=>(
         <span className=" text-sm  text-[#06030C]">{value}</span>
@@ -184,7 +186,7 @@ export function DashboardUserColumn({
 
     // 5. Homeowner Name Column
     {
-      label: "Homeowner’s Name",
+      label: "Homeowner Name ",
       accessor: "hmeowners_name",
       width: "140px",
       formatter: (value: string) => (
@@ -194,7 +196,7 @@ export function DashboardUserColumn({
 
     // 6. Homeowner Phone Column
     {
-      label: "Homeowner’s Phone",
+      label: "Homeowner Phone",
       accessor: "hmeowners_phone",
       width: "150px",
       formatter: (value: string) => (
@@ -212,12 +214,23 @@ export function DashboardUserColumn({
       ),
     },
 
-    // 8. Lead Sent Date Column
+    // 8. Lead Sent Date Column with TopRightArrow
     {
-      label: "Lead Sent",
+      label: "Lead Sent to Us",
       accessor: "lead_sent",
-      width: "150px",
-      formatter: DateFormatter,
+      width: "180px",
+      formatter: (value: string, row: any) => (
+        <div className="flex items-center justify-between gap-2 cursor-pointer">
+          <span>{DateFormatter(value)}</span>
+          <button
+            type="button"
+            className="ml-2 p-1 rounded hover:bg-gray-100"
+            onClick={() => onArrowClick && onArrowClick(row)}
+          >
+            <TopRightArrow />
+          </button>
+        </div>
+      ),
     },
 
     // 9. Status Column (if you add status to your demo data)

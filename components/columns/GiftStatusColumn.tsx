@@ -1,6 +1,6 @@
 "use client";
 
-import DownArrowIcon from "@/public/icons/admin/DownArrowIcon";
+import DownArrowIcon from "@/components/icons/admin/DownArrowIcon";
 import React from "react";
 
 // Gift Status type definition based on the giftStatusData structure
