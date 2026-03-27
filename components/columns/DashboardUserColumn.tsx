@@ -31,6 +31,8 @@ interface DashboardUserColumnProps {
   onViewLead?: (row: any) => void;
   onApprove?:(row:any)=>void
   onArrowClick?: (row: any) => void;
+  onLeadProcess?: (row: any) => void;
+  onNotLead?: (row: any) => void;
 }
 
 interface ActionDropdownProps {
@@ -38,13 +40,14 @@ interface ActionDropdownProps {
   onViewLead?: (row: any) => void;
   onDecline?: (row: any) => void;
   onApprove?: (row: any) => void;
+  onLeadProcess?: (row: any) => void;
+  onNotLead?: (row: any) => void;
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({ 
   row, 
-  onViewLead, 
-  onDecline, 
-  onApprove 
+  onLeadProcess,
+  onNotLead,
 }) => {
   return (
     <div className="flex justify-center w-full">
@@ -54,24 +57,20 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
             <Dot3Icon />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none">
+        <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none space-y-3">
           <DropdownMenuItem 
-            onClick={() => onApprove?.(row)}
-            className="cursor-pointer"
+            onClick={() => onLeadProcess?.(row)}
+            className="cursor-pointer text-white" 
+            style={{ background: '#0e93a1' }}
           >
-           Approve
+            Lead in Process
           </DropdownMenuItem>
           <DropdownMenuItem 
-            onClick={() => onDecline?.(row)}
-            className="cursor-pointer"
+            onClick={() => onNotLead?.(row)}
+            className="cursor-pointer text-white" 
+            style={{ background: '#ff0000' }}
           >
-           Decline
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => onViewLead?.(row)}
-            className="cursor-pointer  "
-          >
-            View The Lead
+            Not a Lead
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -90,11 +89,6 @@ const DateFormatter = (value: string) => {
     day: "numeric",
   });
 };
-
- 
-
- 
-
 export function DashboardUserColumn({
   startIndex,
   selectedRows,
@@ -104,8 +98,9 @@ export function DashboardUserColumn({
   onApprove,
   onViewLead,
   onDecline,
-  onArrowClick
- 
+  onArrowClick,
+  onLeadProcess,
+  onNotLead
 }: DashboardUserColumnProps): ColumnConfig[] {
   
   // Check if all rows are selected
@@ -238,12 +233,14 @@ export function DashboardUserColumn({
       label: "Action",
       accessor: "action",
       width: "10px",
-        formatter: (_: any, row: any) => (
+      formatter: (_: any, row: any) => (
         <ActionDropdown
           row={row}
           onViewLead={onViewLead}
           onDecline={onDecline}
           onApprove={onApprove}
+          onLeadProcess={onLeadProcess}
+          onNotLead={onNotLead}
         />
       ),
     },

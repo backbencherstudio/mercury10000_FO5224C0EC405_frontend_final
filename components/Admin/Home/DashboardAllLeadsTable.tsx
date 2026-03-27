@@ -3,10 +3,7 @@
 import DynamicTable from "@/components/reusable/DynamicTable";
 import {   SubmittedLeadsData } from "@/public/demoData/SubmittedLeadsData";
 import { useState } from "react";
- 
-import { ViewLeadDialog } from "./ViewLeadDialog";
-import { LeadApproveDialog } from "./LeadApproveDialog";
-import { DashboardUserColumn } from "@/components/columns/DashboardUserColumn";
+ import { DashboardUserColumn } from "@/components/columns/DashboardUserColumn";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import LocationIcon from "@/components/icons/admin/LocationIcon";
 import UserIcon from "@/components/icons/admin/UserIcon";
@@ -18,6 +15,9 @@ function DashboardAllLeadsTable() {
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [arrowDialogOpen, setArrowDialogOpen] = useState(false);
   const [arrowDialogData, setArrowDialogData] = useState<any>(null);
+  const [leadProcessDialogOpen, setLeadProcessDialogOpen] = useState(false);
+  const [notLeadDialogOpen, setNotLeadDialogOpen] = useState(false);
+  const [dialogRowData, setDialogRowData] = useState<any>(null);
 
  
   // Modal state removed
@@ -49,22 +49,23 @@ function DashboardAllLeadsTable() {
     console.log("View Lead clicked:", row);
   };
 
-  const handleApprove = (row: any) => {
-    // No modal, just log or handle inline
-    console.log("Approve clicked:", row);
-  };
+ 
 
   const handleArrowClick = (row: any) => {
     setArrowDialogData(row);
     setArrowDialogOpen(true);
   };
 
- 
-  // Handler for edit
-  const handleEdit = (row: any) => {
-    console.log("Edit clicked:", row);
-    // Add edit logic here
+  const handleLeadProcess = (row: any) => {
+    setDialogRowData(row);
+    setLeadProcessDialogOpen(true);
   };
+  const handleNotLead = (row: any) => {
+    setDialogRowData(row);
+    setNotLeadDialogOpen(true);
+  };
+
+  
 
   // Get all columns from the single component
   const columns = DashboardUserColumn({
@@ -73,10 +74,12 @@ function DashboardAllLeadsTable() {
     currentData,
     onSelectAll: handleSelectAll,
     onSelectRow: handleSelectRow,
+    onLeadProcess: handleLeadProcess,
+    onNotLead: handleNotLead,
     onViewLead: handleViewLead,
     // onEdit: handleEdit,
-    onApprove: handleApprove,
-    onArrowClick: handleArrowClick, // pass handler
+    // onApprove: handleApprove,
+    onArrowClick: handleArrowClick,  
   });
 
   return (
@@ -93,6 +96,28 @@ function DashboardAllLeadsTable() {
         noDataMessage="No users found"
         loading={false}
       />
+      {/* Lead in Process Custom Dialog */}
+      <Dialog open={leadProcessDialogOpen} onOpenChange={(open) =>{setLeadProcessDialogOpen(open)}}>
+        <DialogContent className="max-w-md p-8 rounded-xl shadow-lg text-white"  >
+            <DialogHeader>
+              <DialogTitle className="text-black text-2xl font-bold flex items-center gap-2">
+                 Lead in Process
+              </DialogTitle>
+            </DialogHeader>
+         
+        </DialogContent>
+      </Dialog>
+      {/* Not a Lead Custom Dialog */}
+      <Dialog open={notLeadDialogOpen} onOpenChange={(open) => {setNotLeadDialogOpen(open)}}>
+        <DialogContent className="max-w-md p-8 rounded-xl shadow-lg text-white"  >
+            <DialogHeader>
+              <DialogTitle className="text-black text-2xl font-bold flex items-center gap-2">
+                Not a Lead
+              </DialogTitle>
+            </DialogHeader>
+        
+        </DialogContent>
+      </Dialog>
       {/* Custom Dialog for TopRightArrow */}
       <Dialog open={arrowDialogOpen} onOpenChange={setArrowDialogOpen} >
         <DialogContent className=" sm:max-w-[980px] p-6">
@@ -121,6 +146,13 @@ function DashboardAllLeadsTable() {
                   </div>
                   <p className=" text-sm text-[#777980] mt-2.5">{ arrowDialogData.hmeowners_phone}</p>
                 </div>
+                  <div className=" border-b border-[#e9e9ea] pb-2.5">
+                    <div  >
+                      
+                      <h3 className=" text-base text-[#070707] font-medium">Trade</h3>
+                    </div>
+                    <p className=" text-sm text-[#777980] mt-2.5">{ arrowDialogData.trade}</p>
+                  </div>
               </div>
               <div>
                 <h3 className=" text-base text-[#070707] font-medium">Notes</h3>
