@@ -174,7 +174,7 @@ export function LeadHistoryColumn({
       formatter: (value: string) => {
         let bg = "bg-gray-200";
         let text = "text-gray-800";
-        const val = value.toLowerCase();
+        const val = (value || '').toLowerCase();
         if (val === "scheduled") {
           bg = "bg-[#F8E997]";
           text = "text-[#AC8815]";
@@ -185,11 +185,11 @@ export function LeadHistoryColumn({
           bg = "bg-[#FFB0B0]";
           text = "text-[#F00]";
         } else if (val === "invalid") {
-         bg = "bg-[#FFB0B0]";
+          bg = "bg-[#FFB0B0]";
           text = "text-[#F00]";
         }
         return (
-          <span className={`px-2 py-1 rounded-[4px] text-xs   ${bg} ${text}`}>{value}</span>
+          <span className={`px-2 py-1 rounded-[4px] text-xs ${bg} ${text}`}>{value || '-'}</span>
         );
       },
     }
