@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { FinancialActivityColumn } from '@/components/columns/FinancialActivityColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { FinancialActivityData } from '@/public/demoData/FinancialActivityData'
@@ -17,87 +17,208 @@ interface UserDetailsProps {
 }
  
 
-export default function UserDetails({user}:UserDetailsProps) {
+export default function UserDetails({ user }: UserDetailsProps) {
+  const { user_name, id, phone_no, city, role } = user;
+  const router = useRouter();
 
-  const {user_name,id,phone_no,city,role}=user
-  const router =useRouter()
- 
+  // Editable state for each field
+  const [editState, setEditState] = useState({
+    user_name: false,
+    id: false,
+    phone_no: false,
+    city: false,
+    trade: false,
+    role: false,
+    work: false,
+  });
+  // Local state for input values
+  const [inputState, setInputState] = useState({
+    user_name,
+    id,
+    phone_no,
+    city,
+    trade: 'Plumbing',
+    role,
+    work: 'LMS',
+  });
 
-  const handleView =( )=>{
-     router.push(`/dashboard/user/all-users/${id}/monthly-details`)
-        
-  }
+  // Check if any field is being edited
+  const isAnyEditing = Object.values(editState).some(Boolean);
+
+  const handleEdit = (field) => {
+    setEditState((prev) => ({ ...prev, [field]: true }));
+  };
+  const handleInputChange = (field, value) => {
+    setInputState((prev) => ({ ...prev, [field]: value }));
+  };
+  const handleSave = () => {
+    // Here you would call an API or update parent state
+    setEditState({
+      user_name: false,
+      id: false,
+      phone_no: false,
+      city: false,
+      trade: false,
+      role: false,
+      work: false,
+    });
+  };
+
+  const handleView = () => {
+    router.push(`/dashboard/user/all-users/${id}/monthly-details`);
+  };
+
   return (
-    <div className=' border border-[#E9E9EA] p-6 rounded-[12px] mt-8'>
-        {/* {user.id} {user.role} */}
-        <div className=' flex  gap-8'>
-        <div className=' flex-1 p-6 border border-[#E9E9EA] rounded-[8px]'>
-          <h2 className=' text-2xl text-[#111827] font-medium'>Basic Details</h2>
-          <div className=' mt-6 space-y-6'>
-            <div className=' p-4 border border-[#11B0C1] bg-[#E6F6F4] rounded-[12px]'>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>User Created</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>26 Feb, 2026</p>
-            </div>
-            <div className=' border-b pb-2 flex justify-between items-end'>
+    <div className="border border-[#E9E9EA] p-6 rounded-[12px] mt-6 ">
+      <div className="flex gap-8">
+        <div className="flex-[70%] p-6 border border-[#E9E9EA] rounded-[8px]">
+          <div className="p-4 border border-[#11B0C1] bg-[#E6F6F4] rounded-[12px]">
+            <h3 className="text-lg text-[#1D1F2C] font-semibold">User Created</h3>
+            <p className="text-base text-[#777980] mt-1.5">26 Feb, 2026</p>
+          </div>
+          <h2 className="text-2xl text-[#111827] font-medium mt-6">Basic Details</h2>
+          <div className="mt-6 space-y-6">
+            {/* User Name */}
+            <div className="border-b pb-2 flex justify-between items-end">
               <div>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>User Name</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>{user_name}</p>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">User Name</h3>
+                {editState.user_name ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.user_name}
+                    onChange={e => handleInputChange('user_name', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.user_name}</p>
+                )}
               </div>
-              <button className=' text-base text-[#777980] cursor-pointer'>Edit</button>
-
+              {!editState.user_name && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('user_name')}>Edit</button>
+              )}
             </div>
-            <div className=' border-b pb-2 flex justify-between items-end'>
+            {/* User ID */}
+            <div className="border-b pb-2 flex justify-between items-end">
               <div>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>User ID</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>{id}</p>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">User ID</h3>
+                {editState.id ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.id}
+                    onChange={e => handleInputChange('id', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.id}</p>
+                )}
               </div>
-              <button className=' text-base text-[#777980] cursor-pointer'>Edit</button>
-
+              {!editState.id && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('id')}>Edit</button>
+              )}
             </div>
-            <div className=' border-b pb-2 flex justify-between items-end'>
+            {/* Phone No. */}
+            <div className="border-b pb-2 flex justify-between items-end">
               <div>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>Phone No.</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>{phone_no}</p>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">Phone No.</h3>
+                {editState.phone_no ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.phone_no}
+                    onChange={e => handleInputChange('phone_no', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.phone_no}</p>
+                )}
               </div>
-              <button className=' text-base text-[#777980] cursor-pointer'>Edit</button>
-
+              {!editState.phone_no && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('phone_no')}>Edit</button>
+              )}
             </div>
-            <div className=' border-b pb-2 flex justify-between items-end'>
+            {/* City */}
+            <div className="border-b pb-2 flex justify-between items-end">
               <div>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>City</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>{city}</p>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">City</h3>
+                {editState.city ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.city}
+                    onChange={e => handleInputChange('city', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.city}</p>
+                )}
               </div>
-              <button className=' text-base text-[#777980] cursor-pointer'>Edit</button>
-
+              {!editState.city && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('city')}>Edit</button>
+              )}
             </div>
-            <div className=' border-b pb-2 flex justify-between items-end'>
+            {/* Trade */}
+            <div className="border-b pb-2 flex justify-between items-end">
               <div>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>Trade</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>Plumbing</p>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">Trade</h3>
+                {editState.trade ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.trade}
+                    onChange={e => handleInputChange('trade', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.trade}</p>
+                )}
               </div>
-              <button className=' text-base text-[#777980] cursor-pointer'>Edit</button>
-
+              {!editState.trade && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('trade')}>Edit</button>
+              )}
             </div>
-            <div className=' border-b pb-2 flex justify-between items-end'>
+            {/* Role */}
+            <div className="border-b pb-2 flex justify-between items-end">
               <div>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>Role</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>{role}</p>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">Role</h3>
+                {editState.role ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.role}
+                    onChange={e => handleInputChange('role', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.role}</p>
+                )}
               </div>
-              <button className=' text-base text-[#777980] cursor-pointer'>Edit</button>
-
+              {!editState.role && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('role')}>Edit</button>
+              )}
             </div>
-            <div className='   flex justify-between items-end'>
+            {/* Work at Company */}
+            <div className="flex justify-between items-end">
               <div>
-              <h3 className=' text-lg text-[#1D1F2C] font-semibold'>Work at Company</h3>
-              <p className=' text-base text-[#777980] mt-1.5'>LMS</p>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">Work at Company</h3>
+                {editState.work ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.work}
+                    onChange={e => handleInputChange('work', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.work}</p>
+                )}
               </div>
-              <button className=' text-base text-[#777980] cursor-pointer'>Edit</button>
-
+              {!editState.work && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('work')}>Edit</button>
+              )}
+            </div>
+            {/* Save Changes Button */}
+            <div className="pt-8">
+              <button
+                className={`bg-[#0b7680] w-full text-white py-4 rounded-[8px] cursor-pointer transition-opacity ${isAnyEditing ? 'opacity-100' : 'opacity-60 cursor-not-allowed'}`}
+                disabled={!isAnyEditing}
+                onClick={handleSave}
+                type="button"
+              >
+                Save Changes
+              </button>
             </div>
           </div>
         </div>
-        <div className=' flex-1'>
-        <div className='  p-6 border border-[#E9E9EA] rounded-[8px]'>
+        <div className=' flex-[30%]'>
+        {/* <div className='  p-6 border border-[#E9E9EA] rounded-[8px]'>
            <h2 className=' text-2xl text-[#111827] font-medium'>Set Fee Rate</h2>
            <form action="" className=' space-y-6 mt-6'>
             <div className=' flex flex-col gap-1.5 '>
@@ -110,9 +231,9 @@ export default function UserDetails({user}:UserDetailsProps) {
             </div>
             <button className=' bg-[#0b7680] py-4 w-full rounded-[8px] text-white text-base cursor-pointer'>Set New Fee</button>
            </form>
-        </div>
+        </div> */}
 
-        <div className='  p-6 border border-[#E9E9EA] rounded-[8px] mt-3'>
+        <div className='p-6 border border-[#E9E9EA] rounded-[8px]'>
               <h2 className=' text-2xl text-[#111827] font-medium'>Other Details</h2>
               <div className=' mt-8 space-y-6'>
                 <div>

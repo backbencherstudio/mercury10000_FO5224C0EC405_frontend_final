@@ -28,6 +28,11 @@ const UserNav = ({ className = "" }: UserNavProps) => {
       href: "/dashboard/user/create-trade",
       
     },
+    {
+      label: "Create Secretary/Admin",
+      href: "/dashboard/user/create-secretary",
+      
+    },
   ];
 
 const isItemActive = (href: string): boolean => {

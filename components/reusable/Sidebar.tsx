@@ -1,7 +1,7 @@
 "use client";
 
 import { CookieHelper } from "@/helper/cookie.helper";
-import { ConnectionIcon, ConnectionSecondaryIcon, HomeIcon, LeadIcon, LeadSecondaryIcon, RewardIcon, RewardSecondaryIcon, SecondaryHome, SettingsIcon, SettingsSecondaryIcon, SupportIcon, SupportSecondaryIcon, User, UserSecondary } from "@/components/icons/sidebar/SidebarIcons";
+import { ConnectionIcon, ConnectionSecondaryIcon, HomeIcon, LeadHistoryIcon, LeadHistorySecondaryIcon, LeadIcon, LeadSecondaryIcon, RewardIcon, RewardSecondaryIcon, SecondaryHome, SettingsIcon, SettingsSecondaryIcon, SupportIcon, SupportSecondaryIcon, User, UserSecondary } from "@/components/icons/sidebar/SidebarIcons";
 import {
   DotIcon,
   LayoutDashboardIcon,
@@ -48,6 +48,13 @@ const navItems: NavItem[] = [
     secondaryIcon: LeadSecondaryIcon,
     label: "Lead",
     href: "/dashboard/lead",
+    type: "admin",
+  },
+  {
+    icon: LeadHistoryIcon,
+    secondaryIcon: LeadHistorySecondaryIcon,
+    label: "Lead History",
+    href: "/dashboard/lead-history",
     type: "admin",
   },
   {

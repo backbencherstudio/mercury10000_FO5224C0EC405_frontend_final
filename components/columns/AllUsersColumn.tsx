@@ -104,11 +104,27 @@ export function AllUsersColumn({
             ),
         },
         {
+            label: "Password",
+            accessor: "password",
+            width: "140px",
+            formatter: (value: string) => (
+                <span className="text-sm text-[#06030C]">{value}</span>
+            ),
+        },
+        {
             label: "Phone No.",
             accessor: "phone_no",
             width: "170px",
             formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>
+            ),
+        },
+        {
+            label: "Trade",
+            accessor: "trade",
+            width: "170px",
+            formatter: (value: string[]) => (
+                <span className="text-sm text-[#06030C]">{value.join(', ')}</span>
             ),
         },
         {

@@ -119,3 +119,21 @@ export const SettingsSecondaryIcon = (props: SVGProps<SVGSVGElement>) => {
 }
 
 
+export const LeadHistoryIcon = (props: SVGProps<SVGSVGElement>) => {
+    return(
+       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" {...props}>
+  <path d="M20 7L12 11L4 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M18.6246 4.66762L13.6246 2.35827C12.5903 1.88058 11.4097 1.88058 10.3754 2.35827L5.37545 4.66762C3.93093 5.33479 3 6.82344 3 8.46617V15.5338C3 17.1766 3.93094 18.6652 5.37545 19.3324L10.3754 21.6417C11.4097 22.1194 12.5903 22.1194 13.6246 21.6417L18.6246 19.3324C20.0691 18.6652 21 17.1766 21 15.5338V8.46617C21 6.82344 20.0691 5.33479 18.6246 4.66762Z" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M12 11V22" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>
+    )
+}
+
+export const LeadHistorySecondaryIcon = (props: SVGProps<SVGSVGElement>) => {
+    return(
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20" fill="none" {...props}>
+  <path fill-rule="evenodd" clip-rule="evenodd" d="M8.25 9.46276V19.9237C7.9517 19.8645 7.65744 19.7719 7.375 19.6415L2.375 17.3319C0.930878 16.6647 0.00013277 15.1765 0 13.5341V6.46569C2.93074e-05 6.10201 0.0480104 5.74648 0.134766 5.40515L8.25 9.46276ZM17.8643 5.40515C17.9511 5.74655 18 6.10193 18 6.46569V13.5341C17.9999 15.1765 17.0691 16.6647 15.625 17.3319L10.625 19.6415C10.3426 19.7719 10.0483 19.8645 9.75 19.9237V9.46276L17.8643 5.40515ZM7.375 0.35827C8.40926 -0.119423 9.59074 -0.119423 10.625 0.35827L15.625 2.66784C16.2865 2.97349 16.8382 3.45281 17.2441 4.03893L9 8.16101L0.754883 4.03893C1.16086 3.45261 1.71331 2.97357 2.375 2.66784L7.375 0.35827Z" fill="white"/>
+</svg>
+    )
+}
+

@@ -9,31 +9,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import TagCrossIcon from '@/components/icons/admin/TagCrossIcon';
  
 
 interface FormData {
-  user_name: string;
-  phone: string;
-  password: string;
-  work: string;
-  country: string;
-  city: string;
-  role: string;
-  trade: string;
+    user_name: string;
+    phone: string;
+    password: string;
+    work: string;
+    country: string;
+    city: string;
+    role: string;
+    trades: string[];
 }
 
-export default function UserHome() {
 
-  const [formData, setFormData] = useState<FormData>({
-    user_name: 'Corny Bias',
-    phone: '+32 1232143',
-    password: 'Corny Bias',
-    work: 'N/A',
-    country: '',
-    city: '',
-    role: '',
-    trade: ''
-  });
+export default function UserHome() {
+    const [formData, setFormData] = useState<FormData>({
+        user_name: 'Corny Bias',
+        phone: '+32 1232143',
+        password: 'Corny Bias',
+        work: 'N/A',
+        country: '',
+        city: '',
+        role: '',
+        trades: [],
+    });
 
   const handleInputChange =(e: React.ChangeEvent<HTMLInputElement>)=>{
     const { id,value }=e.target
@@ -43,12 +44,32 @@ export default function UserHome() {
      }))
   }
 
-  const handleSelectChange =(field: keyof FormData , value:string)=>{
-         setFormData((prev)=>({
+
+    // For single-value selects (country, city, role)
+    const handleSelectChange = (field: keyof FormData, value: string) => {
+        setFormData((prev) => ({
             ...prev,
-            [field]:value
-         }))
-  }
+            [field]: value,
+        }));
+    };
+
+    // For multi-select trades
+    const handleTradeSelect = (value: string) => {
+        setFormData((prev) => {
+            if (prev.trades.includes(value)) return prev; // Prevent duplicates
+            return {
+                ...prev,
+                trades: [...prev.trades, value],
+            };
+        });
+    };
+
+    const handleRemoveTrade = (value: string) => {
+        setFormData((prev) => ({
+            ...prev,
+            trades: prev.trades.filter((trade) => trade !== value),
+        }));
+    };
 
   const handleSubmit =(e:React.FormEvent)=>{
     e.preventDefault();
@@ -57,7 +78,9 @@ export default function UserHome() {
 
 
   return (
-    <div className=' mt-8 border border-[#D2D2D5] rounded-[8px] p-6'>
+    <div className=' flex   gap-6  mt-8'>
+
+    <div className=' border border-[#E9E9EA] rounded-[8px] p-6 flex-3/4'>
         <h2 className=' text-2xl  text-[#111827] font-medium'>Create a User </h2>
         <form action="" className=' mt-6 space-y-6' onSubmit={handleSubmit}>
             <div className=' flex flex-col gap-1.5'>
@@ -76,6 +99,40 @@ export default function UserHome() {
                 <label htmlFor="work">Work at Company</label>
                 <input type="text" name="" id="work" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.work} onChange={handleInputChange} />
             </div>
+                        <div className='flex flex-col gap-1.5'>
+                            <label htmlFor="trade">Trade</label>
+                            <Select onValueChange={handleTradeSelect}>
+                                <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
+                                    <SelectValue placeholder="Select a trade" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectGroup>
+                                        <SelectItem value="na">N/A</SelectItem>
+                                        <SelectItem value="plumbing">Plumbing</SelectItem>
+                                        <SelectItem value="painting">Painting</SelectItem>
+                                    </SelectGroup>
+                                </SelectContent>
+                            </Select>
+                            {/* Show selected trades as tags */}
+                            <div className="flex flex-wrap gap-2 mt-2">
+                                {formData.trades.map((trade) => (
+                                    <span
+                                        key={trade}
+                                        className="flex items-center bg-[#e0f7fa] text-[#161721] text-base font-medium px-3.5 py-2.5 rounded-full border border-[#D2D2D5]  "
+                                    >
+                                        {trade === 'na' ? 'N/A' : trade.charAt(0).toUpperCase() + trade.slice(1)}
+                                        <button
+                                            type="button"
+                                            onClick={() => handleRemoveTrade(trade)}
+                                            className="ml-2.5  cursor-pointer"
+                                            aria-label={`Remove ${trade}`}
+                                        >
+                                           <TagCrossIcon />
+                                        </button>
+                                    </span>
+                                ))}
+                            </div>
+                        </div>
             <div className=' flex items-center gap-6'>
                 <div className='flex-1 '>
                     <label htmlFor="country">Country</label>
@@ -114,43 +171,26 @@ export default function UserHome() {
                       </Select>
                 </div>
             </div>
-            <div className=' flex items-center gap-6'>
-                <div className=' flex-1'>
-                    <label htmlFor="role">Role</label>
-                     <Select onValueChange={(value)=>handleSelectChange('role',value)} value={formData.role}>
-                          <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
-                              <SelectValue placeholder="Select a role" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
-                          </SelectTrigger>
-                          <SelectContent >
-                              <SelectGroup >
-                                  {/* <SelectLabel>Fruits</SelectLabel> */}
-                                  <SelectItem value="support">Support</SelectItem>
-                                  <SelectItem value="user">User</SelectItem>
-                                   
-                              </SelectGroup>
-                          </SelectContent>
-                      </Select>
-                </div>
-                <div className=' flex-1'>
-                    <label htmlFor="trade">Trade</label>
-                     <Select onValueChange={(value)=>handleSelectChange('trade',value)} value={formData.trade}>
-                          <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
-                              <SelectValue placeholder="Select a trade" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
-                          </SelectTrigger>
-                          <SelectContent >
-                              <SelectGroup >
-                                  {/* <SelectLabel>Fruits</SelectLabel> */}
-                                  <SelectItem value="na">N/A</SelectItem>
-                                  <SelectItem value="plumbing">Plumbing</SelectItem>
-                                  <SelectItem value="painting">Painting</SelectItem>
-                                   
-                              </SelectGroup>
-                          </SelectContent>
-                      </Select>
-                </div>
-            </div>
+             
             <button className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Create User</button>
         </form>
+    </div>
+    <div className='flex-1/4 border border-[#E9E9EA] rounded-[8px] p-6 h-auto self-start'>
+        <h2 className=' text-2xl  text-[#111827] font-medium'>Set Fee Rate </h2>
+
+<form action="" className=' mt-6 space-y-6'>
+         <div className=' flex flex-col gap-1.5'>
+                <label htmlFor="leads_fee">Qualified Leads Fee</label>
+                <input type="text" name="" id="leads_fee" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium' placeholder='100$'  />
+            </div>
+         <div className=' flex flex-col gap-1.5'>
+                <label htmlFor="conversion_fee">Conversion Fee</label>
+                <input type="text" name="" id="conversion_fee" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium' placeholder='1,500$'  />
+            </div>
+            <button className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Set Fee</button>
+
+</form>
+    </div>
     </div>
   )
 }
