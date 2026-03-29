@@ -88,6 +88,12 @@ export default function Login() {
             <button type="submit" className=' py-3  bg-[#0e93a1] rounded-[8px] w-full block   text-white mt-5 cursor-pointer hover:bg-[#0e93a1]/90 transition ease-in-out duration-200   text-center'>Login</button>
             {error && <div className="text-red-600 text-center mt-2">{error}</div>}
           </form>
+          {/* Temporary credentials for demo */}
+          <div className="mt-6 mb-2 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-[#555]">
+            <div className="font-semibold mb-1 text-[#b58900]">Temporary Login Credentials</div>
+            <div><span className="font-medium">Admin Email:</span> admin@school.com <span className="ml-2 font-medium">Password:</span> admin123</div>
+            <div><span className="font-medium">Secretary Email:</span> secretary@school.com <span className="ml-2 font-medium">Password:</span> secretary123</div>
+          </div>
           <div className={`flex items-center justify-center w-full my-5`}>
             <div className="flex-1 h-[1px] bg-[#e9e9ea]"></div>
             <span className="px-2.5 text-sm lg:text-base text-[#777980]">Or</span>
