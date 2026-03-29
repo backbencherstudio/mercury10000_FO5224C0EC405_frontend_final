@@ -3,12 +3,7 @@
 
 import React from "react";
 import Dot3Icon from "@/components/icons/admin/Dot3Icon";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import CustomDropdown from "@/components/custom-dropdown/CustomDropdown";
 import { MdOutlineEdit } from "react-icons/md";
 import TopRightArrow from "@/components/icons/admin/TopRightArrow";
  
@@ -37,44 +32,29 @@ interface DashboardUserColumnProps {
 
 interface ActionDropdownProps {
   row: any;
-  onViewLead?: (row: any) => void;
-  onDecline?: (row: any) => void;
-  onApprove?: (row: any) => void;
   onLeadProcess?: (row: any) => void;
   onNotLead?: (row: any) => void;
 }
 
-const ActionDropdown: React.FC<ActionDropdownProps> = ({ 
-  row, 
-  onLeadProcess,
-  onNotLead,
-}) => {
+const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onLeadProcess, onNotLead }) => {
   return (
-    <div className="flex justify-center w-full">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="cursor-pointer hover:bg-[#e9e9ea] px-3 py-1.5 rounded-full focus:outline-none">
-            <Dot3Icon />
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none space-y-3">
-          <DropdownMenuItem 
-            onClick={() => onLeadProcess?.(row)}
-            className="cursor-pointer text-white" 
-            style={{ background: '#0e93a1' }}
-          >
-            Lead in Process
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => onNotLead?.(row)}
-            className="cursor-pointer text-white" 
-            style={{ background: '#ff0000' }}
-          >
-            Not a Lead
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <CustomDropdown
+      items={[
+        {
+          label: 'Lead in Process',
+          onClick: () => onLeadProcess?.(row),
+          className: 'bg-[#0e93a1] text-white   focus:bg-[#0e93a1]/90',
+        },
+        {
+          label: 'Not a Lead',
+          onClick: () => onNotLead?.(row),
+          className: 'bg-[#ff0000] text-white   focus:bg-[#ff0000]/90',
+        },
+      ]}
+      containerClassName="flex justify-center w-full"
+      menuClassName="space-y-1"
+      trigger={<button className="cursor-pointer hover:bg-[#e9e9ea] p-1 rounded-full focus:outline-none"><Dot3Icon /></button>}
+    />
   );
 };
  
@@ -236,9 +216,6 @@ export function DashboardUserColumn({
       formatter: (_: any, row: any) => (
         <ActionDropdown
           row={row}
-          onViewLead={onViewLead}
-          onDecline={onDecline}
-          onApprove={onApprove}
           onLeadProcess={onLeadProcess}
           onNotLead={onNotLead}
         />

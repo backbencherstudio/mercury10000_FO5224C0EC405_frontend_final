@@ -2,40 +2,52 @@ import { Notebook } from "lucide-react";
 import StatCards from "../../Dashboard/StateCards";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DashboardUserTable from "./DashboardAllLeadsTable";
+import { ChartBarDefault } from "./ChartBarDefault";
 
 function AdminHome() {
-    const statCards = [
-    {
-      title: "Pre Application",
-      value: 195,
-      percentage: "0.1%",
-    },
-    {
-      title: "Application Started",
-      value: 7,
-      percentage: "0.8%",
-    },
-    {
-      title: "Applied",
-      value: 18,
-      percentage: "1.5%",
-    },
-    {
-      title: "Inactive",
-      value: 635,
-      percentage: "72.6%",
-    },
-   
-  ];
+  const statCards = [
+  {
+    title: "Total Users",
+    value: 96,
+    percentage: "100%",
+  },
+  {
+    title: "New Lead Received",
+    value: 2,
+    percentage: "2%",
+  },
+  {
+    title: "User Requests",
+    value: 18,
+    percentage: "18%",
+  },
+  {
+    title: "Gifts Overview",
+    value: 12,
+    percentage: "12%",
+  },
+  {
+    title: "Connection Request",
+    value: 12,
+    percentage: "12%",
+  },
+];
   return (
-    <div className="flex flex-col justify-between ">
+    <div className="  ">
       <div>
-        <div className="flex flex-col md:flex-row items-center justify-between mb-4">
-          <h3 className="text-lg md:text-xl font-semibold text-blackColor">
-            Status Statistics
-          </h3>
-        </div>
+        
         <StatCards statCards={statCards} />
+      </div>
+
+      <div className=" flex items-center">
+      <div  className=" flex-3/4 ">
+      <ChartBarDefault/>
+
+      </div>
+      <div className=" flex-3/12 bg-amber-400">
+        right side content
+      </div>
+
       </div>
 
       {/* Tabs for two tables with only active border bottom */}

@@ -12,7 +12,7 @@ export default function StatCards({
   const isLoading = false;
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
       {isLoading
         ? Array.from({ length: 8 }).map((_, idx) => (
             <div
@@ -27,21 +27,19 @@ export default function StatCards({
         : statCards.map((card, idx) => (
             <div
               key={idx}
-              className="p-4 group rounded-lg bg-bgColor hover:bg-blackColor hover:text-whiteColor  border border-gray2Color hover:shadow-lg transition-all duration-200 cursor-pointer relative"
+              className=" bg-[#f6f8fa] p-4 rounded-[12px]"
             >
               {/* Title */}
-              <p className="text-sm text-secondaryColor group-hover:text-whiteColor transition-all duration-200 font-medium mb-5">
+              <p className=" text-base text-[#64748B] ">
                 {card.title}
               </p>
 
               {/* Large Number with Percentage */}
               <div className="flex items-end justify-between">
-                <div className="text-[20px] font-semibold group-hover:text-whiteColor transition-all duration-200 text-blackColor">
+                <div className="  text-[32px] text-[#1E293B] font-semibold mt-7">
                   {card.value}
                 </div>
-                <span className="text-xs font-medium group-hover:text-[#E5B400] transition-all duration-200  px-2 py-1 rounded">
-                  ({card.percentage})
-                </span>
+                
               </div>
 
             </div>

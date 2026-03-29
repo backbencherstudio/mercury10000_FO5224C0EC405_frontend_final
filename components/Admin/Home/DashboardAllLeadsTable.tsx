@@ -1,7 +1,7 @@
 "use client";
 
 import DynamicTable from "@/components/reusable/DynamicTable";
-import {   SubmittedLeadsData } from "@/public/demoData/SubmittedLeadsData";
+import {  SubmittedLeadsData } from "@/public/demoData/SubmittedLeadsData";
 import { useState } from "react";
  import { DashboardUserColumn } from "@/components/columns/DashboardUserColumn";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";

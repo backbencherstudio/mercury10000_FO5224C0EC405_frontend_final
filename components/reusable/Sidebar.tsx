@@ -1,25 +1,13 @@
 "use client";
 
 import { CookieHelper } from "@/helper/cookie.helper";
-import { ConnectionIcon, ConnectionSecondaryIcon, HomeIcon, LeadHistoryIcon, LeadHistorySecondaryIcon, LeadIcon, LeadSecondaryIcon, RewardIcon, RewardSecondaryIcon, SecondaryHome, SettingsIcon, SettingsSecondaryIcon, SupportIcon, SupportSecondaryIcon, User, UserSecondary } from "@/components/icons/sidebar/SidebarIcons";
-import {
-  DotIcon,
-  LayoutDashboardIcon,
-  LogOutIcon,
-  Settings,
-  UserIcon,
-} from "lucide-react";
+import { LogOutIcon } from "lucide-react";
+import { getMenuItemsByRole, UserRole } from "@/config/menuItems";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
 
-interface NavItem {
-  icon: any;
-  secondaryIcon: any;
-  label: string;
-  href: string;
-  type?: "client" | "admin" | "candidate";
-}
+
 
 interface SidebarProps {
   isOpen: boolean;
@@ -28,64 +16,7 @@ interface SidebarProps {
   onToggleCollapse?: () => void;
 }
 
-const navItems: NavItem[] = [
-  {
-    icon: HomeIcon,
-    secondaryIcon: SecondaryHome,
-    label: "Dashboard",
-    href: "/dashboard",
-    type: "admin",
-  },
-  {
-    icon: User,
-    secondaryIcon: UserSecondary,
-    label: "User",
-    href: "/dashboard/user",
-    type: "admin",
-  },
-  {
-    icon: LeadIcon,
-    secondaryIcon: LeadSecondaryIcon,
-    label: "Lead",
-    href: "/dashboard/lead",
-    type: "admin",
-  },
-  {
-    icon: LeadHistoryIcon,
-    secondaryIcon: LeadHistorySecondaryIcon,
-    label: "Lead History",
-    href: "/dashboard/lead-history",
-    type: "admin",
-  },
-  {
-    icon: ConnectionIcon,
-    secondaryIcon: ConnectionSecondaryIcon,
-    label: "Connection",
-    href: "/dashboard/connection",
-    type: "admin",
-  },
-  {
-    icon: RewardIcon,
-    secondaryIcon: RewardSecondaryIcon,
-    label: "Reward",
-    href: "/dashboard/reward",
-    type: "admin",
-  },
-  {
-    icon: SupportIcon,
-    secondaryIcon: SupportSecondaryIcon,
-    label: "Support",
-    href: "/dashboard/support",
-    type: "admin",
-  },
-  {
-    icon: SettingsIcon,
-    secondaryIcon: SettingsSecondaryIcon,
-    label: "Settings",
-    href: "/dashboard/settings",
-    type: "admin",
-  },
-];
+
 
 const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const pathname = usePathname();
@@ -94,21 +25,43 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   const isActive = (href: string): boolean => {
+    // For secretary role, only match exact path
+    if (role === 'secretary') {
+      return pathname === href;
+    }
+    // For admin, keep previous logic
     if (href === "/dashboard") {
       return pathname === "/dashboard";
     }
     if (pathname === href) {
       return true;
     }
-
-
     return pathname.startsWith(href + "/");
   };
 
   const handleLogout = () => {
     CookieHelper.destroy({ key: "accessToken" });
-    router.push("/login");
+    router.push("/log-in");
   };
+
+  // Get role from cookies or default to 'admin'
+  const [role, setRole] = React.useState<UserRole>('admin');
+  const [menuItems, setMenuItems] = React.useState<any[]>([]);
+
+  React.useEffect(() => {
+    let userRole: UserRole = 'admin';
+    if (typeof window !== 'undefined') {
+      const cookies = document.cookie.split(';').map(c => c.trim());
+      const userRoleCookie = cookies.find(c => c.startsWith('userRole='));
+      if (userRoleCookie) {
+        const value = userRoleCookie.split('=')[1];
+        if (value === 'admin' || value === 'secretary') userRole = value as UserRole;
+      }
+    }
+    setRole(userRole);
+    setMenuItems(getMenuItemsByRole(userRole));
+  }, []);
+
   return (
     <div className="h-screen  " style={{backgroundColor:'#07454B' }}>
       <div
@@ -122,7 +75,6 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
           w-full
           shadow-[0px_-0.3px_5.5px_0px_rgba(0,0,0,0.02)]
           p-3 lg:p-4 overflow-y-auto transition-all duration-300
-         
         `}
       >
         {/* Header with Logo and Toggle */}
@@ -140,7 +92,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         {/* Navigation Section */}
         <div className="flex-1 mt-12">
           <div className="space-y-2 ">
-            {navItems.map((item, idx) => {
+            {menuItems.map((item, idx) => {
               const active = isActive(item.href);
               return (
                 <Link
@@ -151,27 +103,17 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
                     flex items-center group gap-3 px-3 py-2.5 lg:py-3 rounded-lg 
                     hover:text-whiteColor hover:bg-navActive text-blackColor transition-all duration-200 
                     ${active ? "bg-navActive opacity-100 text-whiteColor" : ""}
-                   
                   `}
-                  title={isCollapsed ? item.label : ""}
+                  title={isCollapsed ? item.name : ""}
                 >
                   <div className="flex gap-2 items-center">
                     <div className="w-[30px] h-[30px] group  flex justify-center items-center flex-shrink-0 text-xl font-medium text-white">
-                      {
-                        active ? <item.secondaryIcon />
-                          :
-
-                          <item.icon
-                          // className={`  group-hover:opacity-100 transition-opacity duration-200 ${
-                          //   active ? "opacity-100" : ""
-                          // }`}
-                          />
-                      }
+                      {active ? <item.secondaryIcon /> : <item.icon />}
                     </div>
                     <span
                       className={`text-base font-medium text-white group-hover:text-white transition-colors duration-200 whitespace-nowrap `}
                     >
-                      {item.label}
+                      {item.name}
                     </span>
                   </div>
                 </Link>
