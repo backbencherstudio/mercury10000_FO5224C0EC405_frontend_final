@@ -85,7 +85,7 @@ function PaginationPage({
                 Records
               </div>
 
-              <div className="flex items-center gap-2">
+              {/* <div className="flex items-center gap-2">
                 <label className="text-sm text-[#4a4c56]">Show</label>
                 <Select
                   value={String(itemsPerPage)}
@@ -104,7 +104,7 @@ function PaginationPage({
                     ))}
                   </SelectContent>
                 </Select>
-              </div>
+              </div> */}
             </div>
             <div className="flex items-center gap-1">
               <button

@@ -2,7 +2,7 @@
 
 import { Menu, X } from "lucide-react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { MdNotifications } from "react-icons/md";
@@ -30,9 +30,27 @@ const Header: React.FC<HeaderProps> = ({
   const [popoverOpen, setPopoverOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Dynamic title logic using routeToTitle mapping (user's preferred system)
+  const routeToTitle: { [key: string]: string } = {
+    "/dashboard": "Home",
+    "/dashboard/user": "User Management",
+    '/dashboard/lead':"Lead ",
+    "/dashboard/lead-history": "Lead History",
+    "/dashboard/connection": "Connection",
+    "/dashboard/reward": "Rewards Management",
+    "/dashboard/support": "Support",
+    "/dashboard/settings": "Setting and Notification",
+    "/secretary-dashboard": "Home",
+    "/secretary-dashboard/lead-history":'All Management'
+  };
+  // Dynamically change the title based on the base route
+  const safePathname = pathname ?? "";
+  const headerTitle: string = routeToTitle[safePathname] || "Dashboard"; // Default to "Dashboard"
 
   return (
-    <nav className=" text-blackColor border-b bg-bgColor border-borderColor  py-3">
+    <nav className=" text-blackColor border-b  border-borderColor  py-6">
       <div className=" px-3  md:px-6   relative flex justify-between w-full mb-1 z-50">
         {/* Mobile menu button */}
         <div>
@@ -52,8 +70,8 @@ const Header: React.FC<HeaderProps> = ({
 
         {/* Notification and Profile Group */}
         <div className="flex items-center gap-2 lg:gap-6 justify-end w-full">
-          <div className=" hidden md:block w-full ">
-            <Search />
+          <div className="flex-1">
+            <h2 className="text-[32px] font-medium text-[#070707] truncate">{headerTitle}</h2>
           </div>
           <div className="flex items-center gap-2 lg:gap-5 justify-between">
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
@@ -143,9 +161,7 @@ const Header: React.FC<HeaderProps> = ({
           </div>
         </div>
       </div>
-      <div className=" md:hidden px-4">
-        <Search />
-      </div>
+      {/* Removed mobile search field */}
     </nav>
   );
 };
