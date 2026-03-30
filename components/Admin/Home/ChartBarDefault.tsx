@@ -12,6 +12,15 @@ import {
   ChartTooltipContent,
   type ChartConfig,
 } from "@/components/ui/chart"
+import FilterIcon from "@/components/icons/admin/FilterIcon"
+import { useState } from "react"
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectItem,
+  SelectValue,
+} from "@/components/ui/select"
 
 export const description = "A bar chart"
 
@@ -37,10 +46,32 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ChartBarDefault() {
+  const [selectedYear, setSelectedYear] = useState("");
   return (
-    <Card className="border-none shadow-none p-0">
+    <Card className="border border-[#E9E9EA] shadow-none py-6">
       <CardContent>
-        <ChartContainer config={chartConfig} className="h-[350px] w-full">
+        <div className="mb-2 flex items-center justify-between">
+          <h3 className="text-base text-[#161721] font-medium">Lead Submission Activity</h3>
+          <div className="flex items-center gap-2">
+            <button className="flex items-center gap-2 p-2.5 text-sm text-[#344054] font-medium">
+              <FilterIcon />
+              Filter
+            </button>
+            <div style={{ minWidth: 120 }}>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-[127px]" style={{ backgroundColor: '#eceff3' }}>
+                  <SelectValue placeholder="Select Year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="lastYear">Last Year</SelectItem>
+                  <SelectItem value="2024">2024</SelectItem>
+                  <SelectItem value="2023">2023</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+        <ChartContainer config={chartConfig} className="h-[408px] w-full -ml-7">
           <BarChart accessibilityLayer data={chartData} barCategoryGap={-5}>
             <CartesianGrid vertical={false} />
             <XAxis

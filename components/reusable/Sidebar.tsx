@@ -36,7 +36,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     if (pathname === href) {
       return true;
     }
-    return pathname.startsWith(href + "/");
+    return pathname?.startsWith(href + "/") || false;
   };
 
   const handleLogout = () => {

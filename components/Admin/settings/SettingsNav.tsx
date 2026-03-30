@@ -35,7 +35,7 @@ export default function SettingsNav() {
       return true;
     }
     
-    if (href !== "/dashboard/settings" && pathname.startsWith(href + "/")) {
+    if (href !== "/dashboard/settings" && pathname?.startsWith(href + "/")) {
       return true;
     }
     

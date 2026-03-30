@@ -81,6 +81,7 @@ export default function Search() {
   };
 
   const handleSearch = () => {
+    if (!searchParams) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("product", search);
 
@@ -90,6 +91,7 @@ export default function Search() {
     setSearch("");
   };
   const handleProductNameSearch = (path: string, name: string) => {
+    if (!searchParams) return;
     const params = new URLSearchParams(searchParams.toString());
     params.set("product", name);
     router.push(`/category/${path}?${params.toString()}`);

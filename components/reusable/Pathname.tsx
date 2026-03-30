@@ -3,7 +3,7 @@ import { ChevronRight, Link } from "lucide-react";
 import { usePathname } from "next/navigation";
 function Pathname() {
     const pathname = usePathname();
-  const sPath = pathname.split("/").filter(Boolean);
+    const sPath = pathname ? pathname.split("/").filter(Boolean) : [];
   return (
     <div>
       <div className="flex flex-wrap mt-8 lg:mt-15 items-center gap-2 text-base text-gray-600">

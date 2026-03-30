@@ -6,6 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { MoveLeft, MoveRight } from "lucide-react";
 
 interface PaginationPageProps {
   totalPages: number;
@@ -78,41 +79,10 @@ function PaginationPage({
         {/* Pagination */}
         {totalPages > 0 && (
           <div className="flex items-center w-full justify-between mt-6 gap-2">
-            <div className="flex items-center gap-1">
-              <button
-                onClick={() => onPageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className="px-2 cursor-pointer py-1.5 flex justify-center  items-center border border-border text-blackColor rounded disabled:opacity-40 disabled:text-borderColor disabled:border-borderColor"
-              >
-                <MdArrowBackIosNew size={15} />
-              </button>
-              {getPagination().map((page, i) => (
-                <button
-                  key={i}
-                  onClick={() => typeof page === "number" && onPageChange(page)}
-                  disabled={page === "..."}
-                  className={`px-2 py-[3px] rounded cursor-pointer h-full text-sm ${
-                    page === currentPage
-                      ? "text-blackColor bg-grayColor1 border border-border h-full  font-medium"
-                      : "text-blackColor "
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
-              <button
-                onClick={() => onPageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className="cursor-pointer px-2 py-1.5 flex justify-center  items-center border border-border text-blackColor rounded disabled:opacity-40 disabled:text-borderColor disabled:border-borderColor"
-              >
-                <MdArrowForwardIos size={15} />
-              </button>
-            </div>
-
             <div className="flex items-center gap-4">
-              <div className="text-sm text-[#4a4c56]">
-                Showing {startIndex} to {endIndex} of {effectiveTotalItems}{" "}
-                entries
+              <div className="text-base text-[#7B7B7B]">
+                Showing {startIndex} to {endIndex} out of {effectiveTotalItems}{" "}
+                Records
               </div>
 
               <div className="flex items-center gap-2">
@@ -136,6 +106,39 @@ function PaginationPage({
                 </Select>
               </div>
             </div>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={() => onPageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className="  cursor-pointer p-2 flex justify-center  items-center border border-border text-blackColor rounded-full disabled:opacity-40 disabled:text-borderColor disabled:border-borderColor"
+              >
+                <MoveLeft  />
+              </button>
+              {getPagination().map((page, i) => (
+                <button
+                  key={i}
+                  onClick={() => typeof page === "number" && onPageChange(page)}
+                  disabled={page === "..."}
+                  className={`px-4 py-2.5 rounded-full cursor-pointer h-full text-sm  ${
+                    page === currentPage
+                      ? "text-[#06030C]   border border-border h-full  font-semibold"
+                      : "text-[#A1A1A1] "
+                  }`}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => onPageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className="cursor-pointer  p-2 flex justify-center  items-center border border-border text-blackColor rounded-full disabled:opacity-40 disabled:text-borderColor disabled:border-borderColor"
+              >
+                {/* <MdArrowForwardIos size={15} />  */}
+                 <MoveRight />
+              </button>
+            </div>
+
+            
           </div>
         )}
       </div>

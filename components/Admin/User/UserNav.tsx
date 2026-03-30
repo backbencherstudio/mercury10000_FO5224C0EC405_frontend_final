@@ -43,7 +43,7 @@ const isItemActive = (href: string): boolean => {
   
   // For child routes, only match if it's a direct child with additional segments
   // But we DON'T want this for "/dashboard/user" as it should only match exact
-  if (href !== "/dashboard/user" && pathname.startsWith(href + "/")) {
+  if (href !== "/dashboard/user" && pathname?.startsWith(href + "/")) {
     return true;
   }
   

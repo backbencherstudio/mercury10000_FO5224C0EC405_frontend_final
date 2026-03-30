@@ -1,8 +1,10 @@
 import { Notebook } from "lucide-react";
-import StatCards from "../../Dashboard/StateCards";
+ 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import DashboardUserTable from "./DashboardAllLeadsTable";
 import { ChartBarDefault } from "./ChartBarDefault";
+import StatCards from "./StateCards";
+import UpcomingGift from "./UpcomingGift";
 
 function AdminHome() {
   const statCards = [
@@ -39,13 +41,13 @@ function AdminHome() {
         <StatCards statCards={statCards} />
       </div>
 
-      <div className=" flex items-center">
+      <div className=" flex items-center mt-5 gap-6">
       <div  className=" flex-3/4 ">
       <ChartBarDefault/>
 
       </div>
-      <div className=" flex-3/12 bg-amber-400">
-        right side content
+      <div className=" flex-3/12  ">
+        <UpcomingGift/>
       </div>
 
       </div>

@@ -104,7 +104,23 @@ export default function RewardHome() {
   })
 
   return (
-    <div className='mt-8'>
+
+    <div>
+       <div className=' p-2.5 border-b border-[#11BECF] inline-block mb-8'>
+        <h3 className=' text-lg text-[#0E93A1] font-medium'>All Rewards</h3>
+       </div>
+
+    <div >
+
+      <div className=' border border-[#D2D2D5] p-6 mb-4 rounded-[8px]'>
+        <h2 className=' text-2xl text-[#111827] font-medium mb-6'>Create a Gift</h2>
+        <div className=' flex flex-col gap-2.5'>
+          <label htmlFor="gift-name">Gift Name</label>
+          <input type="text" id="gift-name" className='border border-[#D2D2D5] py-2 px-4 rounded-[8px] placeholder:text-base placeholder:text-[#161721]  ' placeholder='Bus Ticket' />
+      
+        </div>
+        <button className=' text-base text-white bg-[#0b7680] py-4 w-full rounded-[8px] mt-6 cursor-pointer'> Create Gift</button>
+      </div>
       <div className='p-6 border rounded-[12px]'>
         {/* Header with title and filters */}
         <div className='flex items-center justify-between mb-4'>
@@ -179,6 +195,8 @@ export default function RewardHome() {
     </Dialog>
     
       </div>
+    </div>
+
     </div>
   )
 }

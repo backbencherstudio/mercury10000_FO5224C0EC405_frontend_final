@@ -113,7 +113,7 @@ export default function DynamicTable({
                             ? col.formatter(
                                 row[col.accessor],
                                 row,
-                                (currentPage - 1) * itemsPerPage + rowIndex
+                                ((currentPage ?? 1) - 1) * (itemsPerPage ?? 10) + rowIndex
                               )
                             : row[col.accessor]}
                         </td>
@@ -194,12 +194,12 @@ export default function DynamicTable({
       <div>
         {showPagination && (
           <PaginationPage
-            totalPages={totalpage}
+            totalPages={totalpage ?? 1}
             dataLength={data?.length || 0}
             totalItems={totalItems}
-            onPageChange={onPageChange}
-            currentPage={currentPage}
-            itemsPerPage={itemsPerPage}
+            onPageChange={onPageChange ?? (() => {})}
+            currentPage={currentPage ?? 1}
+            itemsPerPage={itemsPerPage ?? 10}
             setItemsPerPage={setItemsPerPage}
           />
         )}

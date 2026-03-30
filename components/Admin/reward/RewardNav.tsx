@@ -26,17 +26,16 @@ const RewardNav = ({ className = "" }: UserNavProps) => {
   ];
 
 const isItemActive = (href: string): boolean => {
+  if (!pathname) return false;
   // Exact match
   if (pathname === href) {
     return true;
   }
-  
   // For child routes, only match if it's a direct child with additional segments
   // But we DON'T want this for "/dashboard/user" as it should only match exact
   if (href !== "/dashboard/reward" && pathname.startsWith(href + "/")) {
     return true;
   }
-  
   return false;
 };
 

@@ -31,6 +31,7 @@ const ConnectionNav = ({ className = "" }: ConnectionNavProps) => {
   ];
 
 const isItemActive = (href: string): boolean => {
+  if (!pathname) return false;
   // Only exact match for the first item
   if (href === "/dashboard/connection") {
     return pathname === href;
