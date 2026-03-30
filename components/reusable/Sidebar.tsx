@@ -6,6 +6,7 @@ import { getMenuItemsByRole, UserRole } from "@/config/menuItems";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import React from "react";
+import ExitIcon from "../icons/ExitIcon";
 
 
 
@@ -138,10 +139,10 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             title={isCollapsed ? "Log Out Account" : ""}
           >
             <div className="w-[30px] h-[30px] flex justify-center items-center flex-shrink-0">
-              <LogOutIcon />
+              <   ExitIcon />
             </div>
-            <span className={`text-base font-normal  whitespace-nowrap `}>
-              Log Out Account
+            <span className={`text-base text-white font-normal  whitespace-nowrap `}>
+              Logout
             </span>
           </button>
         </div>
