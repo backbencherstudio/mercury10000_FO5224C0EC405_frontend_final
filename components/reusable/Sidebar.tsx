@@ -25,8 +25,12 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   const [isCollapsed, setIsCollapsed] = React.useState(false);
 
   const isActive = (href: string): boolean => {
-    // For secretary role, only match exact path
+    if (!pathname) return false;
     if (role === 'secretary') {
+      // For secretary, highlight Lead History for any subpage
+      if (href === '/secretary-dashboard/lead-history') {
+        return pathname === '/secretary-dashboard/lead-history' || pathname.startsWith('/secretary-dashboard/lead-history/');
+      }
       return pathname === href;
     }
     // For admin, keep previous logic

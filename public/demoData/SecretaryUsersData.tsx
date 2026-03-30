@@ -1,0 +1,92 @@
+export const secretaryUsersData = [
+    {
+        id: '1236',
+        name: 'John Doe',
+        phone: '+32 2143234',
+        city: 'Granada',
+    },
+    {
+        id: '1237',
+        name: 'Jane Smith',
+        phone: '+32 2143235',
+        city: 'Madrid',
+    },
+    {
+        id: '1238',
+        name: 'Carlos Ruiz',
+        phone: '+32 2143236',
+        city: 'Barcelona',
+    },
+    {
+        id: '1239',
+        name: 'Maria Lopez',
+        phone: '+32 2143237',
+        city: 'Valencia',
+    },
+    {
+        id: '1240',
+        name: 'Ana Torres',
+        phone: '+32 2143238',
+        city: 'Seville',
+    },
+    {
+        id: '1241',
+        name: 'Luis Garcia',
+        phone: '+32 2143239',
+        city: 'Bilbao',
+    },
+    {
+        id: '1242',
+        name: 'Elena Perez',
+        phone: '+32 2143240',
+        city: 'Malaga',
+    },
+    {
+        id: '1243',
+        name: 'Miguel Sanchez',
+        phone: '+32 2143241',
+        city: 'Alicante',
+    },
+    {
+        id: '1244',
+        name: 'Lucia Fernandez',
+        phone: '+32 2143242',
+        city: 'Cordoba',
+    },
+    {
+        id: '1245',
+        name: 'Pablo Romero',
+        phone: '+32 2143243',
+        city: 'Valladolid',
+    },
+    {
+        id: '1246',
+        name: 'Sara Moreno',
+        phone: '+32 2143244',
+        city: 'Zaragoza',
+    },
+    {
+        id: '1247',
+        name: 'David Castro',
+        phone: '+32 2143245',
+        city: 'Gijon',
+    },
+    {
+        id: '1248',
+        name: 'Isabel Ruiz',
+        phone: '+32 2143246',
+        city: 'Santander',
+    },
+    {
+        id: '1249',
+        name: 'Jorge Ramos',
+        phone: '+32 2143247',
+        city: 'Salamanca',
+    },
+    {
+        id: '1250',
+        name: 'Carmen Diaz',
+        phone: '+32 2143248',
+        city: 'Toledo',
+    },
+]

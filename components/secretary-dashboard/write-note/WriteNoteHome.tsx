@@ -1,7 +1,16 @@
+'use client'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
 import React from 'react'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
+import { useState } from 'react'
+import Image from 'next/image'
+
+import confirmImg from '@/public/images/admin/confirm-img.png' 
+import bigStar from '@/public/images/admin/big-star.png'
+import smallStar from '@/public/images/admin/little-star.png'
 
 export default function WriteNoteHome() {
+    const [open, setOpen] = useState(false)
     return (
         <div>
             <div className=' p-2.5 border-b border-[#11BECF] inline-block'>
@@ -47,8 +56,24 @@ export default function WriteNoteHome() {
                         <label htmlFor="note">Note</label>
                         <textarea id="note" rows={4} className=' border border-[#E9E9EA] rounded-[8px] p-2 focus:outline-none focus:ring-2 focus:ring-[#0b7680]' placeholder='Write your note here...'></textarea>
                     </div>
-                     <button className=' py-4 w-full text-white text-base bg-[#0b7680] rounded-[8px] mt-6 cursor-pointer'>Send</button>
-
+                    <button 
+                        className=' py-4 w-full text-white text-base bg-[#0b7680] rounded-[8px] mt-6 cursor-pointer'
+                        onClick={() => setOpen(true)}
+                    >Send</button>
+                    <Dialog open={open} onOpenChange={setOpen}>
+                        <DialogContent className="p-16">
+                            <div className="flex justify-center items-center">
+                                <div className="relative">
+                                    <Image src={confirmImg} alt="confirm img" />
+                                    <Image src={bigStar} alt="big star" className="absolute top-10 left-0" />
+                                    <Image src={bigStar} alt="big star" className="absolute top-28 right-0" />
+                                    <Image src={smallStar} alt="little star" className="absolute top-28 left-5" />
+                                    <Image src={smallStar} alt="little star" className="absolute top-8 right-5" />
+                                </div>
+                            </div>
+                            <h2 className='text-center text-2xl font-medium mt-8'>Summery Sent Successfully To Admin</h2>
+                        </DialogContent>
+                    </Dialog>
                 </div>
 
             </div>
