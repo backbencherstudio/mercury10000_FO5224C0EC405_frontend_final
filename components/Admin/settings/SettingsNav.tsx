@@ -17,10 +17,6 @@ export default function SettingsNav() {
       href: "/dashboard/settings",
     },
     {
-      label: "Email & Notification",
-      href: "/dashboard/settings/email-notification",
-    },
-    {
       label: 'Security & Password',
       href: "/dashboard/settings/security-password"
     },
