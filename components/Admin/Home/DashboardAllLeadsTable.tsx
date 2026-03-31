@@ -8,8 +8,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import LocationIcon from "@/components/icons/admin/LocationIcon";
 import UserIcon from "@/components/icons/admin/UserIcon";
 import PhoneIcon from "@/components/icons/admin/PhoneIcon";
+import SearchIcon from "@/components/icons/admin/SearchIcon";
+import FilterIcon from "@/components/icons/admin/FilterIcon";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useMemo } from "react";
 
 function DashboardAllLeadsTable() {
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
@@ -18,14 +23,26 @@ function DashboardAllLeadsTable() {
   const [leadProcessDialogOpen, setLeadProcessDialogOpen] = useState(false);
   const [notLeadDialogOpen, setNotLeadDialogOpen] = useState(false);
   const [dialogRowData, setDialogRowData] = useState<any>(null);
+  const [tradeFilter, setTradeFilter] = useState<string>("all");
 
- 
-  // Modal state removed
+  // Get unique trades for filter dropdown
+  const tradeOptions = useMemo(() => {
+    const set = new Set<string>();
+    SubmittedLeadsData.forEach((item) => {
+      if (item.trade) set.add(item.trade);
+    });
+    return Array.from(set);
+  }, []);
 
-  const totalItems = SubmittedLeadsData.length;
+  // Filter data by trade
+  const filteredData = tradeFilter === "all"
+    ? SubmittedLeadsData
+    : SubmittedLeadsData.filter((item) => item.trade === tradeFilter);
+
+  const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = SubmittedLeadsData.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   const handleSelectAll = (checked: boolean) => {
     const newSelected = new Set(selectedRows);
@@ -84,6 +101,28 @@ function DashboardAllLeadsTable() {
 
   return (
     <div>
+      <div className=' flex items-center justify-end gap-2 mb-4'>
+          <div className=' relative'>
+            <SearchIcon className=' absolute top-1/2 -translate-y-1/2 left-4 ' />
+            <input type="text" name="" id="" className=' bg-[#e9e9ea] py-2 pl-12 rounded-[10px] w-[315px]' placeholder='Search user here' />
+          </div>
+        
+          <button className=' flex items-center gap-2 p-2.5 cursor-pointer'>
+            <FilterIcon />
+          </button>
+          <span>Filter </span>
+          <Select value={tradeFilter} onValueChange={setTradeFilter}>
+            <SelectTrigger className='w-[150px] bg-[#e9e9ea] rounded-[10px] ml-2'>
+              <SelectValue placeholder="Trade Filter" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Trades</SelectItem>
+              {tradeOptions.map((trade) => (
+                <SelectItem key={trade} value={trade}>{trade}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       <DynamicTable
         columns={columns}
         data={currentData}
