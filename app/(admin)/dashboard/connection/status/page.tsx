@@ -57,50 +57,56 @@ export default function UserResponsesPage() {
 
     return (
         <div className='mt-8'>
-            <div className='flex items-center justify-between gap-2 mt-[30px] mb-4'>
+            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-[30px] mb-4'>
                 <div>
-                    <h2 className='text-2xl text-[#111827] font-medium'>Request Responses From Users</h2>
+                    <h2 className='text-xl sm:text-2xl text-[#111827] font-medium'>Request Responses From Users</h2>
                 </div>
-                <div className='flex items-center gap-6'>
-                    <div className='relative'>
-                        <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
-                        <input
-                            type="text"
-                            className='bg-[#e9e9ea] py-2 pl-12 rounded-[10px] w-[315px]'
-                            placeholder='Search user here'
-                            value={search}
-                            onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
-                        />
+                <div className='w-full sm:w-auto'>
+                    <div className='flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6'>
+                        <div className='relative w-full sm:w-auto'>
+                            <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
+                            <input
+                                type="text"
+                                className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500'
+                                placeholder='Search user here'
+                                value={search}
+                                onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
+                            />
+                        </div>
+                        <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
+                            <FilterIcon />
+                            <span className='hidden sm:inline'>Filter</span>
+                        </button>
+                        <div className='w-full sm:w-auto'>
+                            <Select value={tradeFilter} onValueChange={value => { setTradeFilter(value); setCurrentPage(1); }}>
+                                <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px]'>
+                                    <SelectValue placeholder="Trade Filter" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Trades</SelectItem>
+                                    {allTrades.map(trade => (
+                                        <SelectItem key={trade} value={trade}>{trade}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
-                    <button className='flex items-center gap-2 p-2.5 cursor-pointer'>
-                        <FilterIcon />
-                        Filter
-                    </button>
-                    <Select value={tradeFilter} onValueChange={value => { setTradeFilter(value); setCurrentPage(1); }}>
-                        <SelectTrigger className='w-[150px] bg-[#e9e9ea] rounded-[10px]'>
-                            <SelectValue placeholder="Trade Filter" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Trades</SelectItem>
-                            {allTrades.map(trade => (
-                                <SelectItem key={trade} value={trade}>{trade}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
                 </div>
             </div>
-            <DynamicTable
-                columns={UserResponsesColumn({ onEdit: handleEdit })}
-                data={currentData}
-                currentPage={currentPage}
-                itemsPerPage={itemsPerPage}
-                totalpage={totalPages}
-                totalItems={totalItems}
-                onPageChange={setCurrentPage}
-                setItemsPerPage={setItemsPerPage}
-                noDataMessage="No responses found"
-                loading={false}
-            />
+            <div className='overflow-x-auto'>
+                <DynamicTable
+                    columns={UserResponsesColumn({ onEdit: handleEdit })}
+                    data={currentData}
+                    currentPage={currentPage}
+                    itemsPerPage={itemsPerPage}
+                    totalpage={totalPages}
+                    totalItems={totalItems}
+                    onPageChange={setCurrentPage}
+                    setItemsPerPage={setItemsPerPage}
+                    noDataMessage="No responses found"
+                    loading={false}
+                />
+            </div>
         </div>
     )
 }

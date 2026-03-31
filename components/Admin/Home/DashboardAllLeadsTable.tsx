@@ -101,18 +101,18 @@ function DashboardAllLeadsTable() {
 
   return (
     <div>
-      <div className=' flex items-center justify-end gap-2 mb-4'>
-          <div className=' relative'>
-            <SearchIcon className=' absolute top-1/2 -translate-y-1/2 left-4 ' />
-            <input type="text" name="" id="" className=' bg-[#e9e9ea] py-2 pl-12 rounded-[10px] w-[315px]' placeholder='Search user here' />
-          </div>
-        
-          <button className=' flex items-center gap-2 p-2.5 cursor-pointer'>
-            <FilterIcon />
-          </button>
-          <span>Filter </span>
+      <div className='flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 mb-4'>
+        <div className='relative w-full sm:w-auto'>
+          <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
+          <input type="text" className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500' placeholder='Search user here' />
+        </div>
+        <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
+          <FilterIcon />
+          <span className='hidden sm:inline'>Filter</span>
+        </button>
+        <div className='w-full sm:w-auto'>
           <Select value={tradeFilter} onValueChange={setTradeFilter}>
-            <SelectTrigger className='w-[150px] bg-[#e9e9ea] rounded-[10px] ml-2'>
+            <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px] ml-0 sm:ml-2'>
               <SelectValue placeholder="Trade Filter" />
             </SelectTrigger>
             <SelectContent>
@@ -123,18 +123,21 @@ function DashboardAllLeadsTable() {
             </SelectContent>
           </Select>
         </div>
-      <DynamicTable
-        columns={columns}
-        data={currentData}
-        currentPage={currentPage}
-        itemsPerPage={itemsPerPage}
-        totalpage={totalPages}
-        totalItems={totalItems}
-        onPageChange={setCurrentPage}
-        setItemsPerPage={setItemsPerPage}
-        noDataMessage="No users found"
-        loading={false}
-      />
+      </div>
+      <div className='overflow-x-auto'>
+        <DynamicTable
+          columns={columns}
+          data={currentData}
+          currentPage={currentPage}
+          itemsPerPage={itemsPerPage}
+          totalpage={totalPages}
+          totalItems={totalItems}
+          onPageChange={setCurrentPage}
+          setItemsPerPage={setItemsPerPage}
+          noDataMessage="No users found"
+          loading={false}
+        />
+      </div>
       {/* Lead in Process Custom Dialog */}
       <Dialog open={leadProcessDialogOpen} onOpenChange={(open) =>{setLeadProcessDialogOpen(open)}}>
         <DialogContent className="max-w-md p-8 rounded-xl shadow-lg text-white"  >
@@ -200,12 +203,12 @@ function DashboardAllLeadsTable() {
               </div>
               <div>
                 <h3 className=" text-base text-[#070707] font-medium">Images (3)</h3>
-                <div className="flex  flex-col md:flex-row items-center gap-2.5 mt-2.5 ">
+                <div className="flex flex-col sm:flex-row items-center gap-2.5 mt-2.5 w-full">
                   {
                     [...Array(3)].map((_,index)=>(
-                      <div className=" flex-1 w-full" key={index}>
-                        <div className="  h-[117px] border rounded-lg"></div>
-                        <p className=" text-center text-xs text-[#4A4C56] mt-1.5">image {index+1}</p>
+                      <div className="flex-1 w-full min-w-[120px]" key={index}>
+                        <div className="h-[90px] sm:h-[117px] border rounded-lg"></div>
+                        <p className="text-center text-xs text-[#4A4C56] mt-1.5">image {index+1}</p>
                       </div>
                     ))
                   }

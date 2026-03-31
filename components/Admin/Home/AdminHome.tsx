@@ -36,24 +36,23 @@ function AdminHome() {
   },
 ];
   return (
-    <div className="  ">
+    <div className="p-2 sm:p-4">
       <div>
-        
         <StatCards statCards={statCards} />
       </div>
 
-      <div className=" flex items-center mt-5 gap-6">
-      <div  className=" flex-3/4 ">
-      <ChartBarDefault/>
-
-      </div>
-      <div className=" flex-3/12  ">
-        <UpcomingGift/>
-      </div>
-
+      <div className="flex flex-col lg:flex-row items-stretch mt-5 gap-6">
+        <div className="lg:flex-[3_3_0%] w-full">
+          <ChartBarDefault />
+        </div>
+        <div className="lg:flex-[1_1_0%] w-full">
+          <UpcomingGift />
+        </div>
       </div>
 
-   <Leads/>
+      <div className="mt-6">
+        <Leads />
+      </div>
     </div>
   )
 }

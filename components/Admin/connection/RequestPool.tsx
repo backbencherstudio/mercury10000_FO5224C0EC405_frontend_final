@@ -114,34 +114,38 @@ export default function RequestPool() {
 
     return (
         <div>
-            <div className='flex items-center justify-between gap-2 mt-[30px]'>
+            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-[30px]'>
                 <div>
-                    <h2 className='text-2xl text-[#111827] font-medium'>Send a Connection Request To User</h2>
+                    <h2 className='text-xl sm:text-2xl text-[#111827] font-medium'>Send a Connection Request To User</h2>
                 </div>
-                <div className='flex items-center gap-6'>
-                    <div className='relative'>
-                        <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
-                        <input type="text" className='bg-[#e9e9ea] py-2 pl-12 rounded-[10px] w-[315px]' placeholder='Search user here' />
+                <div className='w-full sm:w-auto'>
+                    <div className='flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-6'>
+                        <div className='relative w-full sm:w-auto'>
+                            <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
+                            <input type="text" className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500' placeholder='Search user here' />
+                        </div>
+                        <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
+                            <FilterIcon />
+                            <span className='hidden sm:inline'>Filter</span>
+                        </button>
+                        <div className='w-full sm:w-auto'>
+                            <Select value={tradeFilter} onValueChange={value => { setTradeFilter(value); setCurrentPage(1); }}>
+                                <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px]'>
+                                    <SelectValue placeholder="Trade Filter" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="all">All Trades</SelectItem>
+                                    {allTrades.map(trade => (
+                                        <SelectItem key={trade} value={trade}>{trade}</SelectItem>
+                                    ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
-                    <button className='flex items-center gap-2 p-2.5 cursor-pointer'>
-                        <FilterIcon />
-                        Filter
-                    </button>
-                    <Select value={tradeFilter} onValueChange={value => { setTradeFilter(value); setCurrentPage(1); }}>
-                        <SelectTrigger className='w-[150px] bg-[#e9e9ea] rounded-[10px]'>
-                            <SelectValue placeholder="Trade Filter" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Trades</SelectItem>
-                            {allTrades.map(trade => (
-                                <SelectItem key={trade} value={trade}>{trade}</SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
                 </div>
             </div>
 
-            <div className="mt-8 w-full">
+            <div className="mt-8 w-full overflow-x-auto">
                 <DynamicTable
                     columns={columns}
                     data={currentData}
@@ -152,7 +156,6 @@ export default function RequestPool() {
                     totalItems={totalItems}
                     onPageChange={setCurrentPage}
                     setItemsPerPage={setItemsPerPage}
-                    // Optionally add loading, error, etc.
                 />
 
                 <div className=' flex items-center justify-end mt-8'>
@@ -164,12 +167,12 @@ export default function RequestPool() {
                             <DialogHeader>
                                  <h2 className=' text-center text-2xl text-[#111827] font-medium'>Send A Connection Request</h2>
                             </DialogHeader>
-                            <div className='flex items-center justify-between gap-2 mb-6'>
-                                <div className='relative'>
+                            <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6'>
+                                <div className='relative w-full sm:w-auto'>
                                     <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
                                     <input
                                         type="text"
-                                        className='bg-[#e9e9ea] py-2 pl-12 rounded-[10px] w-[315px]'
+                                        className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500'
                                         placeholder='Search user here'
                                         value={userSearch}
                                         onChange={e => {
@@ -178,25 +181,27 @@ export default function RequestPool() {
                                         }}
                                     />
                                 </div>
-                                <div className=' flex items-center gap-2.5'>
-                                    <button className='flex items-center gap-2 p-2.5 cursor-pointer'>
+                                <div className='flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2.5 w-full sm:w-auto'>
+                                    <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
                                         <FilterIcon />
-                                        Filter
+                                        <span className='hidden sm:inline'>Filter</span>
                                     </button>
-                                    <Select value={userTradeFilter} onValueChange={value => { setUserTradeFilter(value); setUserCurrentPage(1); }}>
-                                        <SelectTrigger className='w-[150px] bg-[#e9e9ea] rounded-[10px] ml-2'>
-                                            <SelectValue placeholder="Trade Filter" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="all">All Trades</SelectItem>
-                                            {userAllTrades.map(trade => (
-                                                <SelectItem key={trade} value={trade}>{trade}</SelectItem>
-                                            ))}
-                                        </SelectContent>
-                                    </Select>
+                                    <div className='w-full sm:w-auto'>
+                                        <Select value={userTradeFilter} onValueChange={value => { setUserTradeFilter(value); setUserCurrentPage(1); }}>
+                                            <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px] ml-0 sm:ml-2'>
+                                                <SelectValue placeholder="Trade Filter" />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="all">All Trades</SelectItem>
+                                                {userAllTrades.map(trade => (
+                                                    <SelectItem key={trade} value={trade}>{trade}</SelectItem>
+                                                ))}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
                                 </div>
                             </div>
-                            <div className='mt-4'>
+                            <div className='mt-4 overflow-x-auto'>
                                 <DynamicTable
                                     columns={userColumns}
                                     data={userCurrentData}
@@ -255,10 +260,10 @@ export default function RequestPool() {
                         </div>
                         <div>
                             <h3 className="text-base text-[#070707] font-medium">Images (3)</h3>
-                            <div className="flex flex-col md:flex-row items-center gap-2.5 mt-2.5">
+                            <div className="flex flex-col sm:flex-row items-center gap-2.5 mt-2.5 w-full">
                                 {[...Array(3)].map((_, index) => (
-                                    <div className="flex-1 w-full" key={index}>
-                                        <div className="h-[117px] border rounded-lg"></div>
+                                    <div className="flex-1 w-full min-w-[120px]" key={index}>
+                                        <div className="h-[90px] sm:h-[117px] border rounded-lg"></div>
                                         <p className="text-center text-xs text-[#4A4C56] mt-1.5">image {index + 1}</p>
                                     </div>
                                 ))}

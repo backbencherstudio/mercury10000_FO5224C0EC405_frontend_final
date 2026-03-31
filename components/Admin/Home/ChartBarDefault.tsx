@@ -48,18 +48,18 @@ const chartConfig = {
 export function ChartBarDefault() {
   const [selectedYear, setSelectedYear] = useState("");
   return (
-    <Card className="border border-[#E9E9EA] shadow-none py-6">
+    <Card className="border border-[#E9E9EA] shadow-none py-3 sm:py-6">
       <CardContent>
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <h3 className="text-base text-[#161721] font-medium">Lead Submission Activity</h3>
-          <div className="flex items-center gap-2">
-            <button className="flex items-center gap-2 p-2.5 text-sm text-[#344054] font-medium">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-2 w-full sm:w-auto">
+            <button className="flex items-center gap-2 p-2.5 text-sm text-[#344054] font-medium w-full sm:w-auto justify-center hover:bg-gray-100 rounded-lg">
               <FilterIcon />
-              Filter
+              <span className="hidden sm:inline">Filter</span>
             </button>
-            <div style={{ minWidth: 120 }}>
+            <div className="w-full sm:w-auto" style={{ minWidth: 120 }}>
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-[127px]" style={{ backgroundColor: '#eceff3' }}>
+                <SelectTrigger className="w-full sm:w-[127px]" style={{ backgroundColor: '#eceff3' }}>
                   <SelectValue placeholder="Select Year" />
                 </SelectTrigger>
                 <SelectContent>
@@ -71,30 +71,32 @@ export function ChartBarDefault() {
             </div>
           </div>
         </div>
-        <ChartContainer config={chartConfig} className="h-[408px] w-full -ml-7">
-          <BarChart accessibilityLayer data={chartData} barCategoryGap={-5}>
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="month"
-              tickLine={false}
-              tickMargin={10}
-              axisLine={false}
-              tickFormatter={(value) => value.slice(0, 3)}
-            />
-            <YAxis
-              domain={[0, 350]}
-              ticks={[0, 50, 100, 150, 200, 250, 300, 350]}
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip
-              cursor={false}
-              content={<ChartTooltipContent hideLabel />}
-            />
-            <Bar dataKey="desktop" fill="#00bba7" radius={8} barSize={28} />
-          </BarChart>
-        </ChartContainer>
+        <div className="overflow-x-auto">
+          <ChartContainer config={chartConfig} className="h-[300px] sm:h-[408px] w-[600px] sm:w-full -ml-7">
+            <BarChart accessibilityLayer data={chartData} barCategoryGap={-5}>
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="month"
+                tickLine={false}
+                tickMargin={10}
+                axisLine={false}
+                tickFormatter={(value) => value.slice(0, 3)}
+              />
+              <YAxis
+                domain={[0, 350]}
+                ticks={[0, 50, 100, 150, 200, 250, 300, 350]}
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <ChartTooltip
+                cursor={false}
+                content={<ChartTooltipContent hideLabel />}
+              />
+              <Bar dataKey="desktop" fill="#00bba7" radius={8} barSize={28} />
+            </BarChart>
+          </ChartContainer>
+        </div>
       </CardContent>
     </Card>
   )

@@ -78,9 +78,9 @@ export default function UserHome() {
 
 
   return (
-    <div className=' flex   gap-6  mt-8'>
+    <div className='flex flex-col lg:flex-row gap-6 mt-8'>
 
-    <div className=' border border-[#E9E9EA] rounded-[8px] p-6 flex-3/4'>
+    <div className='border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 flex-[3_3_0%] w-full'>
         <h2 className=' text-2xl  text-[#111827] font-medium'>Create a User </h2>
         <form action="" className=' mt-6 space-y-6' onSubmit={handleSubmit}>
             <div className=' flex flex-col gap-1.5'>
@@ -133,8 +133,8 @@ export default function UserHome() {
                                 ))}
                             </div>
                         </div>
-            <div className=' flex items-center gap-6'>
-                <div className='flex-1 '>
+            <div className='flex flex-col sm:flex-row items-stretch gap-3 sm:gap-6'>
+                <div className='flex-1'>
                     <label htmlFor="country">Country</label>
                       <Select onValueChange={(value)=>handleSelectChange('country',value)} value={formData.country}>
                           <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
@@ -152,7 +152,7 @@ export default function UserHome() {
                           </SelectContent>
                       </Select>
                 </div>
-                <div className=' flex-1'>
+                <div className='flex-1 mt-3 sm:mt-0'>
                     <label htmlFor="city">City</label>
                      <Select onValueChange={(value)=>handleSelectChange('city',value)} value={formData.city}>
                           <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
@@ -175,7 +175,7 @@ export default function UserHome() {
             <button className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Create User</button>
         </form>
     </div>
-    <div className='flex-1/4 border border-[#E9E9EA] rounded-[8px] p-6 h-auto self-start'>
+    <div className='flex-[1_1_0%] w-full border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 h-auto self-start mt-6 lg:mt-0'>
         <h2 className=' text-2xl  text-[#111827] font-medium'>Set Fee Rate </h2>
 
 <form action="" className=' mt-6 space-y-6'>

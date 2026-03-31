@@ -69,9 +69,9 @@ export default function UserDetails({ user }: UserDetailsProps) {
   };
 
   return (
-    <div className="border border-[#E9E9EA] p-6 rounded-[12px] mt-6 ">
-      <div className="flex gap-8">
-        <div className="flex-[70%] p-6 border border-[#E9E9EA] rounded-[8px]">
+    <div className="border border-[#E9E9EA] p-4 sm:p-6 rounded-[12px] mt-6">
+      <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
+        <div className="flex-[3_3_0%] w-full p-4 sm:p-6 border border-[#E9E9EA] rounded-[8px]">
           <div className="p-4 border border-[#11B0C1] bg-[#E6F6F4] rounded-[12px]">
             <h3 className="text-lg text-[#1D1F2C] font-semibold">User Created</h3>
             <p className="text-base text-[#777980] mt-1.5">26 Feb, 2026</p>
@@ -217,7 +217,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
             </div>
           </div>
         </div>
-        <div className=' flex-[30%]'>
+        <div className='flex-[1_1_0%] w-full mt-6 lg:mt-0'>
         {/* <div className='  p-6 border border-[#E9E9EA] rounded-[8px]'>
            <h2 className=' text-2xl text-[#111827] font-medium'>Set Fee Rate</h2>
            <form action="" className=' space-y-6 mt-6'>
@@ -255,13 +255,15 @@ export default function UserDetails({ user }: UserDetailsProps) {
         </div>
         </div>
 
-        <div className=' mt-8'>
-          <h2 className=' text-2xl text-[#111827] font-medium mb-6'>Financial Activity Data</h2>
-          <DynamicTable
-          columns={FinancialActivityColumn({onView:handleView})}
-          data={FinancialActivityData}
-           showPagination={false}
-          />
+        <div className='mt-8'>
+          <h2 className='text-xl sm:text-2xl text-[#111827] font-medium mb-6'>Financial Activity Data</h2>
+          <div className='overflow-x-auto'>
+            <DynamicTable
+              columns={FinancialActivityColumn({ onView: handleView })}
+              data={FinancialActivityData}
+              showPagination={false}
+            />
+          </div>
         </div>
 
     </div>

@@ -44,25 +44,21 @@ const isItemActive = (href: string): boolean => {
 };
 
   return (
-    <nav className={cn(  className)}>
-      <div className="flex items-center gap-12 ">
+    <nav className={cn(className)}>
+      <div className="flex items-center gap-6 sm:gap-12 overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
         {navItems.map((item) => {
           const isActive = isItemActive(item.href);
-       
-          
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-2  p-2.5 text-lg font-medium transition-colors duration-200",
-                "border-b border-transparent",
-                isActive 
-                  ? "text-[#0e93a1] border-[#1d9aa7]" 
-                  : "text-[#111827] hover:text-[#1d9aa7]  "
+                "flex items-center gap-2 p-2.5 min-w-[160px] text-base sm:text-lg font-medium transition-colors duration-200 border-b border-transparent whitespace-nowrap justify-center",
+                isActive
+                  ? "text-[#0e93a1] border-[#1d9aa7]"
+                  : "text-[#111827] hover:text-[#1d9aa7]"
               )}
             >
-            
               {item.label}
             </Link>
           );

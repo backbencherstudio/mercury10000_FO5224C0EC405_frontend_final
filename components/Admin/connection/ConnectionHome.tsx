@@ -14,7 +14,7 @@ export default function ConnectionHome() {
     };
 
     return (
-        <div className=' border border-[#D2D2D5] p-6 rounded-[8px] mt-[30px] w-full'>
+        <div className='border border-[#D2D2D5] p-4 sm:p-6 rounded-[8px] mt-[30px] w-full'>
             <h2 className=' text-2xl text-[#111827] font-medium'>Upload a Request</h2>
 
             <form action="" className=' mt-12 space-y-6'>
@@ -32,7 +32,7 @@ export default function ConnectionHome() {
                 </div>
                 <div>
                     <label className=' text-base text-[#070707]'>Upload Photos Here</label>
-                    <div className=' flex items-center gap-2 mt-2'>
+                    <div className='flex flex-col sm:flex-row items-stretch gap-2 mt-2'>
                         {[0, 1, 2].map(idx => (
                             <label key={idx} className='py-9 border border-dashed flex-1 rounded-[8px] flex flex-col items-center justify-center cursor-pointer relative group min-h-[120px]'>
                                 {images[idx] ? (
@@ -43,7 +43,7 @@ export default function ConnectionHome() {
                                     />
                                 ) : (
                                     <div className='flex flex-col items-center z-20'>
-                                        <div className=' p-2 bg-[#d2d2d5] rounded-full inline-block'>
+                                        <div className='p-2 bg-[#d2d2d5] rounded-full inline-block'>
                                             <ImageIcon />
                                         </div>
                                         <p>Click to upload</p>
