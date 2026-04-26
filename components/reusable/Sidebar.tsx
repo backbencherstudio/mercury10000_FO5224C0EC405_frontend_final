@@ -1,6 +1,7 @@
 "use client";
 
 import { CookieHelper } from "@/helper/cookie.helper";
+import { normalizeAppRole } from "@/helper/auth.helper";
 import { LogOutIcon } from "lucide-react";
 import { getMenuItemsByRole, UserRole } from "@/config/menuItems";
 import Link from "next/link";
@@ -45,7 +46,11 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   };
 
   const handleLogout = () => {
+    CookieHelper.destroy({ key: "user" });
+    CookieHelper.destroy({ key: "userRole" });
+    CookieHelper.destroy({ key: "userType" });
     CookieHelper.destroy({ key: "accessToken" });
+    CookieHelper.destroy({ key: "refreshToken" });
     router.push("/log-in");
   };
 
@@ -58,9 +63,15 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
     if (typeof window !== 'undefined') {
       const cookies = document.cookie.split(';').map(c => c.trim());
       const userRoleCookie = cookies.find(c => c.startsWith('userRole='));
+      const userTypeCookie = cookies.find(c => c.startsWith('userType='));
       if (userRoleCookie) {
         const value = userRoleCookie.split('=')[1];
-        if (value === 'admin' || value === 'secretary') userRole = value as UserRole;
+        const normalizedRole = normalizeAppRole(decodeURIComponent(value));
+        if (normalizedRole) userRole = normalizedRole as UserRole;
+      } else if (userTypeCookie) {
+        const value = userTypeCookie.split('=')[1];
+        const normalizedRole = normalizeAppRole(decodeURIComponent(value));
+        if (normalizedRole) userRole = normalizedRole as UserRole;
       }
     }
     setRole(userRole);

@@ -15,6 +15,7 @@ import {
 } from "../ui/dropdown-menu";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Search from "./Search";
+import { CookieHelper } from "@/helper/cookie.helper";
 
 interface HeaderProps {
   onNotificationClick?: () => void;
@@ -149,7 +150,12 @@ const Header: React.FC<HeaderProps> = ({
 
                   <DropdownMenuItem
                     onClick={() => {
-                      router.push("/login");
+                      CookieHelper.destroy({ key: "user" });
+                      CookieHelper.destroy({ key: "userRole" });
+                      CookieHelper.destroy({ key: "userType" });
+                      CookieHelper.destroy({ key: "accessToken" });
+                      CookieHelper.destroy({ key: "refreshToken" });
+                      router.push("/log-in");
                     }}
                     className="text-redColor hover:bg-redColor/10! flex justify-center w-full hover:text-redColor! hover:border hover:border-redColor font-semibold cursor-pointer"
                   >

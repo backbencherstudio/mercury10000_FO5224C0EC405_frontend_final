@@ -1,56 +1,152 @@
 'use client'
 import React, { useState } from 'react'
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { setCookie } from 'nookies';
-import { UserRole } from '@/config/menuItems';
 import Image from 'next/image'
 import logo from '@/public/images/auth/auth-logo-2.png'
 import authImg from '@/public/images/auth/sign-up-img.png'
 import Link from 'next/link'
 import GoogleIcon from '@/components/icons/auth/GoogleIcon'
 import AppleIcon from '@/components/icons/auth/AppleIcon'
+import { toast } from 'react-hot-toast';
+import { Fetch } from '@/lib/Fetch';
+import { getDashboardPathByRole, normalizeAppRole } from '@/helper/auth.helper';
+
+type LoginResponse = {
+  success?: boolean;
+  message?: string;
+  authorization?: {
+    type?: string;
+    access_token?: string;
+    refresh_token?: string;
+  };
+  userid?: string;
+  type?: string;
+  email?: string;
+};
 
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [remember, setRemember] = useState(false);
-  const [error, setError] = useState('');
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
+  const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Demo credentials for admin and secretary only
-  const demoUsers: { email: string; password: string; role: UserRole }[] = [
-    { email: 'admin@school.com', password: 'admin123', role: 'admin' },
-    { email: 'secretary@school.com', password: 'secretary123', role: 'secretary' },
-  ];
+  const getCookieMaxAge = () => (remember ? 30 * 24 * 60 * 60 : 24 * 60 * 60);
+  const getErrorMessage = (value: unknown) => {
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object') {
+      const errorValue = value as { message?: unknown; error?: unknown; statusCode?: unknown };
+      if (typeof errorValue.message === 'string') return errorValue.message;
+      if (typeof errorValue.error === 'string') return errorValue.error;
+      if (typeof errorValue.statusCode === 'number') return 'Request failed';
+    }
+    return 'Unable to log in';
+  };
 
-  const handleLogin = (e: React.FormEvent) => {
+  const getErrorField = (value: unknown, message: string): 'email' | 'password' => {
+    const messageText = message.toLowerCase();
+
+    if (messageText.includes('email') && !messageText.includes('password')) {
+      return 'email';
+    }
+
+    if (messageText.includes('password')) {
+      return 'password';
+    }
+
+    if (value && typeof value === 'object') {
+      const errorValue = value as { field?: unknown; path?: unknown };
+      const field = String(errorValue.field || errorValue.path || '').toLowerCase();
+      if (field.includes('email')) return 'email';
+      if (field.includes('password')) return 'password';
+    }
+
+    return 'password';
+  };
+
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const user = demoUsers.find(u => u.email === email && u.password === password);
-    if (user) {
-      // Store user data in cookies using nookies
-      setCookie(null, 'user', JSON.stringify({
-        email: user.email,
-        role: user.role,
-      }), {
-        maxAge: 30 * 24 * 60 * 60, // 30 days
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
-      });
-      setCookie(null, 'userRole', user.role, {
-        maxAge: 30 * 24 * 60 * 60,
-        path: '/',
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'strict'
-      });
-      setError('');
-      if (user.role === 'secretary') {
-        router.push('/secretary-dashboard');
-      } else {
-        router.push('/dashboard');
+    const nextFieldErrors: { email?: string; password?: string } = {};
+
+    if (!email.trim()) nextFieldErrors.email = 'Email is required';
+    if (!password.trim()) nextFieldErrors.password = 'Password is required';
+
+    if (Object.keys(nextFieldErrors).length > 0) {
+      setFieldErrors(nextFieldErrors);
+      return;
+    }
+
+    setLoading(true);
+    setFieldErrors({});
+
+    try {
+      const response = await Fetch.post('/auth/login', { email, password });
+      const data: LoginResponse = response?.data ?? response;
+
+      if (!data?.success || !data.authorization?.access_token) {
+        throw new Error(data?.message || 'Login failed');
       }
-    } else {
-      setError('Invalid credentials. Try admin@school.com/admin123 or secretary@school.com/secretary123');
+
+      const appRole = normalizeAppRole(data.type) ?? 'admin';
+      const maxAge = getCookieMaxAge();
+      const secure = process.env.NODE_ENV === 'production';
+
+      setCookie(null, 'user', JSON.stringify({
+        email: email,
+        userid: data.userid,
+        role: appRole,
+        type: data.type,
+      }), {
+        maxAge,
+        path: '/',
+        secure,
+        sameSite: 'strict'
+      });
+      setCookie(null, 'userRole', appRole, {
+        maxAge,
+        path: '/',
+        secure,
+        sameSite: 'strict'
+      });
+      setCookie(null, 'userType', data.type || '', {
+        maxAge,
+        path: '/',
+        secure,
+        sameSite: 'strict'
+      });
+      setCookie(null, 'accessToken', data.authorization.access_token, {
+        maxAge,
+        path: '/',
+        secure,
+        sameSite: 'strict'
+      });
+      setCookie(null, 'refreshToken', data.authorization.refresh_token || '', {
+        maxAge,
+        path: '/',
+        secure,
+        sameSite: 'strict'
+      });
+
+      toast.success(data.message || 'Logged in successfully');
+
+      const redirectPath = searchParams?.get('redirect');
+      const destination = redirectPath?.startsWith('/')
+        ? redirectPath
+        : getDashboardPathByRole(appRole);
+      router.replace(destination);
+    } catch (loginError: any) {
+      const errorSource = loginError?.response?.data?.message || loginError?.response?.data || loginError?.message;
+      const message = getErrorMessage(errorSource);
+      const field = getErrorField(errorSource, message);
+      const nextFieldErrors: { email?: string; password?: string } = {};
+      nextFieldErrors[field] = message;
+      setFieldErrors(nextFieldErrors);
+      toast.error(message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -69,14 +165,43 @@ export default function Login() {
         <div className=' border p-12 rounded-[12px] '>
           <h2 className=' text-center text-[161721] text-[26px] font-medium '>Login</h2>
           <p className=' text-center text-[#777980] text-base mt-2'> Enter your email and password</p>
+          {/* {pathname === '/log-in' && (
+            <p className=' text-center text-sm text-[#0e93a1] mt-2'>Use your account from the API endpoint.</p>
+          )} */}
           <form className=' mt-12 space-y-5 lg:w-[458px] ' onSubmit={handleLogin}>
             <div className=' flex flex-col  w-full gap-2'>
               <label htmlFor="email">Email Address</label>
-              <input type="text" id="email" className='    border border-[#c5c5c5] rounded-[8px] p-3  ' placeholder='Enter your Email' value={email} onChange={e => setEmail(e.target.value)} />
+              <input
+                type="text"
+                id="email"
+                className='    border border-[#c5c5c5] rounded-[8px] p-3  '
+                placeholder='Enter your Email'
+                value={email}
+                onChange={e => {
+                  setEmail(e.target.value);
+                  if (fieldErrors.email) {
+                    setFieldErrors(prev => ({ ...prev, email: undefined }));
+                  }
+                }}
+              />
+              {fieldErrors.email && <span className="text-red-600 text-sm">{fieldErrors.email}</span>}
             </div>
             <div className=' flex flex-col  w-full gap-2'>
               <label htmlFor="password">Password</label>
-              <input type="password" id="password" className='    border border-[#c5c5c5] rounded-[8px] p-3' placeholder='Enter your password' value={password} onChange={e => setPassword(e.target.value)} />
+              <input
+                type="password"
+                id="password"
+                className='    border border-[#c5c5c5] rounded-[8px] p-3'
+                placeholder='Enter your password'
+                value={password}
+                onChange={e => {
+                  setPassword(e.target.value);
+                  if (fieldErrors.password) {
+                    setFieldErrors(prev => ({ ...prev, password: undefined }));
+                  }
+                }}
+              />
+              {fieldErrors.password && <span className="text-red-600 text-sm">{fieldErrors.password}</span>}
             </div>
             <div className=' flex justify-between items-center'>
               <div className='  flex items-center gap-2.5'>
@@ -85,15 +210,10 @@ export default function Login() {
               </div>
               <Link href='#' className=' text-[#07454b]  text-base'> Forgot password </Link>
             </div>
-            <button type="submit" className=' py-3  bg-[#0e93a1] rounded-[8px] w-full block   text-white mt-5 cursor-pointer hover:bg-[#0e93a1]/90 transition ease-in-out duration-200   text-center'>Login</button>
-            {error && <div className="text-red-600 text-center mt-2">{error}</div>}
+            <button type="submit" disabled={loading} className=' py-3  bg-[#0e93a1] rounded-[8px] w-full block   text-white mt-5 cursor-pointer hover:bg-[#0e93a1]/90 transition ease-in-out duration-200   text-center disabled:opacity-70 disabled:cursor-not-allowed'>
+              {loading ? 'Signing in...' : 'Login'}
+            </button>
           </form>
-          {/* Temporary credentials for demo */}
-          <div className="mt-6 mb-2 p-4 bg-yellow-50 border border-yellow-200 rounded text-sm text-[#555]">
-            <div className="font-semibold mb-1 text-[#b58900]">Temporary Login Credentials</div>
-            <div><span className="font-medium">Admin Email:</span> admin@school.com <span className="ml-2 font-medium">Password:</span> admin123</div>
-            <div><span className="font-medium">Secretary Email:</span> secretary@school.com <span className="ml-2 font-medium">Password:</span> secretary123</div>
-          </div>
           <div className={`flex items-center justify-center w-full my-5`}>
             <div className="flex-1 h-[1px] bg-[#e9e9ea]"></div>
             <span className="px-2.5 text-sm lg:text-base text-[#777980]">Or</span>
