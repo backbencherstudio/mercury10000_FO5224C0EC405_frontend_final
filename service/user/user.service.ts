@@ -118,6 +118,54 @@ export const UserService = {
     };
   },
 
+  createTrade: async (
+    { name, status = "ACTIVE" }: { name: string; status?: "ACTIVE" },
+    context = null
+  ) => {
+    const token =
+      CookieHelper.get({ key: "accessToken", context }) ||
+      CookieHelper.get({ key: "token", context });
+
+    const _config = token
+      ? {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      : config;
+
+    return await Fetch.post(
+      "/trades",
+      {
+        name,
+        status,
+      },
+      _config
+    );
+  },
+
+
+  getTrades: async (context = null) => {
+    const token =
+      CookieHelper.get({ key: "accessToken", context }) ||
+      CookieHelper.get({ key: "token", context });
+
+    const response = await Fetch.get(
+      "/trades",
+      token
+        ? {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        : undefined
+    );
+
+    return response?.data?.data ?? response?.data ?? [];
+  },
+
   register: async (payload: RegisterUserPayload) => {
     return await Fetch.post("/auth/register", payload, config);
   },

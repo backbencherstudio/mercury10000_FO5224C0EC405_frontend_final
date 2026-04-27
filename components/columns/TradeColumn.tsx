@@ -9,12 +9,13 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-// Trade type definition based on the TreadData structure
+// Trade type definition
 interface Trade {
     serial_no: string;
     trade_name: string;
     date: string;
     status: "active" | "pause";
+    id: string;
 }
 
 interface ColumnConfig<T = any> {
@@ -57,29 +58,31 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                 <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none">
                     <DropdownMenuItem
                         onClick={() => onDelete?.(row)}
-                        className="cursor-pointer  "
+                        className="cursor-pointer text-red-600 hover:text-red-700"
                     >
                         Delete Trade
                     </DropdownMenuItem>
+                    {row.status === 'active' ? (
+                        <DropdownMenuItem
+                            onClick={() => onView?.(row)}
+                            className="cursor-pointer"
+                        >
+                            Pause Trade
+                        </DropdownMenuItem>
+                    ) : (
+                        <DropdownMenuItem
+                            onClick={() => onEdit?.(row)}
+                            className="cursor-pointer"
+                        >
+                            Activate Trade
+                        </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
-                        onClick={() => onView?.(row)}
-                        className="cursor-pointer"
-                    >
-                        Pause Trade
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() => onEdit?.(row)}
-                        className="cursor-pointer"
-                    >
-                        Active Trade
-                    </DropdownMenuItem>
-                    {/* <DropdownMenuItem
                         onClick={() => onStatusChange?.(row)}
                         className="cursor-pointer"
                     >
-                        {row.status === 'active' ? 'Pause Trade' : 'Activate Trade'}
-                    </DropdownMenuItem> */}
-
+                        {row.status === 'active' ? 'Change to Paused' : 'Change to Active'}
+                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
@@ -93,12 +96,11 @@ export function TradeColumn({
     onStatusChange
 }: TradeColumnProps): ColumnConfig<Trade>[] {
 
-    // Return all columns configuration with proper typing
     return [
         {
             label: "Serial No.",
             accessor: "serial_no",
-            width: "50px",
+            width: "100px",
             formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>
             ),
@@ -106,7 +108,7 @@ export function TradeColumn({
         {
             label: "Trade Name",
             accessor: "trade_name",
-            width: "300px",
+            width: "250px",
             formatter: (value: string) => (
                 <span className="text-sm font-medium text-[#06030C]">{value}</span>
             ),
@@ -114,7 +116,7 @@ export function TradeColumn({
         {
             label: "Date",
             accessor: "date",
-            width: "300px",
+            width: "200px",
             formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>
             ),
@@ -122,14 +124,13 @@ export function TradeColumn({
         {
             label: "Status",
             accessor: "status",
-            width: "300px",
+            width: "150px",
             formatter: (value: "active" | "pause") => {
                 const statusConfig = {
                     active: {
                         bgColor: "bg-[#A7EADE]",
                         textColor: "text-[#116557]",
                         label: "Active"
-
                     },
                     pause: {
                         bgColor: "bg-[#FFB0B0]",
@@ -141,10 +142,8 @@ export function TradeColumn({
                 const config = statusConfig[value] || statusConfig.pause;
 
                 return (
-                    <div className=" inline-flex items-center justify-center w-full">
-
-                        <span className={` px-2 py-1 rounded-[4px] text-xs font-medium ${config.bgColor} ${config.textColor}`}>
-
+                    <div className="inline-flex items-center justify-center w-full">
+                        <span className={`px-3 py-1 rounded-[4px] text-xs font-medium ${config.bgColor} ${config.textColor}`}>
                             {config.label}
                         </span>
                     </div>
@@ -153,8 +152,8 @@ export function TradeColumn({
         },
         {
             label: "Action",
-            accessor: "action",
-            width: "50px",
+            accessor: "action" as any,
+            width: "100px",
             formatter: (_: any, row: Trade) => (
                 <ActionDropdown
                     row={row}
