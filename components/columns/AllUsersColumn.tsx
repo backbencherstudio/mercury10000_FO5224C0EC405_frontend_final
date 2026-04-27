@@ -12,10 +12,13 @@ import {
 // User type definition based on the data structure
 interface User {
     id: string;
-    user_name: string;
-    phone_no: string;
-    role: 'user' | 'Secretary';
+    name: string;
+    phone_number: string;
+    email: string;
+    trades: string;
     city: string;
+    country: string;
+    type: string;
 }
 
 interface ColumnConfig<T = any> {
@@ -92,47 +95,39 @@ export function AllUsersColumn({
             accessor: "id",
             width: "100px",
             formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
             ),
         },
         {
-            label: "User name",
-            accessor: "user_name",
+            label: "Name",
+            accessor: "name",
             width: "140px",
             formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
-        },
-        {
-            label: "Password",
-            accessor: "password",
-            width: "140px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
             ),
         },
         {
             label: "Phone No.",
-            accessor: "phone_no",
+            accessor: "phone_number",
             width: "170px",
             formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
+            ),
+        },
+        {
+            label: "Email",
+            accessor: "email",
+            width: "210px",
+            formatter: (value: string) => (
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
             ),
         },
         {
             label: "Trade",
-            accessor: "trade",
+            accessor: "trades",
             width: "170px",
-            formatter: (value: string[]) => (
-                <span className="text-sm text-[#06030C]">{value.join(', ')}</span>
-            ),
-        },
-        {
-            label: "Role",
-            accessor: "role",
-            width: "140px",
-            formatter: (value:string)=>(
-                <span className=" text-sm text-[#060306]">{value}</span>
+            formatter: (value: string) => (
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
             ),
         },
         {
@@ -140,7 +135,23 @@ export function AllUsersColumn({
             accessor: "city",
             width: "150px",
             formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
+            ),
+        },
+        {
+            label: "Country",
+            accessor: "country",
+            width: "160px",
+            formatter: (value: string) => (
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
+            ),
+        },
+        {
+            label: "Type",
+            accessor: "type",
+            width: "120px",
+            formatter: (value: string) => (
+                <span className="text-sm text-[#06030C]">{value || '-'}</span>
             ),
         },
         {

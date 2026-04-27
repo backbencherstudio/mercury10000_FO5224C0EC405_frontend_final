@@ -30,6 +30,94 @@ export const UserService = {
     return await Fetch.post("/auth/login", data, config);
   },
 
+  getTradeIdMap: async (context = null) => {
+    const token =
+      CookieHelper.get({ key: "accessToken", context }) ||
+      CookieHelper.get({ key: "token", context });
+
+    const response = await Fetch.get(
+      "/trade",
+      token
+        ? {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        : undefined
+    );
+
+    const rawList = response?.data?.data ?? response?.data ?? response;
+    if (!Array.isArray(rawList)) return {};
+
+    return rawList.reduce((map: Record<string, string>, item: any) => {
+      const id = String(item?.id || item?._id || "");
+      const name = String(item?.name || item?.trade_name || item?.title || "")
+        .trim()
+        .toLowerCase();
+
+      if (id && name) map[name] = id;
+      return map;
+    }, {});
+  },
+  
+  getAllUsers: async (page = 1, limit = 10, context = null) => {
+    const token =
+      CookieHelper.get({ key: "accessToken", context }) ||
+      CookieHelper.get({ key: "token", context });
+
+    const response = await Fetch.get(
+      `/auth/all_users?page=${page}&limit=${limit}`,
+      token
+        ? {
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        : undefined
+    );
+
+    const payload = response?.data ?? response;
+    const users = Array.isArray(payload?.data)
+      ? payload.data
+      : Array.isArray(payload)
+      ? payload
+      : [];
+
+    const totalFromApi = Number(
+      payload?.total ??
+        payload?.totalItems ??
+        payload?.meta?.total ??
+        payload?.meta?.totalItems ??
+        payload?.pagination?.total
+    );
+
+    const totalPagesFromApi = Number(
+      payload?.totalPages ??
+        payload?.meta?.totalPages ??
+        payload?.pagination?.totalPages
+    );
+
+    const hasApiTotal = Number.isFinite(totalFromApi) && totalFromApi >= 0;
+    const hasApiTotalPages = Number.isFinite(totalPagesFromApi) && totalPagesFromApi > 0;
+    const hasMore = users.length === limit;
+
+    const totalItems = hasApiTotal
+      ? totalFromApi
+      : (page - 1) * limit + users.length + (hasMore ? 1 : 0);
+
+    const totalPages = hasApiTotalPages
+      ? totalPagesFromApi
+      : Math.max(1, Math.ceil(totalItems / limit));
+
+    return {
+      users,
+      totalItems,
+      totalPages,
+    };
+  },
+
   register: async (payload: RegisterUserPayload) => {
     return await Fetch.post("/auth/register", payload, config);
   },

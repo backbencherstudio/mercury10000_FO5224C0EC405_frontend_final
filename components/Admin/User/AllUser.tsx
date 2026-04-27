@@ -1,28 +1,61 @@
 'use client'
 import { AllUsersColumn } from '@/components/columns/AllUsersColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
-import { AllUsersData } from '@/public/demoData/AllUsersData'
 import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { useRouter } from 'next/navigation'
  
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import { UserService } from '@/service/user/user.service'
+import { Skeleton } from '@/components/ui/skeleton'
 
 export default function AllUser() {
 
      const router = useRouter()
-    
+
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [users, setUsers] = useState<any[]>([]);
+    const [totalItems, setTotalItems] = useState(0);
+    const [totalPages, setTotalPages] = useState(1);
+    const [loading, setLoading] = useState(true);
+    const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
-    const [viewLead, setViewLead] = useState({ isOpen: false, userData: null });
-    const [isApproveOpen, setIsApproveOpen] = useState(false);
+    const dash = (value: unknown) => {
+        if (value === null || value === undefined) return '-';
+        const text = String(value).trim();
+        return text ? text : '-';
+    };
 
+    useEffect(() => {
+        const loadUsers = async () => {
+            setLoading(true);
+            try {
+                const result = await UserService.getAllUsers(currentPage, itemsPerPage);
+                const rows = Array.isArray(result?.users) ? result.users.map((user: any) => ({
+                    id: dash(user?.id),
+                    name: dash(user?.name),
+                    phone_number: dash(user?.phone_number),
+                    email: dash(user?.email),
+                    trades: Array.isArray(user?.trades) && user.trades.length > 0
+                        ? user.trades.map((trade: any) => dash(trade?.name)).filter((trade: string) => trade !== '-').join(', ') || '-'
+                        : '-',
+                    city: dash(user?.city),
+                    country: dash(user?.country),
+                    type: dash(user?.type),
+                })) : [];
 
-    const totalItems = AllUsersData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = AllUsersData.slice(startIndex, startIndex + itemsPerPage);
+                setUsers(rows);
+                setTotalItems(result?.totalItems ?? rows.length);
+                setTotalPages(result?.totalPages ?? 1);
+            } finally {
+                setLoading(false);
+                setHasLoadedOnce(true);
+            }
+        };
+
+        loadUsers();
+    }, [currentPage, itemsPerPage]);
 
 
 
@@ -36,7 +69,6 @@ export default function AllUser() {
 
        const handleApprove = (row: any) => {
       
-        setIsApproveOpen(true);
     };
 
     const handleDecline = (row: any) => {
@@ -44,12 +76,27 @@ export default function AllUser() {
         
     };
 
-    const handleViewLeadClose = () => {
-        setViewLead({ isOpen: false, userData: null });
-    };
+    const LoadingSkeleton = () => {
+        const columnCount = 9;
 
-    const handleApproveClose = () => {
-        setIsApproveOpen(false);
+        return (
+            <div className='min-w-[1000px] border border-[#E5E7EB] rounded-lg overflow-hidden bg-white'>
+                <div className='grid grid-cols-9 gap-3 px-4 py-4 bg-[#f7f7f7] border-b border-[#E5E7EB]'>
+                    {Array.from({ length: columnCount }).map((_, index) => (
+                        <Skeleton key={`skeleton-header-${index}`} className='h-4 w-full bg-slate-300/80' />
+                    ))}
+                </div>
+                <div className='p-4 space-y-3'>
+                    {Array.from({ length: itemsPerPage }).map((_, rowIndex) => (
+                        <div key={`skeleton-row-${rowIndex}`} className='grid grid-cols-9 gap-3'>
+                            {Array.from({ length: columnCount }).map((__, colIndex) => (
+                                <Skeleton key={`skeleton-cell-${rowIndex}-${colIndex}`} className='h-8 w-full bg-slate-200/90' />
+                            ))}
+                        </div>
+                    ))}
+                </div>
+            </div>
+        );
     };
 
 
@@ -72,18 +119,22 @@ export default function AllUser() {
                 </div>
             </div>
             <div className='overflow-x-auto'>
-                <DynamicTable
-                    columns={AllUsersColumn({ onView: handleViewDetails, onEdit: handleApprove, onDelete: handleDecline })}
-                    data={currentData}
-                    currentPage={currentPage}
-                    itemsPerPage={itemsPerPage}
-                    totalpage={totalPages}
-                    totalItems={totalItems}
-                    onPageChange={setCurrentPage}
-                    setItemsPerPage={setItemsPerPage}
-                    noDataMessage="No users found"
-                    loading={false}
-                />
+                {loading || !hasLoadedOnce ? (
+                    <LoadingSkeleton />
+                ) : (
+                    <DynamicTable
+                        columns={AllUsersColumn({ onView: handleViewDetails, onEdit: handleApprove, onDelete: handleDecline })}
+                        data={users}
+                        currentPage={currentPage}
+                        itemsPerPage={itemsPerPage}
+                        totalpage={totalPages}
+                        totalItems={totalItems}
+                        onPageChange={setCurrentPage}
+                        setItemsPerPage={setItemsPerPage}
+                        noDataMessage="No users found"
+                        loading={false}
+                    />
+                )}
             </div>
         </div>
     )

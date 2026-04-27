@@ -12,8 +12,6 @@ import {
 } from "@/components/ui/select"
 import TagCrossIcon from '@/components/icons/admin/TagCrossIcon';
 import { UserService } from '@/service/user/user.service';
-import { Fetch } from '@/lib/Fetch';
-import { CookieHelper } from '@/helper/cookie.helper';
 
 
 interface FormData {
@@ -65,13 +63,6 @@ export default function UserHome() {
     const [feeFieldErrors, setFeeFieldErrors] = useState<FeeFieldErrors>({});
     const [appliedFeeData, setAppliedFeeData] = useState<AppliedFeeData>({});
     const [tradeIdMap, setTradeIdMap] = useState<Record<string, string>>({});
-
-    const normalizeTradeKey = (value: string) =>
-        value
-            .trim()
-            .toLowerCase()
-            .replace(/\s+/g, ' ')
-            .replace(/[^a-z0-9 ]/g, '');
 
     const setUserField = (field: keyof FormData, value: string | string[]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
@@ -157,43 +148,8 @@ export default function UserHome() {
 
     useEffect(() => {
         const loadTradeIds = async () => {
-            const token =
-                CookieHelper.get({ key: 'accessToken' }) ||
-                CookieHelper.get({ key: 'token' });
-
-            const _config = token
-                ? {
-                    headers: {
-                        'Content-Type': 'application/json',
-                        Authorization: `Bearer ${token}`,
-                    },
-                }
-                : undefined;
-
-            const endpoints = ['/trade', '/trades', '/admin/trades', '/user/trades'];
-
-            for (const endpoint of endpoints) {
-                try {
-                    const response = await Fetch.get(endpoint, _config);
-                    const rawList = response?.data?.data ?? response?.data ?? response;
-                    if (!Array.isArray(rawList)) continue;
-
-                    const map: Record<string, string> = {};
-                    rawList.forEach((item: any) => {
-                        const id = String(item?.id || item?._id || '');
-                        const name = String(item?.name || item?.trade_name || item?.title || '');
-                        const key = normalizeTradeKey(name);
-                        if (id && key) map[key] = id;
-                    });
-
-                    if (Object.keys(map).length > 0) {
-                        setTradeIdMap(map);
-                        return;
-                    }
-                } catch {
-                    // Try next endpoint.
-                }
-            }
+            const map = await UserService.getTradeIdMap();
+            setTradeIdMap(map);
         };
 
         loadTradeIds();
@@ -227,7 +183,7 @@ export default function UserHome() {
         const selectedCountry = countryOptions.find((country) => country.isoCode === formData.country);
         const selectedTradeLabels = formData.trades.filter((trade) => trade !== 'na');
         const selectedTradesPayload = selectedTradeLabels.map((trade) => {
-            const mappedId = tradeIdMap[normalizeTradeKey(trade)];
+            const mappedId = tradeIdMap[trade];
             return mappedId || trade;
         });
 
