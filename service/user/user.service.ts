@@ -7,6 +7,20 @@ const config = {
   },
 };
 
+type RegisterUserPayload = {
+  username: string;
+  phone_number: string;
+  email: string;
+  password: string;
+  work_at_company: string;
+  city: string;
+  country: string;
+  type: "USER";
+  trades: string[];
+  qualified_leads_fee?: number;
+  conversion_fee?: number;
+};
+
 export const UserService = {
   login: async ({ email, password }: { email: string; password: string }) => {
     const data = {
@@ -16,21 +30,8 @@ export const UserService = {
     return await Fetch.post("/auth/login", data, config);
   },
 
-  register: async ({
-    username,
-    email,
-    password,
-  }: {
-    username: string;
-    email: string;
-    password: string;
-  }) => {
-    const data = {
-      username: username,
-      email: email,
-      password: password,
-    };
-    return await Fetch.post("/auth/register", data, config);
+  register: async (payload: RegisterUserPayload) => {
+    return await Fetch.post("/auth/register", payload, config);
   },
 
   logout: (context = null) => {
