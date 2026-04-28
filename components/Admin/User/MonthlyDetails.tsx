@@ -27,9 +27,9 @@ export default function MonthlyDetails() {
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
      const totalItems = SpecificFinancialActivityData.length;
-        const totalPages = Math.ceil(totalItems / itemsPerPage);
-        const startIndex = (currentPage - 1) * itemsPerPage;
-        const currentData = SpecificFinancialActivityData.slice(startIndex, startIndex + itemsPerPage);
+     const totalPages = Math.ceil(totalItems / itemsPerPage);
+     const startIndex = (currentPage - 1) * itemsPerPage;
+     const currentData = SpecificFinancialActivityData.slice(startIndex, startIndex + itemsPerPage);
 
 
     const handleView = () => {
