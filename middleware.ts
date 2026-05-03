@@ -46,3 +46,4 @@ export function middleware(request: NextRequest) {
 export const config = {
   matcher: ["/dashboard/:path*", "/secretary-dashboard/:path*", "/log-in", "/login", "/sign-up", "/verify-email", "/verify-success", "/region"],
 };
+

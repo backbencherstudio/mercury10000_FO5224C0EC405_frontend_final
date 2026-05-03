@@ -65,7 +65,7 @@ export default function ProcessLeads() {
           </div>
           <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
             <FilterIcon />
-            <span className='hidden sm:inline'>Filter</span>
+            {/* <span className='hidden sm:inline'>Filter</span> */}
           </button>
           <div className='w-full sm:w-auto'>
             <Select value={statusFilter} onValueChange={setStatusFilter}>

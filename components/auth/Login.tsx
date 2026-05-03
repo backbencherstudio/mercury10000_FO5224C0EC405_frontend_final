@@ -1,7 +1,6 @@
 'use client'
 import React, { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation';
-import { setCookie } from 'nookies';
+import { useRouter, useSearchParams, usePathname } from 'next/navigation';
 import Image from 'next/image'
 import logo from '@/public/images/auth/auth-logo-2.png'
 import authImg from '@/public/images/auth/sign-up-img.png'
@@ -9,8 +8,10 @@ import Link from 'next/link'
 import GoogleIcon from '@/components/icons/auth/GoogleIcon'
 import AppleIcon from '@/components/icons/auth/AppleIcon'
 import { toast } from 'react-hot-toast';
-import { Fetch } from '@/lib/Fetch';
+import { setCookie } from 'nookies';
 import { getDashboardPathByRole, normalizeAppRole } from '@/helper/auth.helper';
+import { useLoginMutation } from '@/redux/features/auth/authApi';
+
 
 type LoginResponse = {
   success?: boolean;
@@ -33,8 +34,10 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const pathname = usePathname();
 
   const getCookieMaxAge = () => (remember ? 30 * 24 * 60 * 60 : 24 * 60 * 60);
+
   const getErrorMessage = (value: unknown) => {
     if (typeof value === 'string') return value;
     if (value && typeof value === 'object') {
@@ -67,8 +70,11 @@ export default function Login() {
     return 'password';
   };
 
+  const [loginApi] = useLoginMutation();
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+
     const nextFieldErrors: { email?: string; password?: string } = {};
 
     if (!email.trim()) nextFieldErrors.email = 'Email is required';
@@ -83,8 +89,7 @@ export default function Login() {
     setFieldErrors({});
 
     try {
-      const response = await Fetch.post('/auth/login', { email, password });
-      const data: LoginResponse = response?.data ?? response;
+      const data: LoginResponse = await loginApi({ email, password }).unwrap();
 
       if (!data?.success || !data.authorization?.access_token) {
         throw new Error(data?.message || 'Login failed');
@@ -95,40 +100,16 @@ export default function Login() {
       const secure = process.env.NODE_ENV === 'production';
 
       setCookie(null, 'user', JSON.stringify({
-        email: email,
+        email,
         userid: data.userid,
         role: appRole,
         type: data.type,
-      }), {
-        maxAge,
-        path: '/',
-        secure,
-        sameSite: 'strict'
-      });
-      setCookie(null, 'userRole', appRole, {
-        maxAge,
-        path: '/',
-        secure,
-        sameSite: 'strict'
-      });
-      setCookie(null, 'userType', data.type || '', {
-        maxAge,
-        path: '/',
-        secure,
-        sameSite: 'strict'
-      });
-      setCookie(null, 'accessToken', data.authorization.access_token, {
-        maxAge,
-        path: '/',
-        secure,
-        sameSite: 'strict'
-      });
-      setCookie(null, 'refreshToken', data.authorization.refresh_token || '', {
-        maxAge,
-        path: '/',
-        secure,
-        sameSite: 'strict'
-      });
+      }), { maxAge, path: '/', secure, sameSite: 'strict' });
+
+      setCookie(null, 'userRole', appRole, { maxAge, path: '/', secure, sameSite: 'strict' });
+      setCookie(null, 'userType', data.type || '', { maxAge, path: '/', secure, sameSite: 'strict' });
+      setCookie(null, 'accessToken', data.authorization.access_token, { maxAge, path: '/', secure, sameSite: 'strict' });
+      setCookie(null, 'refreshToken', data.authorization.refresh_token || '', { maxAge, path: '/', secure, sameSite: 'strict' });
 
       toast.success(data.message || 'Logged in successfully');
 
@@ -136,13 +117,21 @@ export default function Login() {
       const destination = redirectPath?.startsWith('/')
         ? redirectPath
         : getDashboardPathByRole(appRole);
+
       router.replace(destination);
+
     } catch (loginError: any) {
-      const errorSource = loginError?.response?.data?.message || loginError?.response?.data || loginError?.message;
+      const errorSource =
+        loginError?.data?.message ||
+        loginError?.data ||
+        loginError?.message;
+
       const message = getErrorMessage(errorSource);
       const field = getErrorField(errorSource, message);
+
       const nextFieldErrors: { email?: string; password?: string } = {};
       nextFieldErrors[field] = message;
+
       setFieldErrors(nextFieldErrors);
       toast.error(message);
     } finally {
@@ -164,13 +153,13 @@ export default function Login() {
       <div className=' flex-1 flex items-center justify-center'>
         <div className=' border p-12 rounded-[12px] '>
           <h2 className=' text-center text-[161721] text-[26px] font-medium '>Login</h2>
-          <p className=' text-center text-[#777980] text-base mt-2'> Enter your email and password</p>
+          {/* <p className=' text-center text-[#777980] text-base mt-2'> Enter your email and password</p> */}
           {/* {pathname === '/log-in' && (
             <p className=' text-center text-sm text-[#0e93a1] mt-2'>Use your account from the API endpoint.</p>
           )} */}
           <form className=' mt-12 space-y-5 lg:w-[458px] ' onSubmit={handleLogin}>
             <div className=' flex flex-col  w-full gap-2'>
-              <label htmlFor="email">Email Address</label>
+              {/* <label htmlFor="email">Email Address</label> */}
               <input
                 type="text"
                 id="email"

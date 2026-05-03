@@ -3,7 +3,8 @@ import type { Metadata } from "next";
 import { Inter } from 'next/font/google';
 import "./globals.css";
 import ToastProvider from "@/components/providers/ToastProvider";
- 
+import StoreProviders from "@/redux/StoreProviders";
+
 // If loading a variable font, you don't need to specify the font weight
 const inter = Inter({ subsets: ['latin'] })
 export const metadata: Metadata = {
@@ -19,8 +20,10 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className}`}>
-        <ToastProvider />
-        {children}
+        <StoreProviders>
+          <ToastProvider />
+          {children}
+        </StoreProviders>
       </body>
     </html>
   );

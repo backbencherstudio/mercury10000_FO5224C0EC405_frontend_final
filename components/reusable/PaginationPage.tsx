@@ -1,4 +1,4 @@
-import { MdArrowBackIosNew, MdArrowForwardIos } from "react-icons/md";
+import React, { useId } from "react";
 import {
   Select,
   SelectContent,
@@ -27,6 +27,7 @@ function PaginationPage({
   totalItems,
   itemsPerPage,
 }: PaginationPageProps) {
+  const pageSizeSelectId = useId();
   const getPagination = () => {
     let pages: (number | string)[] = [];
     if (totalPages <= 7) {
@@ -85,26 +86,36 @@ function PaginationPage({
                 Records
               </div>
 
-              {/* <div className="flex items-center gap-2">
-                <label className="text-sm text-[#4a4c56]">Show</label>
-                <Select
-                  value={String(itemsPerPage)}
-                  onValueChange={(value) =>
-                    handleItemsPerPageChange(Number(value))
-                  }
-                >
-                  <SelectTrigger className="w-[62px] px-1.5!">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {uniqueArray.map((opt) => (
-                      <SelectItem key={opt} value={String(opt)}>
-                        {opt}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div> */}
+              {typeof setItemsPerPage === "function" && (
+                <div className="flex items-center gap-2">
+                  <label
+                    className="text-sm text-[#4a4c56]"
+                    htmlFor={pageSizeSelectId}
+                  >
+                    Show
+                  </label>
+                  <Select
+                    value={String(itemsPerPage)}
+                    onValueChange={(value) =>
+                      handleItemsPerPageChange(Number(value))
+                    }
+                  >
+                    <SelectTrigger
+                      id={pageSizeSelectId}
+                      className="w-[62px] px-1.5!"
+                    >
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {uniqueArray.map((opt) => (
+                        <SelectItem key={opt} value={String(opt)}>
+                          {opt}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
             </div>
             <div className="flex items-center gap-1">
               <button

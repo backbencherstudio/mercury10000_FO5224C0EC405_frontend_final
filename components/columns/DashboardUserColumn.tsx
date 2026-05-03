@@ -1,13 +1,13 @@
 "use client";
- 
 
 import React from "react";
 import Dot3Icon from "@/components/icons/admin/Dot3Icon";
 import CustomDropdown from "@/components/custom-dropdown/CustomDropdown";
- 
 import TopRightArrow from "@/components/icons/admin/TopRightArrow";
- 
 
+/* =========================
+   Types
+========================= */
 
 interface ColumnConfig {
   label: React.ReactNode;
@@ -22,198 +22,172 @@ interface DashboardUserColumnProps {
   currentData: any[];
   onSelectAll: (checked: boolean) => void;
   onSelectRow: (globalIndex: number, checked: boolean) => void;
-  onDecline?:(row:any)=>void
-  onViewLead?: (row: any) => void;
-  onApprove?:(row:any)=>void
   onArrowClick?: (row: any) => void;
   onLeadProcess?: (row: any) => void;
   onNotLead?: (row: any) => void;
 }
 
-interface ActionDropdownProps {
-  row: any;
-  onLeadProcess?: (row: any) => void;
-  onNotLead?: (row: any) => void;
-}
+/* =========================
+   Dropdown
+========================= */
 
-const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onLeadProcess, onNotLead }) => {
+const ActionDropdown = ({ row, onLeadProcess, onNotLead }: any) => {
   return (
     <CustomDropdown
       items={[
         {
-          label: 'Lead in Process',
+          label: "Lead in Process",
           onClick: () => onLeadProcess?.(row),
-          className: 'bg-[#0e93a1] text-white   focus:bg-[#0e93a1]/90',
+          className: "bg-[#0e93a1] text-white",
         },
         {
-          label: 'Not a Lead',
+          label: "Not a Lead",
           onClick: () => onNotLead?.(row),
-          className: 'bg-[#ff0000] text-white   focus:bg-[#ff0000]/90',
+          className: "bg-red-500 text-white",
         },
       ]}
       containerClassName="flex justify-center w-full"
-      menuClassName="space-y-1"
-      trigger={<button className="cursor-pointer hover:bg-[#e9e9ea] p-1 rounded-full focus:outline-none"><Dot3Icon /></button>}
+      trigger={
+        <button className="cursor-pointer hover:bg-gray-200 p-1 rounded-full">
+          <Dot3Icon />
+        </button>
+      }
     />
   );
 };
- 
- 
- 
 
-// Date formatter for lead_sent
-const DateFormatter = (value: string) => {
-  return new Date(value).toLocaleDateString("en-US", {
+/* =========================
+   Utils
+========================= */
+
+const DateFormatter = (value: string) =>
+  new Date(value).toLocaleDateString("en-US", {
     year: "numeric",
     month: "short",
     day: "numeric",
   });
-};
+
+/* =========================
+   Columns
+========================= */
+
 export function DashboardUserColumn({
   startIndex,
   selectedRows,
   currentData,
   onSelectAll,
   onSelectRow,
-  onApprove,
-  onViewLead,
-  onDecline,
   onArrowClick,
   onLeadProcess,
-  onNotLead
+  onNotLead,
 }: DashboardUserColumnProps): ColumnConfig[] {
-  
-  // Check if all rows are selected
+
   const isAllSelected =
     currentData.length > 0 &&
-    currentData.every((_, index) => selectedRows.has(startIndex + index));
+    currentData.every((_, i) => selectedRows.has(startIndex + i));
 
-  // Check if some rows are selected (for indeterminate state)
-  const isSomeSelected = currentData.some((_, index) =>
-    selectedRows.has(startIndex + index)
+  const isSomeSelected = currentData.some((_, i) =>
+    selectedRows.has(startIndex + i)
   );
 
-  // Return all columns configuration
   return [
-    // 1. Checkbox Column
+
     {
       label: (
-        <div className="flex items-center justify-center">
-          <input
-            type="checkbox"
-            checked={isAllSelected}
-            ref={(el) => {
-              if (el) el.indeterminate = isSomeSelected && !isAllSelected;
-            }}
-            onChange={(e) => onSelectAll(e.target.checked)}
-            onClick={(e) => e.stopPropagation()}
-            className="w-4 h-4  rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer  "
-          />
-        </div>
+        <input
+          type="checkbox"
+          checked={isAllSelected}
+          ref={(el) => {
+            if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+          }}
+          onChange={(e) => onSelectAll(e.target.checked)}
+        />
       ),
       accessor: "checkbox",
       width: "50px",
-      formatter: (_: any, __: any, rowIndex: number) => {
-        const globalIndex = startIndex + rowIndex;
+      formatter: (_: any, __: any, index: number) => {
+        const globalIndex = startIndex + index;
         return (
-          <div className="flex items-center justify-center">
-            <input
-              type="checkbox"
-              checked={selectedRows.has(globalIndex)}
-              onChange={(e) => onSelectRow(globalIndex, e.target.checked)}
-              onClick={(e) => e.stopPropagation()}
-              className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-            />
-          </div>
+          <input
+            type="checkbox"
+            checked={selectedRows.has(globalIndex)}
+            onChange={(e) =>
+              onSelectRow(globalIndex, e.target.checked)
+            }
+          />
         );
       },
     },
 
-    // 2. ID Column
+  
     {
       label: "Lead ID",
-      accessor: "id",
-      width: "100px",
-      formatter: (value: string) => (
-        <span className="text-sm  text-[#06030C]">{value}</span>
-      ),
+      accessor: "lead_no",
+      formatter: (value) => <span>{value}</span>,
     },
 
-    // 3. Full Name Column
+   
     {
-      label: "User name",
-      accessor: "full_name",
-      width: "140px",
-      formatter: (value: string) => (
-        <span className=" text-sm  text-[#06030C]">{value}</span>
+      label: "User Name",
+      accessor: "user",
+      formatter: (_: any, row) => (
+        <span>{row?.name || "-"}</span>
       ),
     },
 
-    // 4. City/Address Column
+ 
     {
       label: "Homeowner Address",
-      accessor: "homeowners_address",
-      width: "170px",
-      formatter:(value:string)=>(
-        <span className=" text-sm  text-[#06030C]">{value}</span>
-      )  ,
+      accessor: "address",
+      formatter: (value) => <span>{value}</span>,
     },
 
-    // 5. Homeowner Name Column
+ 
     {
-      label: "Homeowner Name ",
-      accessor: "hmeowners_name",
-      width: "140px",
-      formatter: (value: string) => (
-        <span className="text-sm f text-[#06030C]">{value}</span>
-      ),
+      label: "Phone",
+      accessor: "phone",
+      formatter: (value) => <span>{value}</span>,
     },
 
-    // 6. Homeowner Phone Column
-    {
-      label: "Homeowner Phone",
-      accessor: "hmeowners_phone",
-      width: "150px",
-      formatter: (value: string) => (
-        <span className="text-sm f text-[#06030C]">{value}</span>
-      ),
-    },
 
-    // 7. Trade/Enquiry Type Column
     {
       label: "Trade",
       accessor: "trade",
-      width: "150px",
-       formatter: (value: string) => (
-        <span className="text-sm f text-[#06030C]">{value}</span>
+      formatter: (_: any, row) => (
+        <span>{row?.trade?.name || "-"}</span>
       ),
     },
 
-    // 8. Lead Sent Date Column with TopRightArrow
+    
     {
-      label: "Lead Sent to Us",
-      accessor: "lead_sent",
-      width: "180px",
-      formatter: (value: string, row: any) => (
-        <div className="flex items-center justify-between gap-2 cursor-pointer">
+      label: "Created At",
+      accessor: "created_at",
+      formatter: (value, row) => (
+        <div className="flex items-center gap-2">
           <span>{DateFormatter(value)}</span>
-          <button
-            type="button"
-            className="ml-2 p-1 rounded hover:bg-gray-100"
-            onClick={() => onArrowClick && onArrowClick(row)}
-          >
+          <button onClick={() => onArrowClick?.(row)}>
             <TopRightArrow />
           </button>
         </div>
       ),
     },
 
-    // 9. Status Column (if you add status to your demo data)
+
+    {
+      label: "Status",
+      accessor: "status",
+      formatter: (value) => (
+        <span className="text-xs px-2 py-1 bg-gray-200 rounded">
+          {value}
+        </span>
+      ),
+    },
+
+
     {
       label: "Action",
       accessor: "action",
-      width: "10px",
-      formatter: (_: any, row: any) => (
+      formatter: (_: any, row) => (
         <ActionDropdown
           row={row}
           onLeadProcess={onLeadProcess}

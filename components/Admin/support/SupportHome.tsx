@@ -6,6 +6,7 @@ import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { title } from 'process'
 import React from 'react'
+import { useGetSupportQuery } from '@/redux/features/Support/support'
 
 
 const statsData=[
@@ -35,6 +36,11 @@ export default function SupportHome() {
   }
 
 
+  const {data, isLoading, error} = useGetSupportQuery({
+
+  })
+  console.log(data, "support data")
+  const SupportData = data?.data || [];
 
 
   return (
@@ -71,7 +77,7 @@ export default function SupportHome() {
         
                     </div>
 
-                    <DynamicTable data={ContactRequestData} columns={ContactRequestColumn({onPending:handlePending,onViewDetails:handleViewDetails})} />
+                    <DynamicTable data={SupportData} columns={ContactRequestColumn({onPending:handlePending,onViewDetails:handleViewDetails})} />
       </div>
     </div>
   )

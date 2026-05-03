@@ -15,6 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import MessageIcon from "@/components/icons/admin/MessageIcon";
+import { useUpdataStatusMutation } from "@/redux/features/Support/support";
 
 interface ColumnConfig {
   label: React.ReactNode;
@@ -31,39 +32,64 @@ interface ContactRequestColumnProps {
 
 // Secretary Note Dialog Component
 const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
-  // Mock note data - replace with actual note from your data
-  const secretaryNote = row.note || "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.";
-
   return (
-    <Dialog >
+    <Dialog>
       <DialogTrigger asChild>
         <button className="cursor-pointer text-base text-[#0E93A1] hover:underline">
           View All
         </button>
       </DialogTrigger>
-      <DialogContent className=" p-12">
+
+      <DialogContent className="p-12">
         <DialogHeader>
-          <DialogTitle className="text-xl text-[#040C0B]  ">Secretary Note Summery</DialogTitle>
-          <DialogDescription className="text-base text-[#040C0B] py-8 border-b border-[#E9E9EA]">
-           The User is saying that he cannot proceed to submit new leads from the app..... <span className=" font-medium">  view more</span>
-          </DialogDescription>
+          <DialogTitle className="text-xl text-[#040C0B]">
+            Request Details
+          </DialogTitle>
         </DialogHeader>
-<div className=" space-y-6">
+
+        <div className="space-y-6 mt-6">
+
         <div>
-            <h2 className=" text-lg text-[#1D1F2C] font-semibold">Requested Date</h2>
-            <p className=" text-base text-[#777980] mt-2">12 Feb, 2026 at 12:00 AM</p>
-        </div>
-        <div>
-            <h2 className=" text-lg text-[#1D1F2C] font-semibold">User Name</h2>
-            <p className=" text-base text-[#777980] mt-2">John Dan</p>
-        </div>
-        <div>
-            <h2 className=" text-lg text-[#1D1F2C] font-semibold">User ID</h2>
-            <p className=" text-base text-[#777980] mt-2">1236</p>
+            <h2 className="text-lg font-semibold">Requested Date</h2>
+            <p className="text-base text-[#777980] mt-2">
+              {new Date(row?.created_at).toLocaleString()}
+            </p>
+          </div>  
+
+          <div>
+            <h2 className="text-lg font-semibold">User Name</h2>
+            <p className="text-base text-[#777980] mt-2">
+              {row?.user?.name || "-"}
+            </p>
+          </div>
+
+         
+          <div>
+            <h2 className="text-lg font-semibold">Request ID</h2>
+            <p className="text-base text-[#777980] mt-2">{row?.id}</p>
+          </div>
+
+          <div>
+            <h2 className="text-lg font-semibold">Phone No.</h2>
+            <p className="text-base text-[#777980] mt-2">
+              {row?.user?.phone_no || "-"}
+            </p>
+          </div>
+
+          {/* <div>
+            <h2 className="text-lg font-semibold">Secretary Note</h2>
+            <p className="text-base text-[#777980] mt-2">
+              {row?.secretary_note || "-"}
+            </p>
+          </div> */}
+
         </div>
 
-</div>
-      <button className=" flex items-center gap-2.5 bg-[#0b7680] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer"> <MessageIcon/> Contact User Now</button>
+        <button className="flex items-center gap-2.5 bg-[#0b7680] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer">
+          <MessageIcon />
+          Contact User Now
+        </button>
+
       </DialogContent>
     </Dialog>
   );
@@ -122,78 +148,85 @@ export function ContactRequestColumn({
   onPending
 }: ContactRequestColumnProps): ColumnConfig[] {
 
-  // Status formatter with styling
   const StatusFormatter = (status: string) => {
+    const formatted = status?.toLowerCase();
+
     const statusStyles = {
       resolved: "bg-[#B0E4DD] text-[#006557] px-3 py-1 rounded-full text-base",
       pending: "bg-[#FFB0B0] text-[#900] px-3 py-1 rounded-full text-base"
     };
+
+    const [updateStatus] = useUpdataStatusMutation();
+
     
+
     return (
       <div className="flex items-center justify-center">
-        <span className={statusStyles[status as keyof typeof statusStyles]}>
-          {status.charAt(0).toUpperCase() + status.slice(1)}
+        <span className={statusStyles[formatted as keyof typeof statusStyles]}>
+          {formatted?.charAt(0).toUpperCase() + formatted?.slice(1)}
         </span>
       </div>
     );
   };
 
-  // Date formatter
   const DateFormatter = (date: string) => {
-    return date;
+    if (!date) return "-";
+    return new Date(date).toLocaleString();
   };
 
   return [
     {
       label: "Request ID",
       accessor: "id",
-      width: "100px",
       formatter: (value: string) => (
         <span className="text-base text-[#040C0B]">{value}</span>
       ),
     },
- 
+
     {
       label: "User Name",
-      accessor: "userName",
-      width: "150px",
-      formatter: (value: string) => (
-        <span className="text-base text-[#040C0B]">{value}</span>
+      accessor: "user",
+      formatter: (_: any, row: any) => (
+        <span className="text-base text-[#040C0B]">
+          {row?.user?.name || "-"}
+        </span>
       ),
     },
- 
+
     {
       label: "Requested Date",
-      accessor: "requestedDate",
-      width: "130px",
+      accessor: "created_at",
       formatter: DateFormatter,
     },
 
     {
-      label: 'Secretary Note',
-      accessor: 'note',
-      width: '120px',
+      label: "Secretary Note",
+      accessor: "secretary_note",
       formatter: (_: any, row: any) => (
         <div className="flex items-center justify-center">
-          <SecretaryNoteDialog row={row} />
+          <SecretaryNoteDialog row={{
+            ...row,
+            note: row.secretary_note
+          }} />
         </div>
-      )
+      ),
     },
-   
+
     {
       label: "Status",
       accessor: "status",
-      width: "120px",
       formatter: (value: string) => StatusFormatter(value),
     },
 
     {
       label: "Action",
       accessor: "action",
-      width: "80px",
       formatter: (_: any, row: any) => (
         <ActionDropdown
-          row={row}
+          row={{
+            ...row,
+            status: row.status?.toLowerCase()
+          }}
           onViewDetails={onViewDetails}
           onResolve={onResolve}
           onPending={onPending}

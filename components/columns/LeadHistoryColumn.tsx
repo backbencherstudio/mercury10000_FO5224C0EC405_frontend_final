@@ -114,7 +114,7 @@ export function LeadHistoryColumn({
     },
     {
       label: "Lead ID",
-      accessor: "id",
+      accessor: "lead_no",
       width: "100px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
