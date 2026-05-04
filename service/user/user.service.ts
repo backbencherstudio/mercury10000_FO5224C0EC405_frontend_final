@@ -166,8 +166,20 @@ export const UserService = {
     return response?.data?.data ?? response?.data ?? [];
   },
 
-  register: async (payload: RegisterUserPayload) => {
-    return await Fetch.post("/auth/register", payload, config);
+  register: async (payload: RegisterUserPayload,context = null) => {
+    const token =
+      CookieHelper.get({ key: "accessToken", context }) ||
+      CookieHelper.get({ key: "token", context });
+
+    const _config = token
+      ? {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      : config;
+    return await Fetch.post("/auth/register", payload, _config);
   },
 
   logout: (context = null) => {

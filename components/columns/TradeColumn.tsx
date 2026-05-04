@@ -62,26 +62,11 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                     >
                         Delete Trade
                     </DropdownMenuItem>
-                    {row.status === 'active' ? (
-                        <DropdownMenuItem
-                            onClick={() => onView?.(row)}
-                            className="cursor-pointer"
-                        >
-                            Pause Trade
-                        </DropdownMenuItem>
-                    ) : (
-                        <DropdownMenuItem
-                            onClick={() => onEdit?.(row)}
-                            className="cursor-pointer"
-                        >
-                            Activate Trade
-                        </DropdownMenuItem>
-                    )}
                     <DropdownMenuItem
                         onClick={() => onStatusChange?.(row)}
                         className="cursor-pointer"
                     >
-                        {row.status === 'active' ? 'Change to Paused' : 'Change to Active'}
+                        {row.status === 'active' ? 'Pause Trade' : 'Activate Trade'}
                     </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>

@@ -12,13 +12,13 @@ export const SupportApi = baseApi.injectEndpoints({
       }),
     }),
 
-    updataStatus: builder.mutation({
-      query: ({ id, status }) => ({
-        url: `/support/${id}/resolve`,
-        method: "PATCH",
-        body: { status },
-      }),
-    }),
+ updataStatus: builder.mutation({
+  query: ({ id, status }) => ({
+    url: `/support/${id}/resolve`,
+    method: "PATCH",
+    body: { status },
+  }),
+}),
 
   }),
 });

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/select"
 import TagCrossIcon from '@/components/icons/admin/TagCrossIcon';
 import { UserService } from '@/service/user/user.service';
+import { useRegisterMutation } from '@/redux/features/auth/authApi'
 
 
 interface FormData {
@@ -48,7 +49,10 @@ const emptyFormData: FormData = {
     city: '',
     trades: [],
 };
-
+type Trade = {
+  id: string;
+  name: string;
+};
 const emptyFeeFormData: FeeFormData = {
     qualified_leads_fee: '',
     conversion_fee: '',
@@ -64,6 +68,7 @@ export default function UserHome() {
     const [appliedFeeData, setAppliedFeeData] = useState<AppliedFeeData>({});
     const [tradeIdMap, setTradeIdMap] = useState<Record<string, string>>({});
 
+    const [registerUser, { isLoading }] = useRegisterMutation();
     const setUserField = (field: keyof FormData, value: string | string[]) => {
         setFormData((prev) => ({ ...prev, [field]: value }));
         if (fieldErrors[field]) {
@@ -156,19 +161,24 @@ export default function UserHome() {
     }, []);
 
     // For multi-select trades
-    const handleTradeSelect = (value: string) => {
-        setFormData((prev) => {
-            if (prev.trades.includes(value)) return prev; // Prevent duplicates
+ const handleTradeSelect = (value: string) => {
+    setFormData((prev) => {
+        if (value === "na") {
             return {
                 ...prev,
-                trades: [...prev.trades, value],
+                trades: ["na"], 
             };
-        });
-
-        if (fieldErrors.trades) {
-            setFieldErrors((prev) => ({ ...prev, trades: undefined }));
         }
-    };
+
+        const exists = prev.trades.includes(value);
+        if (exists) return prev;
+
+        return {
+            ...prev,
+            trades: [...prev.trades, value],
+        };
+    });
+};
 
     const handleRemoveTrade = (value: string) => {
         setFormData((prev) => ({
@@ -177,70 +187,74 @@ export default function UserHome() {
         }));
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+   const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
 
-        const selectedCountry = countryOptions.find((country) => country.isoCode === formData.country);
-        const selectedTradeLabels = formData.trades.filter((trade) => trade !== 'na');
-        const selectedTradesPayload = selectedTradeLabels.map((trade) => {
-            const mappedId = tradeIdMap[trade];
-            return mappedId || trade;
-        });
+  const selectedCountry = countryOptions.find(
+    (country) => country.isoCode === formData.country
+  );
 
-        const payload = {
-            username: formData.user_name.trim(),
-            phone_number: formData.phone.trim(),
-            email: formData.email.trim(),
-            password: formData.password,
-            work_at_company: formData.work.trim(),
-            city: formData.city,
-            country: selectedCountry?.name || formData.country,
-            type: 'USER' as const,
-            trades: selectedTradesPayload,
-            ...appliedFeeData,
-        };
+  const selectedTradesPayload = formData.trades
+    .filter((trade) => trade !== "na")
+    .map((trade) => tradeIdMap[trade] || trade);
 
-        const nextFieldErrors: FieldErrors = {};
+  const payload = {
+    username: formData.user_name.trim(),
+    phone_number: formData.phone.trim(),
+    email: formData.email.trim(),
+    password: formData.password,
+    work_at_company: formData.work.trim(),
+    city: formData.city,
+    country: selectedCountry?.name || formData.country,
+    qualified_leads_fee: feeFormData?.qualified_leads_fee || 0,
+    conversion_fee: feeFormData?.conversion_fee || 0,
+    type: "USER",
+    trades: selectedTradesPayload,
+    ...appliedFeeData,
+  };
 
-        if (!payload.username) nextFieldErrors.user_name = 'User name is required';
-        if (!payload.phone_number) nextFieldErrors.phone = 'Phone number is required';
-        if (!payload.email) nextFieldErrors.email = 'Email is required';
-        if (!payload.password) nextFieldErrors.password = 'Password is required';
-        if (!payload.work_at_company) nextFieldErrors.work = 'Work at company is required';
-        if (!payload.country) nextFieldErrors.country = 'Country is required';
-        if (!payload.city) nextFieldErrors.city = 'City is required';
-        if (payload.trades.length === 0) nextFieldErrors.trades = 'At least one trade is required';
+  const nextFieldErrors: FieldErrors = {};
 
-        if (Object.keys(nextFieldErrors).length > 0) {
-            setFieldErrors(nextFieldErrors);
-            return;
-        }
+  if (!payload.username) nextFieldErrors.user_name = "User name is required";
+  if (!payload.phone_number) nextFieldErrors.phone = "Phone number is required";
+  if (!payload.email) nextFieldErrors.email = "Email is required";
+  if (!payload.password) nextFieldErrors.password = "Password is required";
+  if (!payload.work_at_company) nextFieldErrors.work = "Work is required";
+  if (!payload.country) nextFieldErrors.country = "Country is required";
+  if (!payload.city) nextFieldErrors.city = "City is required";
+  if (payload.trades.length === 0) nextFieldErrors.trades = "At least one trade is required";
 
-        setFieldErrors({});
+  const nextFeeErrors: FeeFieldErrors = {};
+  if (!feeFormData.qualified_leads_fee) nextFeeErrors.qualified_leads_fee = "Qualified leads fee is required";
+  if (!feeFormData.conversion_fee) nextFeeErrors.conversion_fee = "Conversion fee is required";
 
-        setIsSubmitting(true);
-        try {
-            const response = await UserService.register(payload);
-            const data = response?.data ?? response;
+  if (Object.keys(nextFieldErrors).length > 0 || Object.keys(nextFeeErrors).length > 0) {
+    setFieldErrors(nextFieldErrors);
+    setFeeFieldErrors(nextFeeErrors);
+    return;
+  }
 
-            toast.success(data?.message || 'User created successfully');
-            // console.log('Created user:', data);
-            setFormData(emptyFormData);
-            setFeeFormData(emptyFeeFormData);
-            setAppliedFeeData({});
-            setFieldErrors({});
-            setFeeFieldErrors({});
-        } catch (createUserError: any) {
-            const message =
-                createUserError?.response?.data?.message ||
-                createUserError?.response?.data?.error ||
-                createUserError?.message ||
-                'Failed to create user';
-            toast.error(String(message));
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
+  setFieldErrors({});
+  setFeeFieldErrors({});
+
+  try {
+    const res = await registerUser(payload).unwrap();
+
+    toast.success(res?.message || "User created successfully");
+
+    setFormData(emptyFormData);
+    setFeeFormData(emptyFeeFormData);
+    setAppliedFeeData({});
+    setFeeFieldErrors({});
+  } catch (error: any) {
+    const message =
+      error?.data?.message ||
+      error?.message ||
+      "Failed to create user";
+
+    toast.error(message);
+  }
+};
 
 
     return (
@@ -249,7 +263,9 @@ export default function UserHome() {
             <div className='border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 flex-[3_3_0%] w-full'>
                 <h2 className=' text-2xl  text-[#111827] font-medium'>Create a User </h2>
                 <form action="" className=' mt-6 space-y-6' onSubmit={handleSubmit}>
-                    <div className=' flex flex-col gap-1.5'>
+                   <div className="flex gap-4">
+                    <div className='w-2/3'>
+ <div className=' flex flex-col gap-1.5'>
                         <label htmlFor="user_name">User Name</label>
                         <input type="text" name="" id="user_name" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.user_name} onChange={handleInputChange} />
                         {fieldErrors.user_name && <span className='text-red-600 text-sm'>{fieldErrors.user_name}</span>}
@@ -276,7 +292,7 @@ export default function UserHome() {
                     </div>
                     <div className='flex flex-col gap-1.5'>
                         <label htmlFor="trade">Trade</label>
-                        <Select onValueChange={handleTradeSelect}>
+        <Select onValueChange={handleTradeSelect}>
                             <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
                                 <SelectValue placeholder="Select a trade" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
                             </SelectTrigger>
@@ -289,24 +305,30 @@ export default function UserHome() {
                             </SelectContent>
                         </Select>
                         {/* Show selected trades as tags */}
-                        <div className="flex flex-wrap gap-2 mt-2">
-                            {formData.trades.map((trade) => (
-                                <span
-                                    key={trade}
-                                    className="flex items-center bg-[#e0f7fa] text-[#161721] text-base font-medium px-3.5 py-2.5 rounded-full border border-[#D2D2D5]  "
-                                >
-                                    {trade === 'na' ? 'N/A' : trade.charAt(0).toUpperCase() + trade.slice(1)}
-                                    <button
-                                        type="button"
-                                        onClick={() => handleRemoveTrade(trade)}
-                                        className="ml-2.5  cursor-pointer"
-                                        aria-label={`Remove ${trade}`}
-                                    >
-                                        <TagCrossIcon />
-                                    </button>
-                                </span>
-                            ))}
-                        </div>
+                <div className="flex flex-wrap gap-2 mt-2">
+    {formData.trades.length === 0 && (
+        <span className="text-gray-400 text-sm">No trade selected</span>
+    )}
+
+    {formData.trades.map((trade) => (
+        <span
+            key={trade}
+            className="flex items-center bg-[#e0f7fa] px-3 py-2 rounded-full border"
+        >
+            {trade === "na"
+                ? "N/A"
+                : trade.charAt(0).toUpperCase() + trade.slice(1)}
+
+            <button
+                type="button"
+                onClick={() => handleRemoveTrade(trade)}
+                className="ml-2"
+            >
+                <TagCrossIcon />
+            </button>
+        </span>
+    ))}
+</div>
                         {fieldErrors.trades && <span className='text-red-600 text-sm'>{fieldErrors.trades}</span>}
                     </div>
                     <div className='flex flex-col sm:flex-row items-stretch gap-3 sm:gap-6'>
@@ -347,13 +369,10 @@ export default function UserHome() {
                             {fieldErrors.city && <span className='text-red-600 text-sm mt-1 block'>{fieldErrors.city}</span>}
                         </div>
                     </div>
+                    </div>
 
-                    <button disabled={isSubmitting} className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed'>
-                        {isSubmitting ? 'Creating...' : 'Create User'}
-                    </button>
-                </form>
-            </div>
-            <div className='flex-[1_1_0%] w-full border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 h-auto self-start mt-6 lg:mt-0'>
+                    <div className='w-1/3 mt-7'>
+ <div className='flex-[1_1_0%] w-full border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 h-auto self-start mt-6 lg:mt-0'>
                 <h2 className=' text-2xl  text-[#111827] font-medium'>Set Fee Rate </h2>
 
                 <form action="" className=' mt-6 space-y-6' onSubmit={handleSetFeeSubmit}>
@@ -383,10 +402,19 @@ export default function UserHome() {
                         />
                     </div>
                     {feeFieldErrors.conversion_fee && <span className='text-red-600 text-sm'>{feeFieldErrors.conversion_fee}</span>}
-                    <button type='submit' className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Set Fee</button>
+                    {/* <button type='submit' className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Set Fee</button> */}
 
                 </form>
             </div>
+                    </div>
+                   </div>
+
+                    <button disabled={isSubmitting} className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed'>
+                        {isSubmitting ? 'Creating...' : 'Create User'}
+                    </button>
+                </form>
+            </div>
+           
         </div>
     )
 }

@@ -6,20 +6,30 @@ import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { useRouter } from 'next/navigation'
  
 import React, { useEffect, useState } from 'react'
-import { UserService } from '@/service/user/user.service'
+
 import { Skeleton } from '@/components/ui/skeleton'
+import { useGetAllUsersQuery } from '@/redux/features/auth/authApi'
+
 
 export default function AllUser() {
 
+    const [currentPage, setCurrentPage] = useState(1);
+const [itemsPerPage, setItemsPerPage] = useState(10);
+
+const { data, isLoading, isFetching } = useGetAllUsersQuery({
+  page: currentPage,
+  limit: itemsPerPage,
+});
+
      const router = useRouter()
 
-    const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [users, setUsers] = useState<any[]>([]);
-    const [totalItems, setTotalItems] = useState(0);
-    const [totalPages, setTotalPages] = useState(1);
-    const [loading, setLoading] = useState(true);
     const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
+
+    useEffect(() => {
+        if (!isLoading) {
+            setHasLoadedOnce(true);
+        }
+    }, [isLoading]);
 
     const dash = (value: unknown) => {
         if (value === null || value === undefined) return '-';
@@ -27,53 +37,53 @@ export default function AllUser() {
         return text ? text : '-';
     };
 
-    useEffect(() => {
-        const loadUsers = async () => {
-            setLoading(true);
-            try {
-                const result = await UserService.getAllUsers(currentPage, itemsPerPage);
-                const rows = Array.isArray(result?.users) ? result.users.map((user: any) => ({
-                    id: dash(user?.id),
-                    name: dash(user?.name),
-                    phone_number: dash(user?.phone_number),
-                    email: dash(user?.email),
-                    trades: Array.isArray(user?.trades) && user.trades.length > 0
-                        ? user.trades.map((trade: any) => dash(trade?.name)).filter((trade: string) => trade !== '-').join(', ') || '-'
-                        : '-',
-                    city: dash(user?.city),
-                    country: dash(user?.country),
-                    type: dash(user?.type),
-                })) : [];
+const users = Array.isArray(data?.data)
+  ? data.data.map((user: any) => ({
+      id: user?.id ?? "-",
+      name: user?.name ?? "-",
+      phone_number: user?.phone_number ?? "-",
+      email: user?.email ?? "-",
+      trades:
+        Array.isArray(user?.trades) && user.trades.length > 0
+          ? user.trades
+              .map((t: any) => t?.name)
+              .filter(Boolean)
+              .join(", ")
+          : "-",
+      city: user?.city ?? "-",
+      country: user?.country ?? "-",
+      type: user?.type ?? "-",
+    }))
+  : [];
 
-                setUsers(rows);
-                setTotalItems(result?.totalItems ?? rows.length);
-                setTotalPages(result?.totalPages ?? 1);
-            } finally {
-                setLoading(false);
-                setHasLoadedOnce(true);
-            }
-        };
+const totalItems = data?.totalItems ?? ((currentPage - 1) * itemsPerPage + users.length + (users.length === itemsPerPage ? 1 : 0));
+const totalPages = data?.totalPages ?? (users.length === itemsPerPage ? currentPage + 1 : currentPage);
 
-        loadUsers();
-    }, [currentPage, itemsPerPage]);
+const handlePageChange = (page: number) => {
+  setCurrentPage(page);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+const handlePageSizeChange = (size: number) => {
+  setItemsPerPage(size);
+  setCurrentPage(1);
+  window.scrollTo({ top: 0, behavior: "smooth" });
+};
+
+console.log(data,'datta');
 
 
 
     const handleViewDetails = (row: any) => {
-        // setViewLead({ isOpen: true, userData: row });
         router.push(`/dashboard/user/all-users/${row.id}` )
-
-       
     };
 
-
-       const handleApprove = (row: any) => {
-      
+    const handleEdit = (row: any) => {
+        router.push(`/dashboard/user/all-users/${row.id}` )
     };
 
-    const handleDecline = (row: any) => {
-      
-        
+    const handleDelete = (row: any) => {
+        console.log("Delete user", row.id);
     };
 
     const LoadingSkeleton = () => {
@@ -119,11 +129,11 @@ export default function AllUser() {
                 </div>
             </div>
             <div className='overflow-x-auto'>
-                {loading || !hasLoadedOnce ? (
+                {isLoading || !hasLoadedOnce ? (
                     <LoadingSkeleton />
                 ) : (
                     <DynamicTable
-                        columns={AllUsersColumn({ onView: handleViewDetails, onEdit: handleApprove, onDelete: handleDecline })}
+                        columns={AllUsersColumn({ onView: handleViewDetails, onEdit: handleEdit, onDelete: handleDelete })}
                         data={users}
                         currentPage={currentPage}
                         itemsPerPage={itemsPerPage}

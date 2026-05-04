@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
@@ -8,6 +8,7 @@ import CrossIcon from '@/components/icons/admin/CrossIcon'
 import { TradeColumn } from '@/components/columns/TradeColumn'
 import { UserService } from '@/service/user/user.service'
 import { Skeleton } from "@/components/ui/skeleton"
+import { useGetTradesQuery, useCreateTradeMutation, useDeleteTradeMutation, useUpdateTradeMutation } from '@/redux/features/user/user'
 
 type Trade = {
   id: string;
@@ -34,61 +35,57 @@ type AlertState = {
 
 export default function CreateTrade() {
   const [tradeName, setTradeName] = useState('');
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState<AlertState>(null);
-  const [tradeRows, setTradeRows] = useState<TradeRow[]>([]);
-  const [isLoadingTrades, setIsLoadingTrades] = useState(true); // Start as true for initial load
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false); // Track if data has been loaded
+  const [createTradeMutation] = useCreateTradeMutation();
+  const [deleteTradeMutation] = useDeleteTradeMutation();
+  const [updateTradeMutation] = useUpdateTradeMutation();
+  const { data: trades = [], isLoading: isLoadingTrades, error } = useGetTradesQuery(undefined);
+  console.log("trades: ",trades)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);  
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Fetch trades on component mount
   useEffect(() => {
-    fetchTrades();
-  }, []);
-
-  const fetchTrades = async () => {
-    setIsLoadingTrades(true);
-    try {
-      const trades = await UserService.getTrades();
-      
-      if (Array.isArray(trades)) {
-        const formattedTrades: TradeRow[] = trades.map((trade: Trade, index: number) => ({
-          serial_no: String(index + 1).padStart(2, '0'),
-          trade_name: trade.name,
-          date: formatTradeDate(trade.created_at),
-          status: trade.status === 'ACTIVE' ? 'active' : 'pause',
-          id: trade.id,
-        }));
-        setTradeRows(formattedTrades);
-      } else {
-        setTradeRows([]);
-      }
-    } catch (error) {
-      console.error('Error fetching trades:', error);
-      setTradeRows([]);
+    if (error) {
       setAlert({
         type: 'error',
         title: 'Error',
         message: 'Failed to fetch trades',
       });
-    } finally {
-      setIsLoadingTrades(false);
+    }
+    if (!isLoadingTrades) {
       setHasLoadedOnce(true);
     }
-  };
+  }, [error, isLoadingTrades]);
 
-  const formatTradeDate = (value?: string) => {
-    const date = value ? new Date(value) : new Date();
-    if (Number.isNaN(date.getTime())) return '-';
+ const formatTradeDate = (value?: string) => {
+  if (!value) return '-';
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return '-';
 
-    const parts = date.toLocaleDateString('en-GB', {
-      day: 'numeric',
-      month: 'short',
-      year: 'numeric',
-    }).split(' ');
+  const parts = date.toLocaleDateString('en-GB', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  }).split(' ');
 
-    return parts.length === 3 ? `${parts[0]} ${parts[1]}, ${parts[2]}` : date.toLocaleDateString('en-GB');
-  };
+  return parts.length === 3 
+    ? `${parts[0]} ${parts[1]}, ${parts[2]}`
+    : date.toLocaleDateString('en-GB');
+};
+
+const tradeRows = useMemo(() => {
+  if (!Array.isArray(trades)) return [];
+
+  return trades.map((trade, index) => ({
+    serial_no: String(index + 1).padStart(2, '0'),
+    trade_name: trade.name,
+    date: formatTradeDate(trade.created_at), 
+    status: trade.status === 'ACTIVE' ? 'active' : 'pause',
+    id: trade.id,
+  }));
+}, [trades]);
 
   const toAlertMessage = (value: unknown) => {
     if (typeof value === 'string') return value;
@@ -123,10 +120,10 @@ export default function CreateTrade() {
     setAlert(null);
 
     try {
-      const response = await UserService.createTrade({ name });
+      const response = await createTradeMutation({ name }).unwrap();
       const data = response?.data ?? response;
 
-      if (!data?.success) {
+      if (data?.success === false) {
         const message = toAlertMessage(data?.message);
         setAlert({
           type: 'error',
@@ -135,9 +132,6 @@ export default function CreateTrade() {
         });
         return;
       }
-
-      // Refresh the trades list after creating
-      await fetchTrades();
       
       setTradeName('');
       setAlert({
@@ -166,15 +160,40 @@ export default function CreateTrade() {
   };
 
   const handleDelete = async (row: TradeRow) => {
-    console.log('Delete trade:', row);
-    // Add your delete API call here if available
-    // await UserService.deleteTrade(row.id);
+    try {
+      await deleteTradeMutation({ id: row.id }).unwrap();
+      setAlert({
+        type: 'success',
+        title: 'Trade Deleted',
+        message: 'The trade has been successfully deleted.',
+      });
+    } catch (error: any) {
+      const source = error?.data?.message || error?.message || 'Failed to delete trade';
+      setAlert({
+        type: 'error',
+        title: 'Delete Failed',
+        message: toAlertMessage(source),
+      });
+    }
   };
 
   const handleStatusChange = async (row: TradeRow) => {
-    console.log('Change status for trade:', row);
-    // Add your status change API call here if available
-    // await UserService.updateTradeStatus(row.id, row.status === 'active' ? 'PAUSED' : 'ACTIVE');
+    const newStatus = row.status === 'active' ? 'PAUSED' : 'ACTIVE';
+    try {
+      await updateTradeMutation({ id: row.id, body: { status: newStatus } }).unwrap();
+      setAlert({
+        type: 'success',
+        title: 'Status Updated',
+        message: `Trade status has been successfully updated to ${newStatus}.`,
+      });
+    } catch (error: any) {
+      const source = error?.data?.message || error?.message || 'Failed to update trade status';
+      setAlert({
+        type: 'error',
+        title: 'Update Failed',
+        message: toAlertMessage(source),
+      });
+    }
   };
 
   // Filter trades based on search term

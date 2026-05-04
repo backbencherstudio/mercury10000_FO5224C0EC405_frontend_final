@@ -81,6 +81,7 @@ export function LeadHistoryColumn({
   const isAllSelected = currentData.length > 0 && currentData.every((_, idx) => selectedRows.has(startIndex + idx));
   const isSomeSelected = currentData.some((_, idx) => selectedRows.has(startIndex + idx));
 
+  
   return [
     {
       label: (
@@ -120,53 +121,86 @@ export function LeadHistoryColumn({
     },
     {
       label: "City",
-      accessor: "city",
+      accessor: "address",
       width: "170px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "Homeowner Name",
-      accessor: "home_owner_name",
+      accessor: "name",
       width: "140px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "Trade",
-      accessor: "Trade",
+      accessor: "trade",
       width: "120px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: any) => <span className="text-sm text-[#06030C]">{value?.name || '-'}</span>,  
     },
-    {
-      label: "Lead Sent",
-      accessor: "lead_sent",
-      width: "140px",
-      formatter: (value: string, row: LeadHistory) => (
-        <Dialog>
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-[#06030C]">{value}</span>
-            <DialogTrigger asChild>
-              <button className="ml-2 p-1 rounded hover:bg-gray-200 cursor-pointer" type="button">
-                <TopRightArrow />
-              </button>
-            </DialogTrigger>
-          </div>
-          <DialogContent>
-           <h2 className=" text-2xl text-[#111827] font-medium">Meeting Details</h2>
-           <div className=" space-y-6">
-           <div>
-            <h3 className=" text-lg text-[#1D1F2C] font-semibold">Date</h3>
-            <p className=" text-base text-[#777980] mt-1.5">13 February, 2026</p>
-           </div>
-           <div>
-            <h3 className=" text-lg text-[#1D1F2C] font-semibold">Time</h3>
-            <p className=" text-base text-[#777980] mt-1.5">11:00 PM</p>
-           </div>
+   {
+  label: "Lead Sent",
+  accessor: "updated_at",
+  width: "140px",
+  formatter: (value: string, row: LeadHistory) => {
+    const dateObj = value ? new Date(value) : null;
 
-           </div>
-          </DialogContent>
-        </Dialog>
-      ),
-    },
+    const formattedDate = dateObj
+      ? dateObj.toLocaleDateString()
+      : "-";
+
+    const formattedTime = dateObj
+      ? dateObj.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "-";
+
+    return (
+      <Dialog>
+        <div className="flex items-center justify-between">
+          <span className="text-sm text-[#06030C]">
+            {formattedDate}
+          </span>
+
+          <DialogTrigger asChild>
+            <button
+              className="ml-2 p-1 rounded hover:bg-gray-200 cursor-pointer"
+              type="button"
+            >
+              <TopRightArrow />
+            </button>
+          </DialogTrigger>
+        </div>
+
+        <DialogContent>
+          <h2 className="text-2xl text-[#111827] font-medium">
+            Meeting Details
+          </h2>
+
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg text-[#1D1F2C] font-semibold">
+                Date
+              </h3>
+              <p className="text-base text-[#777980] mt-1.5">
+                {formattedDate}
+              </p>
+            </div>
+
+            <div>
+              <h3 className="text-lg text-[#1D1F2C] font-semibold">
+                Time
+              </h3>
+              <p className="text-base text-[#777980] mt-1.5">
+                {formattedTime}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  },
+},
     {
       label: "Status",
       accessor: "status",

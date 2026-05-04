@@ -92,15 +92,15 @@ export function AllAdminColumn({
     },
     {
       label: "User Name",
-      accessor: "user_name",
+      accessor: "name",
       width: "140px",
       formatter: (value: string) => (
         <span className="text-sm text-[#06030C]">{value}</span>
       ),
     },
     {
-      label: "Password",
-      accessor: "password",
+      label: "Email",
+      accessor: "email",
       width: "140px",
       formatter: (value: string) => (
         <span className="text-sm text-[#06030C]">{value}</span>
@@ -108,7 +108,7 @@ export function AllAdminColumn({
     },
     {
       label: "Phone No.",
-      accessor: "Phone",
+      accessor: "phone_number",
       width: "170px",
       formatter: (value: string) => (
         <span className="text-sm text-[#06030C]">{value}</span>

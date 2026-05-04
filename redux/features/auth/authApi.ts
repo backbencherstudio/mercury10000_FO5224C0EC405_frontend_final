@@ -35,9 +35,25 @@ export const authApi = baseApi.injectEndpoints({
       },
     }),
 
+    register: builder.mutation({
+      query: (body) => ({
+        url: "/auth/register",
+        method: "POST",
+        body,
+      }),
+    }),
+
+    getAllUsers: builder.query({
+      query: ({ page = 1, limit = 10 }) => ({
+        url: `/auth/all_users?page=${page}&limit=${limit}`,
+        method: "GET",
+      }),
+      providesTags: ["User"],
+    }),
+
   }),
 
   overrideExisting: false,
 });
 
-export const { useLoginMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useGetAllUsersQuery } = authApi;

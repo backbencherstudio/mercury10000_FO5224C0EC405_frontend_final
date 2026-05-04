@@ -6,7 +6,7 @@ import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { title } from 'process'
 import React from 'react'
-import { useGetSupportQuery } from '@/redux/features/Support/support'
+import { useGetSupportQuery, useUpdataStatusMutation } from '@/redux/features/Support/support'
 
 
 const statsData=[
@@ -26,11 +26,6 @@ const statsData=[
 
 export default function SupportHome() {
 
-  const handlePending = ()=>{
-    console.log();
-    
-  }
-
   const handleViewDetails =()=>{
     console.log()
   }
@@ -42,6 +37,16 @@ export default function SupportHome() {
   console.log(data, "support data")
   const SupportData = data?.data || [];
 
+  const [updateStatus] = useUpdataStatusMutation();
+ const handleToggleStatus = (row: any) => {
+  const newStatus =
+    row.status === "pending" ? "resolved" : "pending";
+
+  updateStatus({
+    id: row.id,
+    status: newStatus,
+  });
+};
 
   return (
     <div>
@@ -77,7 +82,7 @@ export default function SupportHome() {
         
                     </div>
 
-                    <DynamicTable data={SupportData} columns={ContactRequestColumn({onPending:handlePending,onViewDetails:handleViewDetails})} />
+                    <DynamicTable data={SupportData} columns={ContactRequestColumn({onPending:handleToggleStatus,onViewDetails:handleViewDetails})} />
       </div>
     </div>
   )

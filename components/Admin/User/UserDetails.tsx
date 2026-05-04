@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { FinancialActivityColumn } from '@/components/columns/FinancialActivityColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { FinancialActivityData } from '@/public/demoData/FinancialActivityData'
-import {   useRouter } from 'next/navigation'
+import {   useParams, useRouter } from 'next/navigation'
+import { useGetSingleUserDetailsQuery, useUpdateUserMutation } from '@/redux/features/dashboardOverview/dashboardOverView'
+import { CloudCog } from 'lucide-react'
 
 interface User {
   id: string;
-  user_name: string;
-  phone_no: string;
+  username: string;
+  phone_number: string;
   city: string;
   role: 'user' | 'Secretary';
 }
@@ -18,8 +20,17 @@ interface UserDetailsProps {
  
 
 export default function UserDetails({ user }: UserDetailsProps) {
-  const { user_name, id, phone_no, city, role } = user;
-  const router = useRouter();
+
+
+ const params = useParams();
+const id = params?.id as string;
+
+const { data, isLoading } = useGetSingleUserDetailsQuery(id, {
+  skip: !id,
+});
+
+console.log("datasdfsdfsdfsd: ",data);
+  
 
   // Editable state for each field
   const [editState, setEditState] = useState({
@@ -30,17 +41,37 @@ export default function UserDetails({ user }: UserDetailsProps) {
     trade: false,
     role: false,
     work: false,
+    qualify:false,
+  conversion_fee:false,
   });
   // Local state for input values
-  const [inputState, setInputState] = useState({
-    user_name,
-    id,
-    phone_no,
-    city,
-    trade: 'Plumbing',
-    role,
-    work: 'LMS',
-  });
+ const [inputState, setInputState] = useState({
+  username: '',
+  id: '',
+  phone_number: '',
+  city: '',
+  trade: '',
+  role: '',
+  work: '',
+  qualify: '',
+  conversion_fee: '',
+});
+
+useEffect(() => {
+  if (data?.data) {
+    setInputState({
+      username: data.data.name,
+      id: data.data.id,
+      phone_number: data.data.phone_number,
+      city: data.data.city,
+      trade: data.data.trades || '',
+      role: data.data.type,
+      work: data.data.work || '',
+      qualify: data.data.qualified_leads_fee || '',
+      conversion_fee: data.data.conversion_fee || '',
+    });
+  }
+}, [data]);
 
   // Check if any field is being edited
   const isAnyEditing = Object.values(editState).some(Boolean);
@@ -51,8 +82,15 @@ export default function UserDetails({ user }: UserDetailsProps) {
   const handleInputChange = (field, value) => {
     setInputState((prev) => ({ ...prev, [field]: value }));
   };
-  const handleSave = () => {
-    // Here you would call an API or update parent state
+ const [updateUser] = useUpdateUserMutation();
+
+const handleSave = async () => {
+  try {
+    await updateUser({
+      id,
+      body: inputState,
+    }).unwrap();
+
     setEditState({
       user_name: false,
       id: false,
@@ -61,9 +99,13 @@ export default function UserDetails({ user }: UserDetailsProps) {
       trade: false,
       role: false,
       work: false,
+      qualify:false,
+      conversion_fee:false,
     });
-  };
-
+  } catch (err) {
+    console.error(err);
+  }
+};
   const handleView = () => {
     router.push(`/dashboard/user/all-users/${id}/monthly-details`);
   };
@@ -85,11 +127,11 @@ export default function UserDetails({ user }: UserDetailsProps) {
                 {editState.user_name ? (
                   <input
                     className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
-                    value={inputState.user_name}
+                    value={inputState.username}
                     onChange={e => handleInputChange('user_name', e.target.value)}
                   />
                 ) : (
-                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.user_name}</p>
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.username}</p>
                 )}
               </div>
               {!editState.user_name && (
@@ -121,11 +163,11 @@ export default function UserDetails({ user }: UserDetailsProps) {
                 {editState.phone_no ? (
                   <input
                     className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
-                    value={inputState.phone_no}
+                    value={inputState.phone_number}
                     onChange={e => handleInputChange('phone_no', e.target.value)}
                   />
                 ) : (
-                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.phone_no}</p>
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.phone_number}</p>
                 )}
               </div>
               {!editState.phone_no && (
@@ -187,7 +229,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
               )}
             </div>
             {/* Work at Company */}
-            <div className="flex justify-between items-end">
+            <div className="border-b flex justify-between items-end">
               <div>
                 <h3 className="text-lg text-[#1D1F2C] font-semibold">Work at Company</h3>
                 {editState.work ? (
@@ -202,6 +244,40 @@ export default function UserDetails({ user }: UserDetailsProps) {
               </div>
               {!editState.work && (
                 <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('work')}>Edit</button>
+              )}
+            </div>
+             <div className=" border-b flex justify-between items-end">
+              <div>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">Qualified Leads Fee</h3>
+                {editState.qualify ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.qualify}
+                    onChange={e => handleInputChange('qualify', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.qualify}</p>
+                )}
+              </div>
+              {!editState.qualify && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('qualify')}>Edit</button>
+              )}
+            </div>
+             <div className=" border-b flex justify-between items-end">
+              <div>
+                <h3 className="text-lg text-[#1D1F2C] font-semibold">Qualified Leads Fee</h3>
+                {editState.conversion_fee ? (
+                  <input
+                    className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
+                    value={inputState.conversion_fee}
+                    onChange={e => handleInputChange('conversion_fee', e.target.value)}
+                  />
+                ) : (
+                  <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.conversion_fee}</p>
+                )}
+              </div>
+              {!editState.conversion_fee && (
+                <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('conversion_fee')}>Edit</button>
               )}
             </div>
             {/* Save Changes Button */}

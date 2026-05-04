@@ -115,31 +115,31 @@ export function ProcessLeadsColumn({
     },
     {
       label: "Lead ID",
-      accessor: "id",
+      accessor: "lead_no",
       width: "100px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "City",
-      accessor: "city",
+      accessor: "address",
       width: "170px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "Homeowner Name",
-      accessor: "home_owner_name",
+      accessor: "name",
       width: "140px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "Trade",
-      accessor: "Trade",
+      accessor: "trade",
       width: "120px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "Lead Sent",
-      accessor: "lead_sent",
+      accessor: "created_at",
       width: "150px",
       formatter: (value: string, row: LeadHistory) => {
         const [openView, setOpenView] = React.useState(false);

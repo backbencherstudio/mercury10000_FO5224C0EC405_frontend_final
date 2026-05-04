@@ -1,7 +1,7 @@
 "use client";
 import FilterIcon from '@/components/icons/admin/FilterIcon';
 import SearchIcon from '@/components/icons/admin/SearchIcon';
-import React, { useState } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   Select,
   SelectTrigger,
@@ -13,6 +13,7 @@ import { LeadHistoryColumn } from '@/components/columns/LeadHistoryColumn';
 import { leadHistoryData } from '@/public/demoData/LeadHistoryData';
 import DynamicTable from '@/components/reusable/DynamicTable';
 import { ProcessLeadsColumn } from '@/components/columns/ProcessLeadsColumn';
+import { useGetLeadsProcessQuery } from '@/redux/features/dashboardOverview/dashboardOverView';
 
 
 export default function ProcessLeads() {
@@ -20,20 +21,44 @@ export default function ProcessLeads() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [statusFilter, setStatusFilter] = useState('all');
+  const [searchInput, setSearchInput] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
 
-  const totalItems = leadHistoryData.length;
-  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedSearch(searchInput.trim()), 400);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearch, statusFilter]);
+
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const filteredData = statusFilter === 'all'
-    ? leadHistoryData
-    : leadHistoryData.filter(item => (item.status || '').toLowerCase() === statusFilter.toLowerCase());
-  const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
-  const filteredTotalItems = filteredData.length;
-  const filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
+
+  const params = useMemo(() => {
+    const p: Record<string, string | number> = {
+      page: currentPage,
+      limit: itemsPerPage,
+    };
+    if (statusFilter !== "all") {
+      p.status = statusFilter.toUpperCase();
+    }
+    if (debouncedSearch) {
+      p.search = debouncedSearch;
+    }
+    return p;
+  }, [currentPage, itemsPerPage, statusFilter, debouncedSearch]);
+
+  const { data, isLoading, error } = useGetLeadsProcessQuery(params);
+
+  const apiData = data?.data || [];
+  const meta = (data as any)?.meta;
+  const totalItems = Number(meta?.total_items ?? 0);
+  const totalPages = Number(meta?.total_pages ?? 1);
 
   const handleSelectAll = (checked: boolean) => {
     const newSelected = new Set(selectedRows);
-    currentData.forEach((_, index) => {
+    apiData.forEach((_: any, index: number) => {
       const globalIndex = startIndex + index;
       checked ? newSelected.add(globalIndex) : newSelected.delete(globalIndex);
     });
@@ -49,10 +74,9 @@ export default function ProcessLeads() {
   const columns = ProcessLeadsColumn({
     startIndex,
     selectedRows,
-    currentData,
+    currentData: apiData,
     onSelectAll: handleSelectAll,
     onSelectRow: handleSelectRow,
-    // Optionally add onView, onEdit, onDelete handlers here
   });
 
   return (
@@ -61,7 +85,7 @@ export default function ProcessLeads() {
         <div className='flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2'>
           <div className='relative w-full sm:w-auto'>
             <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
-            <input type="text" className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500' placeholder='Search user here' />
+            <input type="text" value={searchInput} onChange={(e) => setSearchInput(e.target.value)} className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500' placeholder='Search user here' />
           </div>
           <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
             <FilterIcon />
@@ -75,7 +99,7 @@ export default function ProcessLeads() {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="Scheduled">Scheduled</SelectItem>
-                <SelectItem value="Active Work">Active Work</SelectItem>
+                <SelectItem value="Active_Work">Active Work</SelectItem>
                 <SelectItem value="Closed">Closed</SelectItem>
                 <SelectItem value="Invalid">Invalid</SelectItem>
               </SelectContent>
@@ -85,16 +109,24 @@ export default function ProcessLeads() {
         <div className='mt-8 overflow-x-auto'>
           <DynamicTable
             columns={columns}
-            data={currentData}
+            data={apiData}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
-            totalpage={filteredTotalPages}
-            totalItems={filteredTotalItems}
+            totalpage={totalPages}
+            totalItems={totalItems}
             onPageChange={setCurrentPage}
-            setItemsPerPage={setItemsPerPage}
+            setItemsPerPage={(n) => {
+              setItemsPerPage(n);
+              setCurrentPage(1);
+            }}
             showPagination={true}
             noDataMessage="No lead history found"
-            loading={false}
+            loading={isLoading}
+            error={
+              error
+                ? String((error as any)?.data?.message ?? (error as any)?.error ?? "Request failed")
+                : undefined
+            }
           />
         </div>
       </div>

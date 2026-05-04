@@ -21,6 +21,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select"
+import { useGetLeadsSubmitionQuery } from "@/redux/features/dashboardOverview/dashboardOverView"
 
 export const description = "A bar chart"
 
@@ -46,7 +47,14 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ChartBarDefault() {
-  const [selectedYear, setSelectedYear] = useState("");
+const [selectedYear, setSelectedYear] = useState("");
+ const { data, refetch, isLoading: leadsSubmitionLoading } =
+  useGetLeadsSubmitionQuery({
+    year: selectedYear,
+    month: "",
+  });
+    console.log(data,'leadsSubmition')
+  
   return (
     <Card className="border border-[#E9E9EA] shadow-none py-3 sm:py-6">
       <CardContent>
@@ -58,22 +66,23 @@ export function ChartBarDefault() {
               <span className="hidden sm:inline">Filter</span>
             </button>
             <div className="w-full sm:w-auto" style={{ minWidth: 120 }}>
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-full sm:w-[127px]" style={{ backgroundColor: '#eceff3' }}>
-                  <SelectValue placeholder="Select Year" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="lastYear">Last Year</SelectItem>
-                  <SelectItem value="2024">2024</SelectItem>
-                  <SelectItem value="2023">2023</SelectItem>
-                </SelectContent>
-              </Select>
+            <Select value={selectedYear} onValueChange={setSelectedYear}>
+  <SelectTrigger className="w-full sm:w-[127px]" style={{ backgroundColor: '#eceff3' }}>
+    <SelectValue placeholder="Select Year" />
+  </SelectTrigger>
+
+  <SelectContent>
+    <SelectItem value="2026">2026</SelectItem>
+    <SelectItem value="2025">2025</SelectItem>
+    <SelectItem value="2024">2024</SelectItem>
+  </SelectContent>
+</Select>
             </div>
           </div>
         </div>
         <div className="overflow-x-auto">
           <ChartContainer config={chartConfig} className="h-[300px] sm:h-[408px] w-[600px] sm:w-full -ml-7">
-            <BarChart accessibilityLayer data={chartData} barCategoryGap={-5}>
+            <BarChart accessibilityLayer data={data?.data as any} barCategoryGap={-5}>
               <CartesianGrid vertical={false} />
               <XAxis
                 dataKey="month"
@@ -93,7 +102,7 @@ export function ChartBarDefault() {
                 cursor={false}
                 content={<ChartTooltipContent hideLabel />}
               />
-              <Bar dataKey="desktop" fill="#00bba7" radius={8} barSize={28} />
+              <Bar dataKey="submitted" fill="#00bba7" radius={8} barSize={28} />
             </BarChart>
           </ChartContainer>
         </div>
