@@ -3,6 +3,7 @@
 import DynamicTable from "@/components/reusable/DynamicTable";
 import { useState, useMemo, useEffect } from "react";
 import { DashboardUserColumn } from "@/components/columns/DashboardUserColumn";
+import { LeadProcessCalendarDialog } from "@/components/Admin/Home/LeadProcessCalendarDialog";
 import {
   Dialog,
   DialogContent,
@@ -77,7 +78,7 @@ const meta = (data as any)?.meta;
 const totalItems = Number(meta?.total_items ?? 0);
 const totalPages = Number(meta?.total_pages ?? 1);
 
-  // ✅ trade options from API
+  // trade options from API
   const tradeOptions = useMemo(() => {
     const set = new Set<string>();
     apiData.forEach((item: any) => {
@@ -86,7 +87,7 @@ const totalPages = Number(meta?.total_pages ?? 1);
     return Array.from(set);
   }, [apiData]);
 
-  // ✅ selection handlers (unchanged)
+  //  selection handlers (unchanged)
   const handleSelectAll = (checked: boolean) => {
     const newSelected = new Set(selectedRows);
     apiData.forEach((_: any, index: number) => {
@@ -175,7 +176,7 @@ const totalPages = Number(meta?.total_pages ?? 1);
         </div>
       </div>
 
-      {/* 📊 Table */}
+      {/*  Table */}
       <div className="overflow-x-auto">
         <DynamicTable
           columns={columns}
@@ -200,21 +201,21 @@ const totalPages = Number(meta?.total_pages ?? 1);
       </div>
 
       {/* dialogs (unchanged) */}
-      <Dialog open={leadProcessDialogOpen} onOpenChange={setLeadProcessDialogOpen}>
-        <DialogContent className="max-w-md p-8 rounded-xl shadow-lg text-white">
-          <DialogHeader>
-            <DialogTitle className="text-black text-2xl font-bold">
-              Lead in Process
-            </DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
+      <LeadProcessCalendarDialog
+        isOpen={leadProcessDialogOpen}
+        onClose={() => setLeadProcessDialogOpen(false)}
+        onSave={(dateTime) => {
+          console.log("Saved datetime:", dateTime);
+          setLeadProcessDialogOpen(false);
+        }}
+          ID={dialogRowData?.id}
+      />
 
       <Dialog open={notLeadDialogOpen} onOpenChange={setNotLeadDialogOpen}>
         <DialogContent className="max-w-md p-8 rounded-xl shadow-lg text-white">
           <DialogHeader>
             <DialogTitle className="text-black text-2xl font-bold">
-              Not a Lead
+              Not a Lead 
             </DialogTitle>
           </DialogHeader>
         </DialogContent>
@@ -235,7 +236,7 @@ const totalPages = Number(meta?.total_pages ?? 1);
                     <h3 className="text-base font-medium">Homeowner Address</h3>
                   </div>
                   <p className="text-sm mt-2.5">
-                    {arrowDialogData.homeowners_address}
+                    {arrowDialogData.address}
                   </p>
                 </div>
 
@@ -245,7 +246,7 @@ const totalPages = Number(meta?.total_pages ?? 1);
                     <h3 className="text-base font-medium">Homeowner Name</h3>
                   </div>
                   <p className="text-sm mt-2.5">
-                    {arrowDialogData.hmeowners_name}
+                    {arrowDialogData.name}
                   </p>
                 </div>
 
@@ -257,16 +258,58 @@ const totalPages = Number(meta?.total_pages ?? 1);
                     </h3>
                   </div>
                   <p className="text-sm mt-2.5">
-                    {arrowDialogData.hmeowners_phone}
+                    {arrowDialogData.phone}
+                  </p>
+                </div>
+
+             <div className="border-b border-[#e9e9ea] pb-2.5">
+  <h3 className="text-base font-medium">Trade</h3>
+  <p className="text-sm mt-2.5 capitalize">
+    {arrowDialogData?.trade?.name 
+      ? arrowDialogData.trade.name 
+      : (typeof arrowDialogData?.trade === 'string' 
+          ? arrowDialogData.trade 
+          : "N/A")}
+  </p>
+</div>
+    <div className="border-b border-[#e9e9ea] pb-2.5">
+                  <div className="flex items-center gap-2">
+                    {/* <PhoneIcon /> */}
+                    <h3 className="text-base font-medium">
+                      Notes
+                    </h3>
+                  </div>
+                  <p className="text-sm mt-2.5">
+                    {arrowDialogData.notes}
                   </p>
                 </div>
 
                 <div className="border-b border-[#e9e9ea] pb-2.5">
-                  <h3 className="text-base font-medium">Trade</h3>
-                  <p className="text-sm mt-2.5">
-                    {arrowDialogData.trade}
-                  </p>
-                </div>
+  <div className="flex items-center gap-2">
+    <h3 className="text-base font-medium">Attached Images</h3>
+  </div>
+  
+  {arrowDialogData?.files && arrowDialogData.files.length > 0 ? (
+    <div className="flex flex-wrap gap-3 mt-3">
+      {arrowDialogData.files.map((file: any, index: number) => (
+        <div 
+          key={file?.id || index} 
+          className="w-20 h-20 relative rounded-md overflow-hidden border border-[#e9e9ea]"
+        >
+          <img 
+            src={file?.url || file?.file_url || file?.path} 
+            alt={`Attached file ${index + 1}`} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      ))}
+    </div>
+  ) : (
+    <p className="text-sm mt-2.5 text-gray-400">No images attached</p>
+  )}
+</div>
+
+
               </div>
             </div>
           )}

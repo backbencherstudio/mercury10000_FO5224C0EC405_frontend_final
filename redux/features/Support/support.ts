@@ -10,6 +10,7 @@ export const SupportApi = baseApi.injectEndpoints({
         method: "GET",
     
       }),
+      providesTags:["support"],
     }),
 
  updataStatus: builder.mutation({
@@ -18,6 +19,7 @@ export const SupportApi = baseApi.injectEndpoints({
     method: "PATCH",
     body: { status },
   }),
+  invalidatesTags: ["support"],
 }),
 
   }),

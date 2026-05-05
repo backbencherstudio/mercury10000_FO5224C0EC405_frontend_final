@@ -7,7 +7,8 @@ import SuccessTik from '../icons/admin/SuccessTik';
 import { RequestSupportColumn } from '@/components/columns/RequestSupportColumn';
 import DynamicTable from '@/components/reusable/DynamicTable';
 import requestSupportData from '@/public/demoData/RequestSupportData';
- 
+import { useGetSupportQuery } from '@/redux/features/Support/support';
+
 
 
 const stateData = [
@@ -24,15 +25,19 @@ const stateData = [
 export default function SecretaryHome() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    const totalItems = requestSupportData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = requestSupportData.slice(startIndex, startIndex + itemsPerPage);
+    // const totalItems = SupportData.length;
+    // const totalPages = Math.ceil(totalItems / itemsPerPage);
+    // const startIndex = (currentPage - 1) * itemsPerPage;
+    // const currentData = SupportData.slice(startIndex, startIndex + itemsPerPage);
 
     const handleWriteNote = (row: any) => {
         // Implement note writing logic here
         alert(`Write note to admin for request ID: ${row.id}`);
     };
+
+    const { data, isLoading, error } = useGetSupportQuery();
+    const SupportData = data?.data || [];
+    console.log(SupportData);
 
     return (
         <div>
@@ -76,11 +81,11 @@ export default function SecretaryHome() {
                 <div className='overflow-x-auto'>
                     <DynamicTable
                         columns={RequestSupportColumn({ onView: handleWriteNote })}
-                        data={currentData}
+                        data={SupportData}
                         currentPage={currentPage}
                         itemsPerPage={itemsPerPage}
-                        totalpage={totalPages}
-                        totalItems={totalItems}
+                        // totalpage={totalPages}
+                        // totalItems={totalItems}
                         onPageChange={setCurrentPage}
                         setItemsPerPage={setItemsPerPage}
                         noDataMessage="No requests found"

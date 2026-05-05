@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import GreenDownArrow from "../icons/secretary/GreenDownArrow";
 import RedDownArrow from "../icons/secretary/RedDownArrow";
- 
+
 
 // Type for a support request row
 export interface RequestSupportRow {
@@ -70,25 +70,37 @@ export function RequestSupportColumn({ onView, onDelete }: RequestSupportColumnP
     },
     {
       label: "User Name",
-      accessor: "user_name",
-      width: "140px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      accessor: "user",
+      width: "180px",
+      formatter: (row: any) => (
+        <span className="text-sm text-[#06030C] font-medium truncate">
+          {row?.user?.name || row?.name || "N/A"}
+        </span>
+      ),
     },
     {
       label: "Phone No.",
-      accessor: "phone_no",
+      accessor: "user",
       width: "130px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (row: any) => (
+        <span className="text-sm text-[#06030C] font-medium truncate">
+          {row?.user?.phone_number || row?.phone_number || "N/A"}
+        </span>
+      ),
     },
     {
       label: "City",
-      accessor: "city",
+      accessor: "user",
       width: "120px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (row: any) => (
+        <span className="text-sm text-[#06030C] font-medium truncate">
+          {row?.user?.city || "N/A"}
+        </span>
+      ),
     },
     {
       label: "Support Request Date",
-      accessor: "supportReqDate",
+      accessor: "created_at",
       width: "130px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },

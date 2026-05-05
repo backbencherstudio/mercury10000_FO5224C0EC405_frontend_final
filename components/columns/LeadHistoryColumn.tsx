@@ -16,6 +16,7 @@ import {
   DialogDescription,
   DialogClose
 } from "../ui/dialog";
+import { useGetLeadsHistoryQuery, useGetLeadsProcessQuery } from "@/redux/features/dashboardOverview/dashboardOverView";
 
 interface LeadHistory {
   id: string;
@@ -81,7 +82,9 @@ export function LeadHistoryColumn({
   const isAllSelected = currentData.length > 0 && currentData.every((_, idx) => selectedRows.has(startIndex + idx));
   const isSomeSelected = currentData.some((_, idx) => selectedRows.has(startIndex + idx));
 
-  
+  const { data, isLoading, error } = useGetLeadsProcessQuery();
+
+  console.log(data);
   return [
     {
       label: (
@@ -135,72 +138,72 @@ export function LeadHistoryColumn({
       label: "Trade",
       accessor: "trade",
       width: "120px",
-      formatter: (value: any) => <span className="text-sm text-[#06030C]">{value?.name || '-'}</span>,  
+      formatter: (value: any) => <span className="text-sm text-[#06030C]">{value?.name || '-'}</span>,
     },
-   {
-  label: "Lead Sent",
-  accessor: "updated_at",
-  width: "140px",
-  formatter: (value: string, row: LeadHistory) => {
-    const dateObj = value ? new Date(value) : null;
+    {
+      label: "Lead Sent",
+      accessor: "updated_at",
+      width: "140px",
+      formatter: (value: string, row: LeadHistory) => {
+        const dateObj = value ? new Date(value) : null;
 
-    const formattedDate = dateObj
-      ? dateObj.toLocaleDateString()
-      : "-";
+        const formattedDate = dateObj
+          ? dateObj.toLocaleDateString()
+          : "-";
 
-    const formattedTime = dateObj
-      ? dateObj.toLocaleTimeString([], {
-          hour: "2-digit",
-          minute: "2-digit",
-        })
-      : "-";
+        const formattedTime = dateObj
+          ? dateObj.toLocaleTimeString([], {
+            hour: "2-digit",
+            minute: "2-digit",
+          })
+          : "-";
 
-    return (
-      <Dialog>
-        <div className="flex items-center justify-between">
-          <span className="text-sm text-[#06030C]">
-            {formattedDate}
-          </span>
-
-          <DialogTrigger asChild>
-            <button
-              className="ml-2 p-1 rounded hover:bg-gray-200 cursor-pointer"
-              type="button"
-            >
-              <TopRightArrow />
-            </button>
-          </DialogTrigger>
-        </div>
-
-        <DialogContent>
-          <h2 className="text-2xl text-[#111827] font-medium">
-            Meeting Details
-          </h2>
-
-          <div className="space-y-6">
-            <div>
-              <h3 className="text-lg text-[#1D1F2C] font-semibold">
-                Date
-              </h3>
-              <p className="text-base text-[#777980] mt-1.5">
+        return (
+          <Dialog>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-[#06030C]">
                 {formattedDate}
-              </p>
+              </span>
+
+              <DialogTrigger asChild>
+                <button
+                  className="ml-2 p-1 rounded hover:bg-gray-200 cursor-pointer"
+                  type="button"
+                >
+                  <TopRightArrow />
+                </button>
+              </DialogTrigger>
             </div>
 
-            <div>
-              <h3 className="text-lg text-[#1D1F2C] font-semibold">
-                Time
-              </h3>
-              <p className="text-base text-[#777980] mt-1.5">
-                {formattedTime}
-              </p>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
-    );
-  },
-},
+            <DialogContent>
+              <h2 className="text-2xl text-[#111827] font-medium">
+                Meeting Details
+              </h2>
+
+              <div className="space-y-6">
+                <div>
+                  <h3 className="text-lg text-[#1D1F2C] font-semibold">
+                    Date
+                  </h3>
+                  <p className="text-base text-[#777980] mt-1.5">
+                    {formattedDate}
+                  </p>
+                </div>
+
+                <div>
+                  <h3 className="text-lg text-[#1D1F2C] font-semibold">
+                    Time
+                  </h3>
+                  <p className="text-base text-[#777980] mt-1.5">
+                    {formattedTime}
+                  </p>
+                </div>
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      },
+    },
     {
       label: "Status",
       accessor: "status",

@@ -18,7 +18,7 @@ function bearerAuthorization(token: string) {
 export const baseApi = createApi({
   reducerPath: "api",
 
-  tagTypes: ["User", "Leads", "Trades"],
+  tagTypes: ["User", "Leads", "Trades", "support", "onboarding", "LeadsStatus"],
 
   baseQuery: fetchBaseQuery({
     baseUrl: getBaseUrl(),

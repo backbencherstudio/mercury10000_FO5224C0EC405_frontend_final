@@ -43,6 +43,7 @@ interface ProcessLeadsColumnProps {
   onView?: (row: LeadHistory) => void;
   onDelete?: (row: LeadHistory) => void;
   onEdit?: (row: LeadHistory) => void;
+  onStatusChange?: (id: string, newStatus: string) => void;
 }
 
 interface ActionDropdownProps {
@@ -52,23 +53,166 @@ interface ActionDropdownProps {
   onEdit?: (row: LeadHistory) => void;
 }
 
-// const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onView, onDelete, onEdit }) => (
-//   <div className="flex justify-center w-full">
-//     <DropdownMenu>
-//       <DropdownMenuTrigger asChild>
-//         <button className="cursor-pointer hover:bg-[#e9e9ea] px-3 py-1.5 rounded-full focus:outline-none">
-//           <Dot3Icon />
-//         </button>
-//       </DropdownMenuTrigger>
-//       <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none">
-//         <DropdownMenuItem onClick={() => onView?.(row)} className="cursor-pointer">View</DropdownMenuItem>
-//         <DropdownMenuItem onClick={() => onEdit?.(row)} className="cursor-pointer">Edit</DropdownMenuItem>
-//         <DropdownMenuItem onClick={() => onDelete?.(row)} className="cursor-pointer text-red-600">Delete</DropdownMenuItem>
-//       </DropdownMenuContent>
-//     </DropdownMenu>
-//   </div>
-// );
+// ─── Lead Sent Cell: clicking the arrow opens the view dialog directly ───────
+function LeadSentCell({ value }: { value: string }) {
+  const [openView, setOpenView] = React.useState(false);
 
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-sm text-[#06030C]">{value}</span>
+
+      {/* Arrow button → opens single view dialog */}
+      <button
+        className="ml-2 p-1 rounded hover:bg-gray-200 cursor-pointer"
+        type="button"
+        onClick={() => setOpenView(true)}
+      >
+        <TopRightArrow />
+      </button>
+
+      {/* Single View Dialog */}
+      <Dialog open={openView} onOpenChange={setOpenView}>
+        <DialogContent>
+          <h2 className="text-2xl text-[#111827] font-medium">Lead Sent Details</h2>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg text-[#1D1F2C] font-semibold">Date</h3>
+              <p className="text-base text-[#777980] mt-1.5">
+                {value
+                  ? new Date(value).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : "-"}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg text-[#1D1F2C] font-semibold">Time</h3>
+              <p className="text-base text-[#777980] mt-1.5">
+                {value
+                  ? new Date(value).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })
+                  : "-"}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
+
+// ─── Status Cell: 4-item dropdown (View Data, Schedule, Active, Close) ────────
+function StatusCell({
+  value,
+  row,
+  onStatusChange,
+}: {
+  value: string;
+  row: LeadHistory;
+  onStatusChange?: (id: string, newStatus: string) => void;
+}) {
+  const [openViewData, setOpenViewData] = React.useState(false);
+
+  let bg = "bg-gray-200";
+  let text = "text-gray-800";
+  const val = (value || "").toLowerCase();
+
+  if (val === "scheduled") {
+    bg = "bg-[#F8E997]";
+    text = "text-[#AC8815]";
+  } else if (val === "active" || val === "active work") {
+    bg = "bg-[#A7EADE]";
+    text = "text-[#116557]";
+  } else if (val === "closed") {
+    bg = "bg-[#FFB0B0]";
+    text = "text-[#F00]";
+  } else if (val === "invalid") {
+    bg = "bg-[#FFB0B0]";
+    text = "text-[#F00]";
+  }
+
+  // The lead_sent date for "View Data"
+  const leadSentValue = (row as any)?.created_at || (row as any)?.lead_sent || "";
+
+  return (
+    <>
+      <CustomDropdown
+        trigger={
+          <span
+            className={`px-2 flex justify-between gap-2 items-center py-1 rounded-[4px] text-xs cursor-pointer ${bg} ${text}`}
+          >
+            {value || "-"}
+            <TopRightArrow />
+          </span>
+        }
+        items={[
+          {
+            label: "View Data",
+            onClick: () => setOpenViewData(true),
+          },
+          {
+            label: "Schedule",
+            onClick: () => onStatusChange?.(row.id, "SCHEDULED"),
+          },
+          {
+            label: "Active",
+            onClick: () => onStatusChange?.(row.id, "ACTIVE"),
+          },
+          {
+            label: "Close",
+            onClick: () => onStatusChange?.(row.id, "CLOSED"),
+          },
+        ]}
+      />
+
+      {/* View Data Dialog — shows the lead sent date/time */}
+      <Dialog open={openViewData} onOpenChange={setOpenViewData}>
+        <DialogContent>
+          <h2 className="text-2xl text-[#111827] font-medium">Lead Details</h2>
+          <div className="space-y-6">
+            <div>
+              <h3 className="text-lg text-[#1D1F2C] font-semibold">Status</h3>
+              <p className={`text-sm mt-1.5 inline-block px-2 py-1 rounded-[4px] ${bg} ${text}`}>
+                {value || "-"}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg text-[#1D1F2C] font-semibold">Lead Sent Date</h3>
+              <p className="text-base text-[#777980] mt-1.5">
+                {leadSentValue
+                  ? new Date(leadSentValue).toLocaleDateString("en-US", {
+                      day: "numeric",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : "-"}
+              </p>
+            </div>
+            <div>
+              <h3 className="text-lg text-[#1D1F2C] font-semibold">Lead Sent Time</h3>
+              <p className="text-base text-[#777980] mt-1.5">
+                {leadSentValue
+                  ? new Date(leadSentValue).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })
+                  : "-"}
+              </p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+// ─── Main Column Builder ───────────────────────────────────────────────────────
 export function ProcessLeadsColumn({
   startIndex,
   selectedRows,
@@ -78,9 +222,14 @@ export function ProcessLeadsColumn({
   onView,
   onDelete,
   onEdit,
+  onStatusChange,
 }: ProcessLeadsColumnProps): ColumnConfig<LeadHistory>[] {
-  const isAllSelected = currentData.length > 0 && currentData.every((_, idx) => selectedRows.has(startIndex + idx));
-  const isSomeSelected = currentData.some((_, idx) => selectedRows.has(startIndex + idx));
+  const isAllSelected =
+    currentData.length > 0 &&
+    currentData.every((_, idx) => selectedRows.has(startIndex + idx));
+  const isSomeSelected = currentData.some((_, idx) =>
+    selectedRows.has(startIndex + idx)
+  );
 
   return [
     {
@@ -89,9 +238,11 @@ export function ProcessLeadsColumn({
           <input
             type="checkbox"
             checked={isAllSelected}
-            ref={el => { if (el) el.indeterminate = isSomeSelected && !isAllSelected; }}
-            onChange={e => onSelectAll(e.target.checked)}
-            onClick={e => e.stopPropagation()}
+            ref={(el) => {
+              if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+            }}
+            onChange={(e) => onSelectAll(e.target.checked)}
+            onClick={(e) => e.stopPropagation()}
             className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
           />
         </div>
@@ -105,8 +256,8 @@ export function ProcessLeadsColumn({
             <input
               type="checkbox"
               checked={selectedRows.has(globalIndex)}
-              onChange={e => onSelectRow(globalIndex, e.target.checked)}
-              onClick={e => e.stopPropagation()}
+              onChange={(e) => onSelectRow(globalIndex, e.target.checked)}
+              onClick={(e) => e.stopPropagation()}
               className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
             />
           </div>
@@ -117,112 +268,50 @@ export function ProcessLeadsColumn({
       label: "Lead ID",
       accessor: "lead_no",
       width: "100px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: string) => (
+        <span className="text-sm text-[#06030C]">{value}</span>
+      ),
     },
     {
       label: "City",
       accessor: "address",
       width: "170px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: string) => (
+        <span className="text-sm text-[#06030C]">{value}</span>
+      ),
     },
     {
       label: "Homeowner Name",
       accessor: "name",
       width: "140px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: string) => (
+        <span className="text-sm text-[#06030C]">{value}</span>
+      ),
     },
     {
       label: "Trade",
       accessor: "trade",
       width: "120px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (_: any, row: any) => (
+        <span className="text-sm text-[#06030C]">
+          {row?.trade?.name || (typeof row?.trade === "string" ? row.trade : "-")}
+        </span>
+      ),
     },
     {
       label: "Lead Sent",
       accessor: "created_at",
       width: "150px",
-      formatter: (value: string, row: LeadHistory) => {
-        const [openView, setOpenView] = React.useState(false);
-        const [openEdit, setOpenEdit] = React.useState(false);
-        return (
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-[#06030C]">{value}</span>
-            <CustomDropdown
-              trigger={
-                <button className="ml-2 p-1 rounded hover:bg-gray-200 cursor-pointer" type="button">
-                  <TopRightArrow />
-                </button>
-              }
-              items={[
-                { label: 'View lead date', onClick: () => setOpenView(true) },
-                { label: 'Edit lead date', onClick: () => setOpenEdit(true) },
-                { label: 'Active work', onClick: () => {} },
-                { label: 'Close', onClick: () => {} },
-              ]}
-              containerClassName=""
-              menuClassName=""
-            />
-            {/* View Dialog */}
-            <Dialog open={openView} onOpenChange={setOpenView}>
-              <DialogContent>
-                <h2 className="text-2xl text-[#111827] font-medium">Meeting Details</h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg text-[#1D1F2C] font-semibold">Date</h3>
-                    <p className="text-base text-[#777980] mt-1.5">13 February, 2026</p>
-                  </div>
-                  <div>
-                    <h3 className="text-lg text-[#1D1F2C] font-semibold">Time</h3>
-                    <p className="text-base text-[#777980] mt-1.5">11:00 PM</p>
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-            {/* Edit Dialog */}
-            <Dialog open={openEdit} onOpenChange={setOpenEdit}>
-              <DialogContent>
-                <h2 className="text-2xl text-[#111827] font-medium">Edit Lead Date</h2>
-                <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg text-[#1D1F2C] font-semibold">Date</h3>
-                    <input type="date" className="border rounded px-2 py-1 mt-1.5 w-full" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg text-[#1D1F2C] font-semibold">Time</h3>
-                    <input type="time" className="border rounded px-2 py-1 mt-1.5 w-full" />
-                  </div>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
-        );
-      },
+      // Use a proper React component so hooks work correctly
+      formatter: (value: string) => <LeadSentCell value={value} />,
     },
     {
       label: "Status",
       accessor: "status",
-      width: "120px",
-      formatter: (value: string) => {
-        let bg = "bg-gray-200";
-        let text = "text-gray-800";
-        const val = (value || '').toLowerCase();
-        if (val === "scheduled") {
-          bg = "bg-[#F8E997]";
-          text = "text-[#AC8815]";
-        } else if (val === "active work") {
-          bg = "bg-[#A7EADE]";
-          text = "text-[#116557]";
-        } else if (val === "closed") {
-          bg = "bg-[#FFB0B0]";
-          text = "text-[#F00]";
-        } else if (val === "invalid") {
-          bg = "bg-[#FFB0B0]";
-          text = "text-[#F00]";
-        }
-        return (
-          <span className={`px-2 py-1 rounded-[4px] text-xs ${bg} ${text}`}>{value || '-'}</span>
-        );
-      },
-    }
+      width: "140px",
+      formatter: (value: string, row: LeadHistory) => (
+        <StatusCell value={value} row={row} onStatusChange={onStatusChange} />
+      ),
+    },
   ];
 }
