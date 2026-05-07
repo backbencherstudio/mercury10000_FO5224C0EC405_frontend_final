@@ -1,4 +1,5 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import Dot3Icon from "@/components/icons/admin/Dot3Icon";
 import {
   DropdownMenu,
@@ -32,6 +33,10 @@ interface ContactRequestColumnProps {
 
 // Secretary Note Dialog Component
 const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
+
+  const [expanded, setExpanded] = useState(false);
+
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -48,6 +53,28 @@ const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
         </DialogHeader>
 
         <div className="space-y-6 mt-6">
+
+          <div className="max-w-xl bg-[#F8FAFB]  p-2">
+            <p
+              className={`text-sm text-gray-700 ${!expanded ? "line-clamp-2" : ""
+                }`}
+            >
+              <p className="text-base text-[#777980] mt-2">
+                {row?.secretary_note || "-"}
+              </p>
+            </p>
+
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-black text-sm mt-1"
+            >
+              {expanded ? "View Less" : "View More"}
+            </button>
+          </div>
+          <div>
+
+
+          </div>
 
           <div>
             <h2 className="text-lg font-semibold">Requested Date</h2>

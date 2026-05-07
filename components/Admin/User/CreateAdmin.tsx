@@ -9,12 +9,12 @@ import { AllAdminColumn } from '@/components/columns/AllAdminColumn';
 import { useRegisterMutation } from '@/redux/features/auth/authApi';
 import { toast } from 'react-hot-toast';
 import { useGetAllscrateryQuery } from "@/redux/features/user/user";
-import { CloudCog } from "lucide-react";
+import { CloudCog, Eye, EyeOff } from "lucide-react";
 
 export default function CreateAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -30,7 +30,7 @@ export default function CreateAdmin() {
 
   // 2. Derive data from the query results
   const allSecretaryData = allSecretary?.data || [];
-  console.log(allSecretaryData,'ddddddddd')
+  console.log(allSecretaryData, 'ddddddddd')
 
   // 3. Setup pagination variables based on the fetched data
   const totalItems = allSecretaryData?.length || 0;
@@ -63,7 +63,7 @@ export default function CreateAdmin() {
     if (!formData.phone) nextFieldErrors.phone = "Phone number is required";
     if (!formData.password) nextFieldErrors.password = "Password is required";
     if (!formData.email) nextFieldErrors.email = "Email is required";
-    
+
     if (Object.keys(nextFieldErrors).length > 0) {
       setFieldErrors(nextFieldErrors);
       return;
@@ -132,16 +132,34 @@ export default function CreateAdmin() {
             {fieldErrors.phone && <span className='text-red-600 text-sm'>{fieldErrors.phone}</span>}
           </div>
           <div className='flex flex-col gap-1.5'>
-            <label htmlFor='password' className='text-base text-[#1D1F2C]'>Password</label>
-            <input
-              id='password'
-              type='password'
-              className='py-2 px-2.5 rounded-[8px] border border-[#D2D2D5] w-full text-base text-[#161721]'
-              placeholder='Enter password'
-              value={formData.password}
-              onChange={handleInputChange}
-            />
-            {fieldErrors.password && <span className='text-red-600 text-sm'>{fieldErrors.password}</span>}
+            <label htmlFor='password' className='text-base text-[#1D1F2C]'>
+              Password
+            </label>
+
+            <div className="relative">
+              <input
+                id='password'
+                type={showPassword ? "text" : "password"}
+                className='py-2 px-2.5 pr-10 rounded-[8px] border border-[#D2D2D5] w-full text-base text-[#161721]'
+                placeholder='Enter password'
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+
+            {fieldErrors.password && (
+              <span className='text-red-600 text-sm'>
+                {fieldErrors.password}
+              </span>
+            )}
           </div>
           <div className='flex flex-col gap-1.5'>
             <label htmlFor='email' className='text-base text-[#1D1F2C]'>Email</label>

@@ -12,6 +12,7 @@ export interface RequestPoolColumnOptions {
 	handleDelete: (row: any) => void;
 	currentData: any[];
 	setViewNote: (note: string) => void;
+	lockedTrade: string | null;
 }
 
 export function RequestPoolColumn({
@@ -23,6 +24,7 @@ export function RequestPoolColumn({
 	handleDelete,
 	currentData,
 	setViewNote,
+	lockedTrade,
 }: RequestPoolColumnOptions) {
 	return [
 		{
@@ -30,7 +32,7 @@ export function RequestPoolColumn({
 				<div className="flex items-center justify-center">
 					<input
 						type="checkbox"
-						checked={selectedRows.size === currentData.length && currentData.length > 0}
+						checked={selectedRows.size === currentData.filter(row => !lockedTrade || row.trade?.name === lockedTrade).length && currentData.length > 0}
 						ref={el => {
 							if (el) el.indeterminate = selectedRows.size > 0 && selectedRows.size < currentData.length;
 						}}
@@ -42,51 +44,55 @@ export function RequestPoolColumn({
 			),
 			accessor: 'checkbox',
 			width: '50px',
-			formatter: (_: any, row: any) => (
-				<div className="flex items-center justify-center">
-					<input
-						type="checkbox"
-						checked={selectedRows.has(row.id)}
-						onChange={e => handleSelectRow(row.id, e.target.checked)}
-						onClick={e => e.stopPropagation()}
-						className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-					/>
-				</div>
-			),
+			formatter: (_: any, row: any) => {
+				const isDisabled = lockedTrade && row.trade?.name !== lockedTrade;
+				return (
+					<div className={`flex items-center justify-center ${isDisabled ? 'opacity-50' : ''}`}>
+						<input
+							type="checkbox"
+							checked={selectedRows.has(row.id)}
+							onChange={e => handleSelectRow(row.id, e.target.checked)}
+							onClick={e => e.stopPropagation()}
+							disabled={isDisabled}
+							className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+						/>
+					</div>
+				);
+			},
 		},
 		{
 			label: 'ID',
 			accessor: 'id',
 			width: '60px',
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
+			formatter: (value: string) => (
+				<span className="text-sm text-[#06030C]">{value}</span>
+			),
 		},
 		{
 			label: 'City',
-			accessor: 'city',
+			accessor: 'location',
 			width: '120px',
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
+			formatter: (value: string) => (
+				<span className="text-sm text-[#06030C]">{value}</span>
+			),
 		},
 		{
 			label: 'Trade',
-			accessor: 'Trade',
+			accessor: 'trade',
 			width: '120px',
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
+			formatter: (value: any) => (
+				<span className="text-sm text-[#06030C]">{value?.name || 'N/A'}</span>
+			),
 		},
 		{
 			label: 'Note',
-			accessor: 'note',
+			accessor: 'description',
 			width: '200px',
 			formatter: (value: string, row: any) => (
 				<>
-					<span>
+					{/* <span>
 						{value.length > 60 ? value.slice(0, 60) + '......' : value}
-					</span>
+					</span> */}
 					{/* {value.length > 60 && (
 						<button
 							className="ml-2 text-xs underline text-blue-600 hover:text-blue-800"
@@ -96,6 +102,8 @@ export function RequestPoolColumn({
 							View More
 						</button>
 					)} */}
+					<span className="text-sm text-[#06030C]">{value}</span>
+
 				</>
 			),
 		},

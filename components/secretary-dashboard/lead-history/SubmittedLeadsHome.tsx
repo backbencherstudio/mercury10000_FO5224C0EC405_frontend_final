@@ -4,17 +4,60 @@ import { secretarySubmittedLeadsData } from '@/public/demoData/SecretarySubmitte
 import DynamicTable from '@/components/reusable/DynamicTable'
 import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
-import React, { useState } from 'react'
+import React, { useMemo, useState } from 'react'
+import { useGetDashboardOverviewQuery } from '@/redux/features/dashboardOverview/dashboardOverView'
+import { CloudCog } from 'lucide-react'
 
 export default function SubmittedLeadsHome() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
+    const [arrowDialogOpen, setArrowDialogOpen] = useState(false);
+    const [arrowDialogData, setArrowDialogData] = useState<any>(null);
 
-    const totalItems = secretarySubmittedLeadsData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
+    const [leadProcessDialogOpen, setLeadProcessDialogOpen] = useState(false);
+    const [notLeadDialogOpen, setNotLeadDialogOpen] = useState(false);
+    const [dialogRowData, setDialogRowData] = useState<any>(null);
+
+    const [tradeFilter, setTradeFilter] = useState<string>("all");
+    const [searchInput, setSearchInput] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+
+    const params = useMemo(() => {
+        const p: Record<string, string | number> = {
+            page: currentPage,
+            limit: itemsPerPage,
+        };
+
+        if (tradeFilter !== "all") {
+            p.trade_id = tradeFilter;
+        }
+
+        if (debouncedSearch) {
+            p.search = debouncedSearch;
+        }
+
+        return p;
+    }, [currentPage, itemsPerPage, tradeFilter, debouncedSearch]);
+
+    const { data, isLoading, error } = useGetDashboardOverviewQuery(params);
+
+    const apiData = data?.data || [];
+    const meta = (data as any)?.meta;
+
+    console.log(data, "ppppppppppp")
+    const allSubmitedLeads = data?.data || [];
+    console.log("allSubmitedLeads", allSubmitedLeads);
+    const totalItems = data?.total_items || 0;
+    const totalPages = data?.total_pages || 1;
     const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = secretarySubmittedLeadsData.slice(startIndex, startIndex + itemsPerPage);
+    const currentData = allSubmitedLeads.slice(
+        startIndex,
+        startIndex + itemsPerPage
+    );
+    console.log("currentData", currentData);
+
+
 
     // Selection handlers
     const onSelectAll = (checked: boolean) => {

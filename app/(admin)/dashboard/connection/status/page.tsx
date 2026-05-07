@@ -7,6 +7,7 @@ import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { useRouter } from 'next/navigation'
 import React, { useState, useMemo } from 'react'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { useGetCunnectionStausQuery } from '@/redux/features/connection/connections'
 
 
 export default function UserResponsesPage() {
@@ -17,6 +18,9 @@ export default function UserResponsesPage() {
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [tradeFilter, setTradeFilter] = useState('all');
+
+    const { data: cunnectionStatus, isLoading: isLoadingCunnectionStatus, error: errorCunnectionStatus } = useGetCunnectionStausQuery({ type: tradeFilter })
+    console.log("cunnectionStatus: ", cunnectionStatus)
 
     // Get all unique trades for filter dropdown
     const allTrades = useMemo(() => {
@@ -47,7 +51,7 @@ export default function UserResponsesPage() {
     const handleEdit = (row: any) => {
         setIsEditOpen(true);
     };
-    const handleDelete = (row: any) => {};
+    const handleDelete = (row: any) => { };
     const handleViewClose = () => {
         setViewRow({ isOpen: false, rowData: null });
     };

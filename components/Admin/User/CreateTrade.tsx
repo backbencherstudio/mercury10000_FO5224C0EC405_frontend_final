@@ -6,7 +6,6 @@ import SearchIcon from '@/components/icons/admin/SearchIcon'
 import SuccessTik from '@/components/icons/admin/SuccessTik'
 import CrossIcon from '@/components/icons/admin/CrossIcon'
 import { TradeColumn } from '@/components/columns/TradeColumn'
-import { UserService } from '@/service/user/user.service'
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetTradesQuery, useCreateTradeMutation, useDeleteTradeMutation, useUpdateTradeMutation } from '@/redux/features/user/user'
 
@@ -35,15 +34,15 @@ type AlertState = {
 
 export default function CreateTrade() {
   const [tradeName, setTradeName] = useState('');
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [alert, setAlert] = useState<AlertState>(null);
   const [createTradeMutation] = useCreateTradeMutation();
   const [deleteTradeMutation] = useDeleteTradeMutation();
   const [updateTradeMutation] = useUpdateTradeMutation();
   const { data: trades = [], isLoading: isLoadingTrades, error } = useGetTradesQuery(undefined);
-  console.log("trades: ",trades)
-  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);  
+  console.log("trades: ", trades)
+  const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -59,33 +58,33 @@ export default function CreateTrade() {
     }
   }, [error, isLoadingTrades]);
 
- const formatTradeDate = (value?: string) => {
-  if (!value) return '-';
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return '-';
+  const formatTradeDate = (value?: string) => {
+    if (!value) return '-';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '-';
 
-  const parts = date.toLocaleDateString('en-GB', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-  }).split(' ');
+    const parts = date.toLocaleDateString('en-GB', {
+      day: 'numeric',
+      month: 'short',
+      year: 'numeric',
+    }).split(' ');
 
-  return parts.length === 3 
-    ? `${parts[0]} ${parts[1]}, ${parts[2]}`
-    : date.toLocaleDateString('en-GB');
-};
+    return parts.length === 3
+      ? `${parts[0]} ${parts[1]}, ${parts[2]}`
+      : date.toLocaleDateString('en-GB');
+  };
 
-const tradeRows = useMemo(() => {
-  if (!Array.isArray(trades)) return [];
+  const tradeRows = useMemo(() => {
+    if (!Array.isArray(trades)) return [];
 
-  return trades.map((trade, index) => ({
-    serial_no: String(index + 1).padStart(2, '0'),
-    trade_name: trade.name,
-    date: formatTradeDate(trade.created_at), 
-    status: trade.status === 'ACTIVE' ? 'active' : 'pause',
-    id: trade.id,
-  }));
-}, [trades]);
+    return trades.map((trade, index) => ({
+      serial_no: String(index + 1).padStart(2, '0'),
+      trade_name: trade.name,
+      date: formatTradeDate(trade.created_at),
+      status: trade.status === 'ACTIVE' ? 'active' : 'pause',
+      id: trade.id,
+    }));
+  }, [trades]);
 
   const toAlertMessage = (value: unknown) => {
     if (typeof value === 'string') return value;
@@ -132,7 +131,7 @@ const tradeRows = useMemo(() => {
         });
         return;
       }
-      
+
       setTradeName('');
       setAlert({
         type: 'success',
@@ -197,7 +196,7 @@ const tradeRows = useMemo(() => {
   };
 
   // Filter trades based on search term
-  const filteredTrades = tradeRows.filter(trade => 
+  const filteredTrades = tradeRows.filter(trade =>
     trade.trade_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -217,11 +216,11 @@ const tradeRows = useMemo(() => {
         <Skeleton className="h-4 w-[200px]" />
         <Skeleton className="h-4 w-[150px]" />
         <Skeleton className="h-4 w-[100px]" />
-          <Skeleton className="h-4 w-[200px]" />
-          <Skeleton className="h-4 w-[200px]" />
-          <Skeleton className="h-4 w-[200px]" />
+        <Skeleton className="h-4 w-[200px]" />
+        <Skeleton className="h-4 w-[200px]" />
+        <Skeleton className="h-4 w-[200px]" />
       </div>
-      
+
       {/* Table Rows Skeleton */}
       {[...Array(3)].map((_, index) => (
         <div key={index} className="flex gap-4 py-4 border-b border-[#E9E9EA] last:border-0">
@@ -267,15 +266,15 @@ const tradeRows = useMemo(() => {
 
     // Show the table with data
     return (
-      <DynamicTable 
-        data={displayTrades} 
-        columns={TradeColumn({ 
-          onView: handleView, 
-          onEdit: handleEdit, 
+      <DynamicTable
+        data={displayTrades}
+        columns={TradeColumn({
+          onView: handleView,
+          onEdit: handleEdit,
           onDelete: handleDelete,
-          onStatusChange: handleStatusChange 
-        })} 
-        showPagination={false} 
+          onStatusChange: handleStatusChange
+        })}
+        showPagination={false}
       />
     );
   };
@@ -291,7 +290,7 @@ const tradeRows = useMemo(() => {
           <p className='text-sm text-[#06030C] mt-4'>{alert.message}</p>
         </div>
       )}
-      
+
       <div className='p-4 sm:p-6 border border-[#D2D2D5] rounded-[8px] mt-8'>
         <h3 className='text-xl sm:text-2xl text-[#111827] font-medium'>Create a Trade</h3>
         <form onSubmit={handleCreateTrade}>
@@ -331,16 +330,16 @@ const tradeRows = useMemo(() => {
             <div className='flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2'>
               <div className='relative w-full sm:w-auto'>
                 <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
-                <input 
-                  type="text" 
-                  className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500' 
-                  placeholder='Search trades here' 
+                <input
+                  type="text"
+                  className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500'
+                  placeholder='Search trades here'
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   disabled={isLoadingTrades}
                 />
               </div>
-              <button 
+              <button
                 className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'
                 disabled={isLoadingTrades}
               >

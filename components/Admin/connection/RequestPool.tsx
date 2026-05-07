@@ -1,12 +1,12 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import FilterIcon from '@/components/icons/admin/FilterIcon';
 import SearchIcon from '@/components/icons/admin/SearchIcon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import DynamicTable from '@/components/reusable/DynamicTable';
 import { requestPoolData } from '@/public/demoData/RequestPoolData';
 import { RequestPoolColumn } from '@/components/columns/RequestPoolColumn';
-import { usersData } from '@/public/demoData/UsersData';
+import { useGetAllUsersQuery } from '@/redux/features/auth/authApi';
 import { UsersColumn } from '@/components/columns/UsersColumn';
 import {
     Dialog,
@@ -17,6 +17,8 @@ import {
     DialogDescription,
     DialogClose
 } from '@/components/ui/dialog';
+import { CloudCog } from 'lucide-react';
+import { useGetRequestPoolQuery, useUpdateUserRequestSentMutation } from '@/redux/features/connection/connections';
 
 
 export default function RequestPool() {
@@ -32,49 +34,121 @@ export default function RequestPool() {
     const [userTradeFilter, setUserTradeFilter] = useState('all');
     const [userSelectedRows, setUserSelectedRows] = useState<Set<string>>(new Set());
     const [userSearch, setUserSearch] = useState('');
+
+    const { data: userData, isLoading: isUserLoading } = useGetAllUsersQuery({ page: 1, limit: 100 });
+
+    const usersData = useMemo(() => {
+        return Array.isArray(userData?.data) ? userData.data : [];
+    }, [userData]);
+
+    const { data, isLoading, error } = useGetRequestPoolQuery({});
+    const requestPoolData = useMemo(() => {
+        const rawData = data?.data;
+        if (!rawData) return [];
+        return Array.isArray(rawData) ? rawData : Object.values(rawData);
+    }, [data]);
+
+    const lockedTrade = useMemo(() => {
+        if (selectedRows.size === 0) return null;
+        const firstId = Array.from(selectedRows)[0];
+        const firstRow = requestPoolData.find((r: any) => r.id === firstId);
+        return firstRow?.trade?.name || null;
+    }, [selectedRows, requestPoolData]);
+
+    const [userSend, { isLoading: isSending }] = useUpdateUserRequestSentMutation();
+
+    const handleBulkSend = async () => {
+        const userIds = Array.from(userSelectedRows);
+        const requestIds = Array.from(selectedRows);
+
+        if (userIds.length === 0 || requestIds.length === 0) return;
+
+        try {
+            await Promise.all(requestIds.map(requestId =>
+                userSend({
+                    id: requestId,
+                    data: { user_ids: userIds }
+                }).unwrap()
+            ));
+            setSendDialogOpen(false);
+            setSelectedRows(new Set());
+            setUserSelectedRows(new Set());
+        } catch (err) {
+            console.error('Bulk send failed:', err);
+        }
+    };
+
     // User table filter logic
-    const userAllTrades = Array.from(new Set(usersData.map((row) => row.trade)));
-    const userFilteredData = usersData.filter(row => {
-        const tradeMatch = userTradeFilter === 'all' || row.trade === userTradeFilter;
-        const searchMatch = userSearch.trim() === '' || row.name.toLowerCase().includes(userSearch.trim().toLowerCase());
-        return tradeMatch && searchMatch;
-    });
+    const userAllTrades = useMemo(() => {
+        const trades = new Set<string>();
+        usersData.forEach((user: any) => {
+            if (Array.isArray(user.trades)) {
+                user.trades.forEach((t: any) => {
+                    if (t.name) trades.add(t.name);
+                });
+            }
+        });
+        return Array.from(trades);
+    }, [usersData]);
+
+    const userFilteredData = useMemo(() => {
+        return usersData.filter((row: any) => {
+            const tradeMatch = userTradeFilter === 'all' ||
+                (Array.isArray(row.trades) && row.trades.some((t: any) => t.name === userTradeFilter));
+            const searchMatch = userSearch.trim() === '' ||
+                row.name?.toLowerCase().includes(userSearch.trim().toLowerCase());
+            return tradeMatch && searchMatch;
+        });
+    }, [usersData, userTradeFilter, userSearch]);
+
     const userTotalItems = userFilteredData.length;
     const userTotalPages = Math.ceil(userTotalItems / userItemsPerPage);
     const userStartIndex = (userCurrentPage - 1) * userItemsPerPage;
-    const userCurrentData = userFilteredData.slice(userStartIndex, userStartIndex + userItemsPerPage);
 
-        const handleUserSelectAll = (checked: boolean) => {
-            if (checked) {
-                setUserSelectedRows(new Set(userCurrentData.map(row => row.userId)));
-            } else {
-                setUserSelectedRows(new Set());
-            }
-        };
-        const handleUserSelectRow = (id: string, checked: boolean) => {
-            setUserSelectedRows(prev => {
-                const next = new Set(prev);
-                if (checked) next.add(id); else next.delete(id);
-                return next;
-            });
-        };
-        const userColumns = UsersColumn({
-            selectedRows: userSelectedRows,
-            handleSelectAll: handleUserSelectAll,
-            handleSelectRow: handleUserSelectRow,
-            currentData: userCurrentData,
+    const userCurrentData = useMemo(() => {
+        const sliced = userFilteredData.slice(userStartIndex, userStartIndex + userItemsPerPage);
+        // Map to match UsersColumn expected format
+        return sliced.map((user: any) => ({
+            ...user,
+            userId: user.id, // UsersColumn expects userId
+            trade: Array.isArray(user.trades) ? user.trades.map((t: any) => t.name).join(', ') : '-'
+        }));
+    }, [userFilteredData, userStartIndex, userItemsPerPage]);
+
+    const handleUserSelectAll = (checked: boolean) => {
+        if (checked) {
+            setUserSelectedRows(new Set(userCurrentData.map(row => row.userId)));
+        } else {
+            setUserSelectedRows(new Set());
+        }
+    };
+    const handleUserSelectRow = (id: string, checked: boolean) => {
+        setUserSelectedRows(prev => {
+            const next = new Set(prev);
+            if (checked) next.add(id); else next.delete(id);
+            return next;
         });
+    };
+    const userColumns = UsersColumn({
+        selectedRows: userSelectedRows,
+        handleSelectAll: handleUserSelectAll,
+        handleSelectRow: handleUserSelectRow,
+        currentData: userCurrentData,
+    });
     const [tradeFilter, setTradeFilter] = useState<string>('all');
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
     // Get unique trades for filter dropdown
-    const allTrades = Array.from(new Set(requestPoolData.map((row) => row.Trade)));
+    const allTrades = Array.from(
+        new Set(requestPoolData.map((row: any) => row.trade?.name).filter(Boolean))
+    );
 
     // Filter data by trade
-    const filteredData = tradeFilter === 'all'
-        ? requestPoolData
-        : requestPoolData.filter((row) => row.Trade === tradeFilter);
+    const filteredData =
+        tradeFilter === 'all'
+            ? requestPoolData
+            : requestPoolData.filter((row: any) => row.trade?.name === tradeFilter);
 
     const totalItems = filteredData.length;
     const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -83,15 +157,27 @@ export default function RequestPool() {
 
     const handleSelectAll = (checked: boolean) => {
         if (checked) {
-            setSelectedRows(new Set(currentData.map(row => row.id)));
+            const rowsToSelect = currentData
+                .filter(row => !lockedTrade || row.trade?.name === lockedTrade)
+                .map(row => row.id);
+            setSelectedRows(new Set(rowsToSelect));
         } else {
             setSelectedRows(new Set());
         }
     };
+
     const handleSelectRow = (id: string, checked: boolean) => {
         setSelectedRows(prev => {
             const next = new Set(prev);
-            if (checked) next.add(id); else next.delete(id);
+            if (checked) {
+                // If it's the first selection, or matches the locked trade
+                const row = requestPoolData.find((r: any) => r.id === id);
+                if (!lockedTrade || row?.trade?.name === lockedTrade) {
+                    next.add(id);
+                }
+            } else {
+                next.delete(id);
+            }
             return next;
         });
     };
@@ -110,6 +196,7 @@ export default function RequestPool() {
         handleDelete,
         currentData,
         setViewNote,
+        lockedTrade,
     });
 
     return (
@@ -135,9 +222,9 @@ export default function RequestPool() {
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Trades</SelectItem>
-                                    {allTrades.map(trade => (
+                                    {/* {allTrades.map(trade => (
                                         <SelectItem key={trade} value={trade}>{trade}</SelectItem>
-                                    ))}
+                                    ))} */}
                                 </SelectContent>
                             </Select>
                         </div>
@@ -159,13 +246,26 @@ export default function RequestPool() {
                 />
 
                 <div className=' flex items-center justify-end mt-8'>
-                    <Dialog open={sendDialogOpen} onOpenChange={setSendDialogOpen}>
+                    <Dialog
+                        open={sendDialogOpen}
+                        onOpenChange={(open) => {
+                            setSendDialogOpen(open);
+                            if (open && lockedTrade) {
+                                setUserTradeFilter(lockedTrade);
+                            }
+                        }}
+                    >
                         <DialogTrigger asChild>
-                            <button className=' py-3 bg-[#0b7680] rounded-[8px] w-3xs text-base text-white cursor-pointer '>Send Connection</button>
-                        </DialogTrigger> 
+                            <button
+                                disabled={selectedRows.size === 0}
+                                className={`py-3 rounded-[8px] w-3xs text-base text-white cursor-pointer ${selectedRows.size === 0 ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0b7680]'}`}
+                            >
+                                Send Connection
+                            </button>
+                        </DialogTrigger>
                         <DialogContent className="sm:max-w-6xl p-6 rounded-xl shadow-lg">
                             <DialogHeader>
-                                 <h2 className=' text-center text-2xl text-[#111827] font-medium'>Send A Connection Request</h2>
+                                <h2 className=' text-center text-2xl text-[#111827] font-medium'>Send A Connection Request</h2>
                             </DialogHeader>
                             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6'>
                                 <div className='relative w-full sm:w-auto'>
@@ -187,14 +287,18 @@ export default function RequestPool() {
                                         <span className='hidden sm:inline'>Filter</span>
                                     </button>
                                     <div className='w-full sm:w-auto'>
-                                        <Select value={userTradeFilter} onValueChange={value => { setUserTradeFilter(value); setUserCurrentPage(1); }}>
-                                            <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px] ml-0 sm:ml-2'>
+                                        <Select value={userTradeFilter} onValueChange={setUserTradeFilter}>
+                                            <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px]'>
                                                 <SelectValue placeholder="Trade Filter" />
                                             </SelectTrigger>
+
                                             <SelectContent>
                                                 <SelectItem value="all">All Trades</SelectItem>
-                                                {userAllTrades.map(trade => (
-                                                    <SelectItem key={trade} value={trade}>{trade}</SelectItem>
+
+                                                {userAllTrades.map((trade: any) => (
+                                                    <SelectItem key={trade} value={trade}>
+                                                        {trade}
+                                                    </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>
@@ -213,12 +317,23 @@ export default function RequestPool() {
                                     setItemsPerPage={setUserItemsPerPage}
                                     showPagination={true}
                                     noDataMessage="No users found"
-                                    loading={false}
+                                    loading={isUserLoading}
                                 />
                             </div>
                             <div className=' flex items-center justify-center gap-8'>
-                                <button className=' p-3 border border-[#D2D2D5] rounded-[8px] w-[248px] cursor-pointer'>Cancel</button>
-                                <button className=' p-3 rounded-[8px] bg-[#0b7680] text-white text-base  cursor-pointer w-[248px]'>Send Connection</button>
+                                <button
+                                    onClick={() => setSendDialogOpen(false)}
+                                    className=' p-3 border border-[#D2D2D5] rounded-[8px] w-[248px] cursor-pointer'
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    onClick={handleBulkSend}
+                                    disabled={userSelectedRows.size === 0 || isSending}
+                                    className={`p-3 rounded-[8px] text-white text-base cursor-pointer w-[248px] ${userSelectedRows.size === 0 || isSending ? 'bg-gray-400 cursor-not-allowed' : 'bg-[#0b7680]'}`}
+                                >
+                                    {isSending ? 'Sending...' : 'Send Connection'}
+                                </button>
                             </div>
                         </DialogContent>
                     </Dialog>
@@ -233,19 +348,19 @@ export default function RequestPool() {
                         <div className="space-y-5">
                             <div className="border-b border-[#e9e9ea] pb-2.5">
                                 <div className="flex items-center gap-2">
-                                    
+
                                     <h3 className="text-base text-[#070707] font-medium">City</h3>
                                 </div>
                                 <p className="text-sm text-[#777980] mt-2.5">123 Main St, Los Angeles</p>
                             </div>
                             <div className="border-b border-[#e9e9ea] pb-2.5">
                                 <div className="flex items-center gap-2">
-                                    
+
                                     <h3 className="text-base text-[#070707] font-medium">Trade</h3>
                                 </div>
                                 <p className="text-sm text-[#777980] mt-2.5">Electrician</p>
                             </div>
-                          
+
                             <div className="border-b border-[#e9e9ea] pb-2.5">
                                 <div>
                                     <h3 className="text-base text-[#070707] font-medium">Trade</h3>

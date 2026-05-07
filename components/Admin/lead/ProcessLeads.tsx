@@ -104,7 +104,7 @@ export default function ProcessLeads() {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="Scheduled">Scheduled</SelectItem>
-                <SelectItem value="Active_Work">Active Work</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Closed">Closed</SelectItem>
                 <SelectItem value="Invalid">Invalid</SelectItem>
               </SelectContent>

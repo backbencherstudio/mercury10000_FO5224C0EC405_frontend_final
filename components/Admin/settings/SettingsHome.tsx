@@ -1,44 +1,77 @@
 "use client";
 
-import React, { useState } from 'react'
+import { useGetAuthmeQuery, useUpdateUserProfileMutation } from '@/redux/features/auth/authApi';
+import React, { useState, useEffect } from 'react'
 
 interface EditableField {
   name: string;
-  location: string;
+  address: string;
   email: string;
 }
 
 export default function SettingsHome() {
   const [isEditing, setIsEditing] = useState<{
     name: boolean;
-    location: boolean;
+    address: boolean;
     email: boolean;
   }>({
     name: false,
-    location: false,
+    address: false,
     email: false
   });
 
+  const { data: authData } = useGetAuthmeQuery({})
+  const user = authData?.data
+
   const [formData, setFormData] = useState<EditableField>({
-    name: 'John Ryan',
-    location: 'United Kingdom',
-    email: 'sample@gmail.com'
+    name: "",
+    address: "",
+    email: ""
   });
 
   const [tempData, setTempData] = useState<EditableField>({
-    name: 'John Ryan',
-    location: 'United Kingdom',
-    email: 'sample@gmail.com'
+    name: "",
+    address: "",
+    email: ""
   });
+
+  useEffect(() => {
+    if (user) {
+      setFormData({
+        name: user.name || "",
+        address: user.address || "",
+        email: user.email || ""
+      });
+      setTempData({
+        name: user.name || "",
+        address: user.address || "",
+        email: user.email || ""
+      });
+    }
+  }, [user]);
+
+  const [updateUserProfile, { isError }] = useUpdateUserProfileMutation()
 
   const handleEdit = (field: keyof EditableField) => {
     setTempData(prev => ({ ...prev, [field]: formData[field] }));
     setIsEditing(prev => ({ ...prev, [field]: true }));
   };
 
-  const handleSave = (field: keyof EditableField) => {
-    setFormData(prev => ({ ...prev, [field]: tempData[field] }));
+  const handleSave = async (field: keyof EditableField) => {
+    const updated = { ...formData, [field]: tempData[field] };
+    setFormData(updated);
     setIsEditing(prev => ({ ...prev, [field]: false }));
+
+    const bodyMap: Record<keyof EditableField, string> = {
+      name: 'name',
+      address: 'address',
+      email: 'email',
+    };
+
+    await updateUserProfile({
+      id: user?.id,
+      body: { [bodyMap[field]]: tempData[field] }
+    });
   };
 
   const handleCancel = (field: keyof EditableField) => {
@@ -61,7 +94,7 @@ export default function SettingsHome() {
   return (
     <div className='mt-12 space-y-6'>
       <h2 className='text-[26px] text-[#161721] font-medium'>Your Details</h2>
-      
+
       {/* Name Field */}
       <div className='flex items-end justify-between border-b border-[#E9E9EA] pb-2'>
         <div className='flex-1'>
@@ -108,29 +141,29 @@ export default function SettingsHome() {
       <div className='flex items-end justify-between border-b border-[#E9E9EA] pb-2'>
         <div className='flex-1'>
           <h3 className='text-lg text-[#1D1F2C] font-semibold'>Location</h3>
-          {isEditing.location ? (
+          {isEditing.address ? (
             <input
               type="text"
-              value={tempData.location}
-              onChange={(e) => handleChange('location', e.target.value)}
-              onKeyDown={(e) => handleKeyDown(e, 'location')}
+              value={tempData.address}
+              onChange={(e) => handleChange('address', e.target.value)}
+              onKeyDown={(e) => handleKeyDown(e, 'address')}
               className='mt-1.5 w-full bg-transparent text-base text-[#777980] border-0 outline-none p-0'
               autoFocus
             />
           ) : (
-            <p className='mt-1.5 text-base text-[#777980]'>{formData.location}</p>
+            <p className='mt-1.5 text-base text-[#777980]'>{formData.address}</p>
           )}
         </div>
-        {isEditing.location ? (
+        {isEditing.address ? (
           <div className='flex gap-2 ml-4'>
             <button
-              onClick={() => handleSave('location')}
+              onClick={() => handleSave('address')}
               className='text-base text-[#0E93A1] cursor-pointer hover:text-[#0C7A85]'
             >
               Save
             </button>
             <button
-              onClick={() => handleCancel('location')}
+              onClick={() => handleCancel('address')}
               className='text-base text-[#777980] cursor-pointer hover:text-[#5A5B65]'
             >
               Cancel
@@ -138,7 +171,7 @@ export default function SettingsHome() {
           </div>
         ) : (
           <button
-            onClick={() => handleEdit('location')}
+            onClick={() => handleEdit('address')}
             className='text-base text-[#777980] cursor-pointer hover:text-[#0E93A1]'
           >
             Edit

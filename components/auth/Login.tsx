@@ -203,7 +203,7 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Login'}
             </button>
           </form>
-          <div className={`flex items-center justify-center w-full my-5`}>
+          {/* <div className={`flex items-center justify-center w-full my-5`}>
             <div className="flex-1 h-[1px] bg-[#e9e9ea]"></div>
             <span className="px-2.5 text-sm lg:text-base text-[#777980]">Or</span>
             <div className="flex-1 h-[1px] bg-[#e9e9ea]"></div>
@@ -211,7 +211,7 @@ export default function Login() {
           <div className=' flex flex-col lg:flex-row items-center  gap-5'>
             <button className=' flex items-center gap-2.5 py-4 px-6 bg-[#5583ec] rounded-[8px] text-white cursor-pointer'> <GoogleIcon className=' bg-white rounded-full ' /> Login with Google </button>
             <button className=' flex items-center gap-2.5 py-4 px-6 border border-[#e9e9ea] cursor-pointer    rounded-[8px] text-[#1D1F2C]'>  <AppleIcon /> Login with Apple </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

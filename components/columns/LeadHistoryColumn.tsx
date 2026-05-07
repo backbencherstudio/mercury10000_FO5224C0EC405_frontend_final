@@ -82,9 +82,7 @@ export function LeadHistoryColumn({
   const isAllSelected = currentData.length > 0 && currentData.every((_, idx) => selectedRows.has(startIndex + idx));
   const isSomeSelected = currentData.some((_, idx) => selectedRows.has(startIndex + idx));
 
-  const { data, isLoading, error } = useGetLeadsProcessQuery();
 
-  console.log(data);
   return [
     {
       label: (

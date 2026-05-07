@@ -1,30 +1,70 @@
-import React from 'react'
+"use client"
+import { Eye, EyeOff } from 'lucide-react';
+import React, { useState } from 'react'
 
 export default function SecurityPassword() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   return (
     <div className=' mt-[70px]'>
 
-         <h2 className='text-[26px] text-[#161721] font-medium'>Notification Preferences</h2>
-         <form action="" className=' mt-6'>
-            <div className=' space-y-6'>
-            <div className=' flex flex-col  gap-2'>
-                <label htmlFor="password" className=' text-lg text-[#1D1F2C] font-medium'>Change Password</label>
-                <input type="password" name="" id="password" className=' border border-[#777980] py-2 px-2.5 rounded-[8px]' value='00000000000' />
-            </div>
-            <div className=' flex flex-col  gap-2'>
-                <label htmlFor="confirm-password" className=' text-lg text-[#1D1F2C] font-medium'>Confirm New Password</label>
-                <input type="password" name="" id="password" className=' border border-[#777980] py-2 px-2.5 rounded-[8px]' value='00000000000' />
-            </div>
+      <h2 className='text-[26px] text-[#161721] font-medium'>Notification Preferences</h2>
+      <form action="" className=' mt-6'>
+        <div className=' space-y-6'>
+          <div className='flex flex-col gap-2'>
+            <label htmlFor="password" className='text-lg text-[#1D1F2C] font-medium'>
+              Change Password
+            </label>
 
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                id="password"
+                className='border border-[#777980] py-2 px-2.5 rounded-[8px] w-full'
+                value='00000000000'
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
             </div>
-            <ul className=' list-disc pl-5 mt-1'>
-                <li className=' text-sm text-[#777980] '>special character</li>
-                <li className=' text-sm text-[#777980] '>numeric</li>
-                <li className=' text-sm text-[#777980] '>uppercase, and lowercase</li>
-               
-            </ul>
-            <button className=' py-4 w-[230px] bg-[#0b7680] rounded-[8px] text-white text-base mt-12 cursor-pointer'>Update</button>
-         </form>
+          </div>
+          <div className='flex flex-col gap-2'>
+            <label htmlFor="confirm-password" className='text-lg text-[#1D1F2C] font-medium'>
+              Confirm New Password
+            </label>
+
+            <div className="relative">
+              <input
+                type={showConfirmPassword ? "text" : "password"}
+                id="confirm-password"
+                className='border border-[#777980] py-2 px-2.5 rounded-[8px] w-full'
+                value='00000000000'
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+          </div>
+
+        </div>
+        <ul className=' list-disc pl-5 mt-1'>
+          <li className=' text-sm text-[#777980] '>special character</li>
+          <li className=' text-sm text-[#777980] '>numeric</li>
+          <li className=' text-sm text-[#777980] '>uppercase, and lowercase</li>
+
+        </ul>
+        <button className=' py-4 w-[230px] bg-[#0b7680] rounded-[8px] text-white text-base mt-12 cursor-pointer'>Update</button>
+      </form>
     </div>
   )
 }

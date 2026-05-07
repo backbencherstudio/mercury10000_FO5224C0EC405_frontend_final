@@ -12,6 +12,7 @@ import {
 import { LeadHistoryColumn } from '@/components/columns/LeadHistoryColumn';
 import { leadHistoryData } from '@/public/demoData/LeadHistoryData';
 import DynamicTable from '@/components/reusable/DynamicTable';
+import { useGetLeadsProcessQuery } from '@/redux/features/dashboardOverview/dashboardOverView';
 
 
 export default function LeadsInProcess() {
@@ -19,13 +20,22 @@ export default function LeadsInProcess() {
   const [itemsPerPage, setItemsPerPage] = useState(10);
   const [selectedRows, setSelectedRows] = useState<Set<number>>(new Set());
   const [statusFilter, setStatusFilter] = useState('all');
+  const [searchInput, setSearchInput] = useState('');
+  const params = {
+    search: searchInput,
+  };
+  const { data, isLoading, error } = useGetLeadsProcessQuery(params);
 
-  const totalItems = leadHistoryData.length;
+  const ApiData = data?.data || [];
+
+  console.log(ApiData);
+
+  const totalItems = ApiData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const filteredData = statusFilter === 'all'
-    ? leadHistoryData
-    : leadHistoryData.filter(item => (item.status || '').toLowerCase() === statusFilter.toLowerCase());
+    ? ApiData
+    : ApiData.filter(item => (item.status || '').toLowerCase() === statusFilter.toLowerCase());
   const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
   const filteredTotalItems = filteredData.length;
   const filteredTotalPages = Math.ceil(filteredTotalItems / itemsPerPage);
@@ -62,6 +72,7 @@ export default function LeadsInProcess() {
             <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
             <input
               type="text"
+              value={searchInput} onChange={(e) => setSearchInput(e.target.value)}
               className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500'
               placeholder='Search user here'
             />

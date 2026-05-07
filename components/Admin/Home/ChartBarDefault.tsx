@@ -47,14 +47,15 @@ const chartConfig = {
 } satisfies ChartConfig
 
 export function ChartBarDefault() {
-const [selectedYear, setSelectedYear] = useState("");
- const { data, refetch, isLoading: leadsSubmitionLoading } =
-  useGetLeadsSubmitionQuery({
-    year: selectedYear,
-    month: "",
-  });
-    console.log(data,'leadsSubmition')
-  
+  const [selectedYear, setSelectedYear] = useState("");
+  const { data, refetch, isLoading: leadsSubmitionLoading } =
+    useGetLeadsSubmitionQuery({
+      year: selectedYear,
+      month: "",
+    });
+  const leadData = data?.data || [];
+  console.log(leadData, 'leadsSubmition')
+
   return (
     <Card className="border border-[#E9E9EA] shadow-none py-3 sm:py-6">
       <CardContent>
@@ -66,17 +67,17 @@ const [selectedYear, setSelectedYear] = useState("");
               <span className="hidden sm:inline">Filter</span>
             </button>
             <div className="w-full sm:w-auto" style={{ minWidth: 120 }}>
-            <Select value={selectedYear} onValueChange={setSelectedYear}>
-  <SelectTrigger className="w-full sm:w-[127px]" style={{ backgroundColor: '#eceff3' }}>
-    <SelectValue placeholder="Select Year" />
-  </SelectTrigger>
+              <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-full sm:w-[127px]" style={{ backgroundColor: '#eceff3' }}>
+                  <SelectValue placeholder="Select Year" />
+                </SelectTrigger>
 
-  <SelectContent>
-    <SelectItem value="2026">2026</SelectItem>
-    <SelectItem value="2025">2025</SelectItem>
-    <SelectItem value="2024">2024</SelectItem>
-  </SelectContent>
-</Select>
+                <SelectContent>
+                  <SelectItem value="2026">2026</SelectItem>
+                  <SelectItem value="2025">2025</SelectItem>
+                  <SelectItem value="2024">2024</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
