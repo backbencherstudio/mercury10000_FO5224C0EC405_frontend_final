@@ -10,6 +10,7 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
         method: "GET",
         params,
       }),
+      providesTags: ["AllLeads"],
     }),
 
     //lead process
@@ -28,7 +29,7 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { status }
       }),
-      invalidatesTags: ["LeadsStatus"],
+      invalidatesTags: ["AllLeads"],
     }),
 
     //update user
@@ -61,10 +62,10 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
       }),
     }),
 
-    // leads history
+    // leads submited secretary side
     getLeadsHistory: builder.query({
       query: (params) => ({
-        url: `/leads/all`,
+        url: `/leads/all-submitted`,
         method: "GET",
         params: {
           page: params?.page,
@@ -73,6 +74,14 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
           ...(params?.trade_id ? { trade_id: params.trade_id } : {}),
           ...(params?.status ? { status: params.status } : {}),
         },
+      }),
+    }),
+
+    getLeadsHistorySecratery: builder.query({
+      query: (params) => ({
+        url: `/leads/all-process-leads`,
+        method: "GET",
+        params,
       }),
     }),
 
@@ -91,4 +100,4 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
 });
 
 // hook export (naming important)
-export const { useGetDashboardOverviewQuery, useGetLeadsProcessQuery, useUpdateUserMutation, useGetSingleUserDetailsQuery, useGetLeadsSubmitionQuery, useGetLeadsHistoryQuery, useUpdateScheduleTimeMutation, useUpdateStausLeadsProcessMutation } = dashboardOverviewApi;
+export const { useGetDashboardOverviewQuery, useGetLeadsProcessQuery, useUpdateUserMutation, useGetSingleUserDetailsQuery, useGetLeadsSubmitionQuery, useGetLeadsHistoryQuery, useUpdateScheduleTimeMutation, useUpdateStausLeadsProcessMutation, useGetLeadsHistorySecrateryQuery, } = dashboardOverviewApi;

@@ -23,7 +23,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import { useGetDashboardOverviewQuery } from "@/redux/features/dashboardOverview/dashboardOverView";
+import { useGetDashboardOverviewQuery, useUpdateScheduleTimeMutation, useUpdateStausLeadsProcessMutation } from "@/redux/features/dashboardOverview/dashboardOverView";
 
 function DashboardAllLeadsTable() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -34,7 +34,6 @@ function DashboardAllLeadsTable() {
   const [arrowDialogData, setArrowDialogData] = useState<any>(null);
 
   const [leadProcessDialogOpen, setLeadProcessDialogOpen] = useState(false);
-  const [notLeadDialogOpen, setNotLeadDialogOpen] = useState(false);
   const [dialogRowData, setDialogRowData] = useState<any>(null);
 
   const [tradeFilter, setTradeFilter] = useState<string>("all");
@@ -71,12 +70,14 @@ function DashboardAllLeadsTable() {
   }, [currentPage, itemsPerPage, tradeFilter, debouncedSearch]);
 
   const { data, isLoading, error } = useGetDashboardOverviewQuery(params);
+  const [updateSchedule] = useUpdateScheduleTimeMutation();
+  const [updateStatus] = useUpdateStausLeadsProcessMutation();
 
   const apiData = data?.data || [];
-const meta = (data as any)?.meta;
+  const meta = (data as any)?.meta;
 
-const totalItems = Number(meta?.total_items ?? 0);
-const totalPages = Number(meta?.total_pages ?? 1);
+  const totalItems = Number(meta?.total_items ?? 0);
+  const totalPages = Number(meta?.total_pages ?? 1);
 
   // trade options from API
   const tradeOptions = useMemo(() => {
@@ -113,9 +114,13 @@ const totalPages = Number(meta?.total_pages ?? 1);
     setLeadProcessDialogOpen(true);
   };
 
-  const handleNotLead = (row: any) => {
-    setDialogRowData(row);
-    setNotLeadDialogOpen(true);
+  const handleNotLead = async (row: any) => {
+    if (!row?.id) return;
+    try {
+      await updateStatus({ id: row.id, status: "CLOSED" }).unwrap();
+    } catch (err) {
+      console.error("Failed to mark as not a lead:", err);
+    }
   };
 
   const columns = DashboardUserColumn({
@@ -131,7 +136,7 @@ const totalPages = Number(meta?.total_pages ?? 1);
 
   return (
     <div>
-     
+
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-end gap-2 mb-4">
         <div className="relative w-full sm:w-auto">
           <SearchIcon className="absolute top-1/2 -translate-y-1/2 left-4" />
@@ -164,13 +169,13 @@ const totalPages = Number(meta?.total_pages ?? 1);
             <SelectContent>
               <SelectItem value="all">All Trades</SelectItem>
               {tradeOptions.map((trade: any, index) => (
-  <SelectItem
-    key={trade?.id || trade?.value || index}
-    value={trade?.id || trade}
-  >
-    {trade?.name || trade}
-  </SelectItem>
-))}
+                <SelectItem
+                  key={trade?.id || trade?.value || index}
+                  value={trade?.id || trade}
+                >
+                  {trade?.name || trade}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -208,18 +213,9 @@ const totalPages = Number(meta?.total_pages ?? 1);
           console.log("Saved datetime:", dateTime);
           setLeadProcessDialogOpen(false);
         }}
-          ID={dialogRowData?.id}
+        ID={dialogRowData?.id}
       />
 
-      <Dialog open={notLeadDialogOpen} onOpenChange={setNotLeadDialogOpen}>
-        <DialogContent className="max-w-md p-8 rounded-xl shadow-lg text-white">
-          <DialogHeader>
-            <DialogTitle className="text-black text-2xl font-bold">
-              Not a Lead 
-            </DialogTitle>
-          </DialogHeader>
-        </DialogContent>
-      </Dialog>
 
       <Dialog open={arrowDialogOpen} onOpenChange={setArrowDialogOpen}>
         <DialogContent className="sm:max-w-[980px] p-6">
@@ -262,17 +258,17 @@ const totalPages = Number(meta?.total_pages ?? 1);
                   </p>
                 </div>
 
-             <div className="border-b border-[#e9e9ea] pb-2.5">
-  <h3 className="text-base font-medium">Trade</h3>
-  <p className="text-sm mt-2.5 capitalize">
-    {arrowDialogData?.trade?.name 
-      ? arrowDialogData.trade.name 
-      : (typeof arrowDialogData?.trade === 'string' 
-          ? arrowDialogData.trade 
-          : "N/A")}
-  </p>
-</div>
-    <div className="border-b border-[#e9e9ea] pb-2.5">
+                <div className="border-b border-[#e9e9ea] pb-2.5">
+                  <h3 className="text-base font-medium">Trade</h3>
+                  <p className="text-sm mt-2.5 capitalize">
+                    {arrowDialogData?.trade?.name
+                      ? arrowDialogData.trade.name
+                      : (typeof arrowDialogData?.trade === 'string'
+                        ? arrowDialogData.trade
+                        : "N/A")}
+                  </p>
+                </div>
+                <div className="border-b border-[#e9e9ea] pb-2.5">
                   <div className="flex items-center gap-2">
                     {/* <PhoneIcon /> */}
                     <h3 className="text-base font-medium">
@@ -285,29 +281,29 @@ const totalPages = Number(meta?.total_pages ?? 1);
                 </div>
 
                 <div className="border-b border-[#e9e9ea] pb-2.5">
-  <div className="flex items-center gap-2">
-    <h3 className="text-base font-medium">Attached Images</h3>
-  </div>
-  
-  {arrowDialogData?.files && arrowDialogData.files.length > 0 ? (
-    <div className="flex flex-wrap gap-3 mt-3">
-      {arrowDialogData.files.map((file: any, index: number) => (
-        <div 
-          key={file?.id || index} 
-          className="w-20 h-20 relative rounded-md overflow-hidden border border-[#e9e9ea]"
-        >
-          <img 
-            src={file?.url || file?.file_url || file?.path} 
-            alt={`Attached file ${index + 1}`} 
-            className="w-full h-full object-cover"
-          />
-        </div>
-      ))}
-    </div>
-  ) : (
-    <p className="text-sm mt-2.5 text-gray-400">No images attached</p>
-  )}
-</div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-base font-medium">Attached Images</h3>
+                  </div>
+
+                  {arrowDialogData?.files && arrowDialogData.files.length > 0 ? (
+                    <div className="flex flex-wrap gap-3 mt-3">
+                      {arrowDialogData.files.map((file: any, index: number) => (
+                        <div
+                          key={file?.id || index}
+                          className="w-20 h-20 relative rounded-md overflow-hidden border border-[#e9e9ea]"
+                        >
+                          <img
+                            src={file?.url || file?.file_url || file?.path}
+                            alt={`Attached file ${index + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm mt-2.5 text-gray-400">No images attached</p>
+                  )}
+                </div>
 
 
               </div>

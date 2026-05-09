@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import GreenDownArrow from "../icons/secretary/GreenDownArrow";
 import RedDownArrow from "../icons/secretary/RedDownArrow";
+import Link from "next/link";
 
 
 // Type for a support request row
@@ -48,12 +49,14 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onView, onDelete }
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none">
-          <DropdownMenuItem
-            onClick={() => onView?.(row)}
-            className="cursor-pointer"
-          >
-            Write Note to Admin
-          </DropdownMenuItem>
+          <Link href={`/secretary-dashboard/write-note?id=${row.id}`}>
+            <DropdownMenuItem
+              onClick={() => onView?.(row)}
+              className="cursor-pointer"
+            >
+              <button>Write Note to Admin</button>
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
@@ -66,7 +69,11 @@ export function RequestSupportColumn({ onView, onDelete }: RequestSupportColumnP
       label: "ID",
       accessor: "id",
       width: "80px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (_: string, __: RequestSupportRow, index?: number) => (
+        <span className="text-sm text-[#06030C]">
+          {index !== undefined ? index + 1 : "-"}
+        </span>
+      ),
     },
     {
       label: "User Name",

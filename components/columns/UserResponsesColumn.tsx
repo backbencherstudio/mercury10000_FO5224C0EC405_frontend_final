@@ -186,18 +186,22 @@ export function UserResponsesColumn({ onEdit }: UserResponsesColumnProps): Colum
         },
         {
             label: "He Sent",
-            accessor: "he_sent",
+            accessor: "last_lead_he_sent",
             width: "120px",
             formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">
+                    {value || "-"}
+                </span>
             ),
         },
         {
             label: "Total Leads",
-            accessor: "total_leads",
+            accessor: "total_leads_he_sent",
             width: "100px",
             formatter: (value: number) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">
+                    {value}
+                </span>
             ),
         },
         {

@@ -21,8 +21,10 @@ export function SecretaryUsersColumn(): ColumnConfig<SecretaryUser>[] {
             label: "ID",
             accessor: "id",
             width: "100px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+            formatter: (_: string, __: SecretaryUser, index?: number) => (
+                <span className="text-sm text-[#06030C]">
+                    {index !== undefined ? index + 1 : "-"}
+                </span>
             ),
         },
         {
@@ -35,7 +37,7 @@ export function SecretaryUsersColumn(): ColumnConfig<SecretaryUser>[] {
         },
         {
             label: "Phone",
-            accessor: "phone",
+            accessor: "phone_number",
             width: "170px",
             formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>

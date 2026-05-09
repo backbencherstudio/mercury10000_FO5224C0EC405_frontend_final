@@ -17,12 +17,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
- 
- 
+
+
 import Image from 'next/image'
-import confirmImg from '@/public/images/admin/confirm-img.png' 
+import confirmImg from '@/public/images/admin/confirm-img.png'
 import bigStar from '@/public/images/admin/big-star.png'
 import smallStar from '@/public/images/admin/little-star.png'
+import { useGetRwardQuery, useGiftCardMutation } from '@/redux/features/reward/reward'
 
 export default function RewardHome() {
   // State for selection and pagination
@@ -31,12 +32,34 @@ export default function RewardHome() {
   const [itemsPerPage, setItemsPerPage] = useState(10)
   const [searchTerm, setSearchTerm] = useState('')
 
+  //POST API GIFT CARD
+
+  const [payload, setPayload] = useState({
+    name: "",
+  });
+
+  const [giftCard, { isLoading }] = useGiftCardMutation();
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPayload({
+      ...payload,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    giftCard(payload);
+  };
+
+
   // Calculate pagination
   const startIndex = (currentPage - 1) * itemsPerPage
   const endIndex = startIndex + itemsPerPage
 
   // Filter data based on search term
-  const filteredData = giftStatusData.filter(item => 
+  const filteredData = giftStatusData.filter(item =>
     item.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.userId.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -106,96 +129,110 @@ export default function RewardHome() {
   return (
 
     <div>
-       <div className=' p-2.5 border-b border-[#11BECF] inline-block mb-8'>
+      <div className=' p-2.5 border-b border-[#11BECF] inline-block mb-8'>
         <h3 className=' text-lg text-[#0E93A1] font-medium'>All Rewards</h3>
-       </div>
-
-    <div >
-
-      <div className=' border border-[#D2D2D5] p-6 mb-4 rounded-[8px]'>
-        <h2 className=' text-2xl text-[#111827] font-medium mb-6'>Create a Gift</h2>
-        <div className=' flex flex-col gap-2.5'>
-          <label htmlFor="gift-name">Gift Name</label>
-          <input type="text" id="gift-name" className='border border-[#D2D2D5] py-2 px-4 rounded-[8px] placeholder:text-base placeholder:text-[#161721]  ' placeholder='Bus Ticket' />
-      
-        </div>
-        <button className=' text-base text-white bg-[#0b7680] py-4 w-full rounded-[8px] mt-6 cursor-pointer'> Create Gift</button>
       </div>
-      <div className='p-6 border rounded-[12px]'>
-        {/* Header with title and filters */}
-        <div className='flex items-center justify-between mb-4'>
-          <h3 className='text-2xl text-[#111827] font-medium'>All Gift Status</h3>
-          <div>
-            <div className='flex items-center'>
-              <div className='relative'>
-                <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
-                <input 
-                  type="text" 
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className='bg-[#e9e9ea] py-2 pl-12 rounded-[10px] w-[315px] outline-none focus:ring-1 focus:ring-blue-500' 
-                  placeholder='Search user here' 
-                />
-              </div>
-              <button className='flex items-center gap-2 p-2.5 cursor-pointer mr-2 hover:bg-gray-100 rounded-lg'>
-                <FilterIcon />
-                Filter
-              </button>
-              <div className='flex items-center gap-2.5'>
-                <button className='flex items-center gap-7 border border-[#D2D2D5] py-2 px-2.5 rounded-[8px] cursor-pointer hover:bg-gray-50'>
-                  From <DownArrowIcon2 />
+
+      <div >
+
+        <div className=' border border-[#D2D2D5] p-6 mb-4 rounded-[8px]'>
+          <h2 className=' text-2xl text-[#111827] font-medium mb-6'>Create a Gift</h2>
+          <form onSubmit={handleSubmit} className='flex flex-col gap-2.5'>
+            <label htmlFor="gift-name">Gift Name</label>
+
+            <input
+              name="name"
+              onChange={handleChange}
+              value={payload.name}
+              type="text"
+              id="gift-name"
+              className='border border-[#D2D2D5] py-2 px-4 rounded-[8px] placeholder:text-base placeholder:text-[#161721]'
+              placeholder='Bus Ticket'
+            />
+
+            <button
+              type="submit"
+              className='text-base text-white bg-[#0b7680] py-4 w-full rounded-[8px] mt-6 cursor-pointer'
+            >
+              {isLoading ? "Loading..." : "Create Gift"}
+            </button>
+          </form>
+        </div>
+        <div className='p-6 border rounded-[12px]'>
+          {/* Header with title and filters */}
+          <div className='flex items-center justify-between mb-4'>
+            <h3 className='text-2xl text-[#111827] font-medium'>All Gift Status</h3>
+            <div>
+              <div className='flex items-center'>
+                <div className='relative'>
+                  <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
+                  <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    className='bg-[#e9e9ea] py-2 pl-12 rounded-[10px] w-[315px] outline-none focus:ring-1 focus:ring-blue-500'
+                    placeholder='Search user here'
+                  />
+                </div>
+                <button className='flex items-center gap-2 p-2.5 cursor-pointer mr-2 hover:bg-gray-100 rounded-lg'>
+                  <FilterIcon />
+                  Filter
                 </button>
-                <button className='flex items-center gap-7 border border-[#D2D2D5] py-2 px-2.5 rounded-[8px] cursor-pointer hover:bg-gray-50'>
-                  To <DownArrowIcon2 />
-                </button>
+                <div className='flex items-center gap-2.5'>
+                  <button className='flex items-center gap-7 border border-[#D2D2D5] py-2 px-2.5 rounded-[8px] cursor-pointer hover:bg-gray-50'>
+                    From <DownArrowIcon2 />
+                  </button>
+                  <button className='flex items-center gap-7 border border-[#D2D2D5] py-2 px-2.5 rounded-[8px] cursor-pointer hover:bg-gray-50'>
+                    To <DownArrowIcon2 />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-       
-        {/* Dynamic Table */}
-        <DynamicTable
-          columns={columns}
-          data={currentData}
-          currentPage={currentPage}
-          itemsPerPage={itemsPerPage}
-          onPageChange={handlePageChange}
-          totalpage={totalPages}
-          totalItems={filteredData.length}
-          setItemsPerPage={setItemsPerPage}
-          border={true}
-          showPagination={true}
-          noDataMessage="No gift status data found!"
-        />
+
+          {/* Dynamic Table */}
+          <DynamicTable
+            columns={columns}
+            data={currentData}
+            currentPage={currentPage}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            totalpage={totalPages}
+            totalItems={filteredData.length}
+            setItemsPerPage={setItemsPerPage}
+            border={true}
+            showPagination={true}
+            noDataMessage="No gift status data found!"
+          />
 
           <Dialog >
-    
-        <DialogTrigger asChild>
-         <button className=' mt-4 py-4 px-6 bg-[#0b7680] text-base text-white rounded-[8px] cursor-pointer'>Send Reward</button>
-        </DialogTrigger>
-        <DialogContent className=" p-16">
-           <div className=" flex justify-center items-center">
-          <div className=" relative">
-          <Image src={confirmImg} alt="confirm img"/>
-         
-            <Image src={bigStar} alt="big star" className=" absolute top-10 left-0"/>
-            <Image src={bigStar} alt="big star" className=" absolute top-28 right-0"/>
-         
-          
-            <Image src={smallStar} alt="little star" className="  absolute top-28 left-5"/>
-            <Image src={smallStar} alt="little star" className="  absolute top-8 right-5"/>
-          
 
-          </div>
+            <DialogTrigger asChild>
+              <button className=' mt-4 py-4 px-6 bg-[#0b7680] text-base text-white rounded-[8px] cursor-pointer'>Send Reward</button>
+            </DialogTrigger>
+            <DialogContent className=" p-16">
+              <div className=" flex justify-center items-center">
+                <div className=" relative">
+                  <Image src={confirmImg} alt="confirm img" />
+
+                  <Image src={bigStar} alt="big star" className=" absolute top-10 left-0" />
+                  <Image src={bigStar} alt="big star" className=" absolute top-28 right-0" />
+
+
+                  <Image src={smallStar} alt="little star" className="  absolute top-28 left-5" />
+                  <Image src={smallStar} alt="little star" className="  absolute top-8 right-5" />
+
+
+                </div>
+              </div>
+              <h2 className=' text-center text-2xl  font-medium mt-8'>Reward Sent Successfully</h2>
+            </DialogContent>
+
+          </Dialog>
+
         </div>
-      <h2 className=' text-center text-2xl  font-medium mt-8'>Reward Sent Successfully</h2>
-        </DialogContent>
-     
-    </Dialog>
-    
       </div>
-    </div>
 
     </div>
   )
@@ -204,4 +241,4 @@ export default function RewardHome() {
 
 
 
- 
+

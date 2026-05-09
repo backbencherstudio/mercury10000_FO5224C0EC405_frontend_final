@@ -26,14 +26,12 @@ export const Connection = baseApi.injectEndpoints({
         }),
 
         getCunnectionStaus: builder.query({
-            query: (params: { type: string }) => ({
+            query: (params) => ({
                 url: "/connection-requests/status-list",
                 method: "GET",
-                params
-
+                params,
             }),
             providesTags: ["requestconnection"],
-
         }),
 
         updateUserRequestSent: builder.mutation({

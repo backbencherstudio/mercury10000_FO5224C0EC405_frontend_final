@@ -32,10 +32,10 @@ export default function SecretaryHome() {
 
     const handleWriteNote = (row: any) => {
         // Implement note writing logic here
-        alert(`Write note to admin for request ID: ${row.id}`);
+        // alert(`Write note to admin for request ID: ${row.id}`);
     };
 
-    const { data, isLoading, error } = useGetSupportQuery();
+    const { data, isLoading, error } = useGetSupportQuery({});
     const SupportData = data?.data || [];
     console.log(SupportData);
 

@@ -95,18 +95,16 @@ export function LeadProcessCalendarDialog({
             </div>
             <div className="flex flex-col rounded-lg border border-[#E9E9EA] overflow-hidden">
               <button
-                className={`px-3 py-2 text-sm font-medium ${
-                  ampm === "PM" ? "bg-[#E3F2F1] text-[#0E93A1]" : "bg-white text-gray-500 hover:bg-gray-50"
-                }`}
+                className={`px-3 py-2 text-sm font-medium ${ampm === "PM" ? "bg-[#E3F2F1] text-[#0E93A1]" : "bg-white text-gray-500 hover:bg-gray-50"
+                  }`}
                 onClick={() => setAmpm("PM")}
               >
                 PM
               </button>
               <div className="h-[1px] bg-[#E9E9EA]"></div>
               <button
-                className={`px-3 py-2 text-sm font-medium ${
-                  ampm === "AM" ? "bg-[#E3F2F1] text-[#0E93A1]" : "bg-white text-gray-500 hover:bg-gray-50"
-                }`}
+                className={`px-3 py-2 text-sm font-medium ${ampm === "AM" ? "bg-[#E3F2F1] text-[#0E93A1]" : "bg-white text-gray-500 hover:bg-gray-50"
+                  }`}
                 onClick={() => setAmpm("AM")}
               >
                 AM
@@ -141,9 +139,8 @@ export function LeadProcessCalendarDialog({
                 <button
                   key={day}
                   onClick={() => setSelectedDate(new Date(currentDate.getFullYear(), currentDate.getMonth(), day))}
-                  className={`py-2 text-sm text-center rounded-full mx-auto w-8 h-8 flex items-center justify-center ${
-                    isSelected ? "bg-[#0E93A1] text-white font-bold" : "text-[#040C0B] hover:bg-gray-100"
-                  }`}
+                  className={`py-2 text-sm text-center rounded-full mx-auto w-8 h-8 flex items-center justify-center ${isSelected ? "bg-[#0E93A1] text-white font-bold" : "text-[#040C0B] hover:bg-gray-100"
+                    }`}
                 >
                   {day}
                 </button>

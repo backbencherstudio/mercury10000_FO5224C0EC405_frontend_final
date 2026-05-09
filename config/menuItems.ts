@@ -1,6 +1,6 @@
 import {
   HomeIcon, SecondaryHome,
-  User, UserSecondary,LeadIcon,LeadHistorySecondaryIcon,LeadHistoryIcon,LeadSecondaryIcon, ConnectionIcon, RewardIcon, RewardSecondaryIcon, SupportIcon, SupportSecondaryIcon, SettingsIcon, SettingsSecondaryIcon 
+  User, UserSecondary, LeadIcon, LeadHistorySecondaryIcon, LeadHistoryIcon, LeadSecondaryIcon, ConnectionIcon, RewardIcon, RewardSecondaryIcon, SupportIcon, SupportSecondaryIcon, SettingsIcon, SettingsSecondaryIcon
   , ConnectionSecondaryIcon,
   PenIcon,
   PenSecondaryIcon
@@ -18,7 +18,7 @@ export interface MenuItem {
   category: string;
 }
 
-export type UserRole = 'admin' | 'secretary' ;
+export type UserRole = 'admin' | 'secretary';
 
 export const menuConfig: Record<UserRole, MenuItem[]> = {
   admin: [
@@ -40,15 +40,15 @@ export const menuConfig: Record<UserRole, MenuItem[]> = {
       description: 'User',
       category: 'User'
     },
-    {
-      id: 'lead',
-      name: 'Lead',
-      href: '/dashboard/lead',
-      icon: LeadIcon,
-      secondaryIcon: LeadSecondaryIcon,
-      description: 'Lead',
-      category: 'Lead'
-    },
+    // {
+    //   id: 'lead',
+    //   name: 'Lead',
+    //   href: '/dashboard/lead',
+    //   icon: LeadIcon,
+    //   secondaryIcon: LeadSecondaryIcon,
+    //   description: 'Lead',
+    //   category: 'Lead'
+    // },
     {
       id: 'lead-history',
       name: 'Lead History',
@@ -124,9 +124,9 @@ export const menuConfig: Record<UserRole, MenuItem[]> = {
       category: 'Academic'
     }
   ],
-  
-   
- 
+
+
+
 };
 
 export const getMenuItemsByRole = (role: UserRole | string): MenuItem[] => {

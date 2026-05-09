@@ -36,6 +36,15 @@ export function SecretarySubmittedColumn({
   const isAllSelected = currentData.length > 0 && currentData.every((_, idx) => selectedRows.has(startIndex + idx));
   const isSomeSelected = currentData.some((_, idx) => selectedRows.has(startIndex + idx));
 
+  const formatDate = (value: string) => {
+    const formattedDate = new Date(value).toLocaleDateString("en-GB", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+    return <span className="text-sm text-[#06030C]">{formattedDate}</span>;
+  };
+
   return [
     {
       label: (
@@ -71,29 +80,33 @@ export function SecretarySubmittedColumn({
       label: "ID",
       accessor: "id",
       width: "80px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (_: string, __: any, index?: number) => (
+        <span className="text-sm text-[#06030C]">
+          {index !== undefined ? index + 1 : "-"}
+        </span>
+      ),
     },
     {
       label: "User Name",
-      accessor: "user_name",
+      accessor: "user",
       width: "140px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: any) => <span className="text-sm text-[#06030C]">{value?.name || "--"}</span>,
     },
     {
       label: "Homeowner Name",
-      accessor: "homeowners_name",
+      accessor: "name",
       width: "140px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "Homeowner Address",
-      accessor: "homeowners_address",
+      accessor: "address",
       width: "200px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
     {
       label: "Homeowner Phone",
-      accessor: "homeowners_phone",
+      accessor: "phone",
       width: "130px",
       formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
     },
@@ -101,16 +114,16 @@ export function SecretarySubmittedColumn({
       label: "Trade",
       accessor: "trade",
       width: "110px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value || "--"}</span>,
     },
     {
       label: "Lead Sent to Us",
-      accessor: "lead_sent",
+      accessor: "updated_at",
       width: "120px",
       formatter: (value: string) => <div className=" flex items-center justify-between">
 
-          <span className="text-sm text-[#06030C]">{value}</span>
-          <TopRightArrow/>
+        <span className="text-sm text-[#06030C]">{formatDate(value)}</span>
+        {/* <TopRightArrow /> */}
       </div>
     },
   ];

@@ -56,19 +56,19 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
             onClick={() => onView?.(row)}
             className="cursor-pointer"
           >
-            View  
+            View
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => onDelete?.(row)}
             className="cursor-pointer"
           >
-            Delete  
+            Delete
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => onEdit?.(row)}
             className="cursor-pointer"
           >
-            Edit  
+            Edit
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -86,8 +86,10 @@ export function AllAdminColumn({
       label: "ID",
       accessor: "id",
       width: "100px",
-      formatter: (value: string) => (
-        <span className="text-sm text-[#06030C]">{value}</span>
+      formatter: (_: string, __: any, index?: number) => (
+        <span className="text-sm text-[#06030C]">
+          {index !== undefined ? index + 1 : "-"}
+        </span>
       ),
     },
     {
