@@ -45,7 +45,8 @@ export function RequestPoolColumn({
 			accessor: 'checkbox',
 			width: '50px',
 			formatter: (_: any, row: any) => {
-				const isDisabled = lockedTrade && row.trade?.name !== lockedTrade;
+				const isDisabled = !!lockedTrade && row.trade?.name !== lockedTrade;
+
 				return (
 					<div className={`flex items-center justify-center ${isDisabled ? 'opacity-50' : ''}`}>
 						<input
@@ -54,7 +55,8 @@ export function RequestPoolColumn({
 							onChange={e => handleSelectRow(row.id, e.target.checked)}
 							onClick={e => e.stopPropagation()}
 							disabled={isDisabled}
-							className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'}`}
+							className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
+								}`}
 						/>
 					</div>
 				);

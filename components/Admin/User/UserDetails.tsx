@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { FinancialActivityColumn } from '@/components/columns/FinancialActivityColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { FinancialActivityData } from '@/public/demoData/FinancialActivityData'
-import {   useParams, useRouter } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
 import { useGetSingleUserDetailsQuery, useUpdateUserMutation } from '@/redux/features/dashboardOverview/dashboardOverView'
 import { CloudCog } from 'lucide-react'
 
@@ -17,20 +17,21 @@ interface User {
 interface UserDetailsProps {
   user: User;
 }
- 
+
 
 export default function UserDetails({ user }: UserDetailsProps) {
 
 
- const params = useParams();
-const id = params?.id as string;
+  const params = useParams();
+  const id = params?.id as string;
+  const router = useRouter();
 
-const { data, isLoading } = useGetSingleUserDetailsQuery(id, {
-  skip: !id,
-});
+  const { data, isLoading } = useGetSingleUserDetailsQuery(id, {
+    skip: !id,
+  });
 
-console.log("datasdfsdfsdfsd: ",data);
-  
+  console.log("datasdfsdfsdfsd: ", data);
+
 
   // Editable state for each field
   const [editState, setEditState] = useState({
@@ -41,37 +42,37 @@ console.log("datasdfsdfsdfsd: ",data);
     trade: false,
     role: false,
     work: false,
-    qualify:false,
-  conversion_fee:false,
+    qualify: false,
+    conversion_fee: false,
   });
   // Local state for input values
- const [inputState, setInputState] = useState({
-  username: '',
-  id: '',
-  phone_number: '',
-  city: '',
-  trade: '',
-  role: '',
-  work: '',
-  qualify: '',
-  conversion_fee: '',
-});
+  const [inputState, setInputState] = useState({
+    username: '',
+    id: '',
+    phone_number: '',
+    city: '',
+    trade: '',
+    role: '',
+    work: '',
+    qualify: '',
+    conversion_fee: '',
+  });
 
-useEffect(() => {
-  if (data?.data) {
-    setInputState({
-      username: data.data.name,
-      id: data.data.id,
-      phone_number: data.data.phone_number,
-      city: data.data.city,
-      trade: data.data.trades || '',
-      role: data.data.type,
-      work: data.data.work || '',
-      qualify: data.data.qualified_leads_fee || '',
-      conversion_fee: data.data.conversion_fee || '',
-    });
-  }
-}, [data]);
+  useEffect(() => {
+    if (data?.data) {
+      setInputState({
+        username: data.data.name,
+        id: data.data.id,
+        phone_number: data.data.phone_number,
+        city: data.data.city,
+        trade: data.data.trades || '',
+        role: data.data.type,
+        work: data.data.work || '',
+        qualify: data.data.qualified_leads_fee || '',
+        conversion_fee: data.data.conversion_fee || '',
+      });
+    }
+  }, [data]);
 
   // Check if any field is being edited
   const isAnyEditing = Object.values(editState).some(Boolean);
@@ -82,30 +83,30 @@ useEffect(() => {
   const handleInputChange = (field, value) => {
     setInputState((prev) => ({ ...prev, [field]: value }));
   };
- const [updateUser] = useUpdateUserMutation();
+  const [updateUser] = useUpdateUserMutation();
 
-const handleSave = async () => {
-  try {
-    await updateUser({
-      id,
-      body: inputState,
-    }).unwrap();
+  const handleSave = async () => {
+    try {
+      await updateUser({
+        id,
+        body: inputState,
+      }).unwrap();
 
-    setEditState({
-      user_name: false,
-      id: false,
-      phone_no: false,
-      city: false,
-      trade: false,
-      role: false,
-      work: false,
-      qualify:false,
-      conversion_fee:false,
-    });
-  } catch (err) {
-    console.error(err);
-  }
-};
+      setEditState({
+        user_name: false,
+        id: false,
+        phone_no: false,
+        city: false,
+        trade: false,
+        role: false,
+        work: false,
+        qualify: false,
+        conversion_fee: false,
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
   const handleView = () => {
     router.push(`/dashboard/user/all-users/${id}/monthly-details`);
   };
@@ -246,7 +247,7 @@ const handleSave = async () => {
                 <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('work')}>Edit</button>
               )}
             </div>
-             <div className=" border-b flex justify-between items-end">
+            <div className=" border-b flex justify-between items-end">
               <div>
                 <h3 className="text-lg text-[#1D1F2C] font-semibold">Qualified Leads Fee</h3>
                 {editState.qualify ? (
@@ -263,7 +264,7 @@ const handleSave = async () => {
                 <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('qualify')}>Edit</button>
               )}
             </div>
-             <div className=" border-b flex justify-between items-end">
+            <div className=" border-b flex justify-between items-end">
               <div>
                 <h3 className="text-lg text-[#1D1F2C] font-semibold">Qualified Leads Fee</h3>
                 {editState.conversion_fee ? (
@@ -294,7 +295,7 @@ const handleSave = async () => {
           </div>
         </div>
         <div className='flex-[1_1_0%] w-full mt-6 lg:mt-0'>
-        {/* <div className='  p-6 border border-[#E9E9EA] rounded-[8px]'>
+          {/* <div className='  p-6 border border-[#E9E9EA] rounded-[8px]'>
            <h2 className=' text-2xl text-[#111827] font-medium'>Set Fee Rate</h2>
            <form action="" className=' space-y-6 mt-6'>
             <div className=' flex flex-col gap-1.5 '>
@@ -309,38 +310,38 @@ const handleSave = async () => {
            </form>
         </div> */}
 
-        <div className='p-6 border border-[#E9E9EA] rounded-[8px]'>
-              <h2 className=' text-2xl text-[#111827] font-medium'>Other Details</h2>
-              <div className=' mt-8 space-y-6'>
-                <div>
-                  <h3 className=' text-lg font-semibold text-[#1D1F2C]'>Total Leads Sent To Us</h3>
-                  <p className=' text-base text-[#777980] mt-1.5'> 20</p>
-                </div>
-                <div>
-                  <h3 className=' text-lg font-semibold text-[#1D1F2C]'>Total Gifts</h3>
-                  <p className=' text-base text-[#777980] mt-1.5'> 10</p>
-                </div>
-                <div>
-                  <h3 className=' text-lg font-semibold text-[#1D1F2C]'>Total Connection fullfilled</h3>
-                  <p className=' text-base text-[#777980] mt-1.5'> 4</p>
-                </div>
-
+          <div className='p-6 border border-[#E9E9EA] rounded-[8px]'>
+            <h2 className=' text-2xl text-[#111827] font-medium'>Other Details</h2>
+            <div className=' mt-8 space-y-6'>
+              <div>
+                <h3 className=' text-lg font-semibold text-[#1D1F2C]'>Total Leads Sent To Us</h3>
+                <p className=' text-base text-[#777980] mt-1.5'> 20</p>
               </div>
-        </div>
+              <div>
+                <h3 className=' text-lg font-semibold text-[#1D1F2C]'>Total Gifts</h3>
+                <p className=' text-base text-[#777980] mt-1.5'> 10</p>
+              </div>
+              <div>
+                <h3 className=' text-lg font-semibold text-[#1D1F2C]'>Total Connection fullfilled</h3>
+                <p className=' text-base text-[#777980] mt-1.5'> 4</p>
+              </div>
 
-        </div>
-        </div>
-
-        <div className='mt-8'>
-          <h2 className='text-xl sm:text-2xl text-[#111827] font-medium mb-6'>Financial Activity Data</h2>
-          <div className='overflow-x-auto'>
-            <DynamicTable
-              columns={FinancialActivityColumn({ onView: handleView })}
-              data={FinancialActivityData}
-              showPagination={false}
-            />
+            </div>
           </div>
+
         </div>
+      </div>
+
+      <div className='mt-8'>
+        <h2 className='text-xl sm:text-2xl text-[#111827] font-medium mb-6'>Financial Activity Data</h2>
+        <div className='overflow-x-auto'>
+          <DynamicTable
+            columns={FinancialActivityColumn({ onView: handleView })}
+            data={FinancialActivityData}
+            showPagination={false}
+          />
+        </div>
+      </div>
 
     </div>
   )
