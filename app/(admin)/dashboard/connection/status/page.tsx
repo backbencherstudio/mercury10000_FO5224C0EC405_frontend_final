@@ -21,12 +21,17 @@ export default function UserResponsesPage() {
 
 
     const { data: cunnectionStatus, isLoading } =
-        useGetCunnectionStausQuery({
-            page: currentPage,
-            limit: itemsPerPage,
-            search,
-            trade_id: tradeFilter === "all" ? "" : tradeFilter,
-        });
+        useGetCunnectionStausQuery(
+            {
+                page: currentPage,
+                limit: itemsPerPage,
+                search,
+                trade_id: tradeFilter === "all" ? undefined : tradeFilter,
+            },
+            {
+                refetchOnMountOrArgChange: true,
+            }
+        );
     console.log("cunnectionStatus: ", cunnectionStatus)
 
     const Alltrades = cunnectionStatus?.data?.map(

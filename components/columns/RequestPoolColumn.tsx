@@ -5,53 +5,39 @@ import { format } from 'path';
 
 export interface RequestPoolColumnOptions {
 	selectedRows: Set<string>;
-	handleSelectAll: (checked: boolean) => void;
 	handleSelectRow: (id: string, checked: boolean) => void;
 	handleView: (row: any) => void;
-	handleEdit: (row: any) => void;
 	handleDelete: (row: any) => void;
 	currentData: any[];
-	setViewNote: (note: string) => void;
 	lockedTrade: string | null;
 }
 
 export function RequestPoolColumn({
 	selectedRows,
-	handleSelectAll,
 	handleSelectRow,
 	handleView,
-	handleEdit,
 	handleDelete,
 	currentData,
-	setViewNote,
 	lockedTrade,
 }: RequestPoolColumnOptions) {
 	return [
 		{
 			label: (
-				<div className="flex items-center justify-center">
-					<input
-						type="checkbox"
-						checked={selectedRows.size === currentData.filter(row => !lockedTrade || row.trade?.name === lockedTrade).length && currentData.length > 0}
-						ref={el => {
-							if (el) el.indeterminate = selectedRows.size > 0 && selectedRows.size < currentData.length;
-						}}
-						onChange={e => handleSelectAll(e.target.checked)}
-						onClick={e => e.stopPropagation()}
-						className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-					/>
+				<div className="flex items-center justify-center text-sm font-medium text-[#111827]">
+					Select
 				</div>
 			),
 			accessor: 'checkbox',
 			width: '50px',
 			formatter: (_: any, row: any) => {
-				const isDisabled = !!lockedTrade && row.trade?.name !== lockedTrade;
+				const isSelected = selectedRows.has(row.id);
+				const isDisabled = selectedRows.size > 0 && !isSelected;
 
 				return (
 					<div className={`flex items-center justify-center ${isDisabled ? 'opacity-50' : ''}`}>
 						<input
 							type="checkbox"
-							checked={selectedRows.has(row.id)}
+							checked={isSelected}
 							onChange={e => handleSelectRow(row.id, e.target.checked)}
 							onClick={e => e.stopPropagation()}
 							disabled={isDisabled}
@@ -83,7 +69,7 @@ export function RequestPoolColumn({
 			accessor: 'trade',
 			width: '120px',
 			formatter: (value: any) => (
-				<span className="text-sm text-[#06030C]">{value?.name || 'N/A'}</span>
+				<span className="text-sm text-[#06030C]">{value?.name || (typeof value === 'string' ? value : 'N/A')}</span>
 			),
 		},
 		{
@@ -117,7 +103,6 @@ export function RequestPoolColumn({
 				<CustomDropdown
 					items={[
 						{ label: 'View', onClick: () => handleView(row) },
-						{ label: 'Edit', onClick: () => handleEdit(row) },
 						{ label: 'Delete', onClick: () => handleDelete(row), className: 'text-red-600' },
 					]}
 				/>

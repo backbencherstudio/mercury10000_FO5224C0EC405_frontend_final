@@ -1,7 +1,6 @@
 'use client'
 import { GiftStatusColumn } from '@/components/columns/GiftStatusColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
-import { giftStatusData } from '@/public/demoData/giftStatusData'
 import DownArrowIcon2 from '@/components/icons/admin/DownArrowIcon2'
 import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
@@ -23,7 +22,9 @@ import Image from 'next/image'
 import confirmImg from '@/public/images/admin/confirm-img.png'
 import bigStar from '@/public/images/admin/big-star.png'
 import smallStar from '@/public/images/admin/little-star.png'
-import { useGetRwardQuery, useGiftCardMutation } from '@/redux/features/reward/reward'
+import { useGetGiftCardStatusQuery, useGetGiftCardsQuery, useGetRwardQuery, useGiftCardMutation, useSendGiftCardMutation } from '@/redux/features/reward/reward'
+import toast from 'react-hot-toast'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 export default function RewardHome() {
   // State for selection and pagination
@@ -39,6 +40,25 @@ export default function RewardHome() {
   });
 
   const [giftCard, { isLoading }] = useGiftCardMutation();
+  const [sendGiftCard, { isLoading: isSendingReward }] = useSendGiftCardMutation();
+
+  const { data: giftCardStatusData } = useGetGiftCardStatusQuery({});
+  const { data: availableGiftCards } = useGetGiftCardsQuery({});
+
+  const [selectedGiftCardId, setSelectedGiftCardId] = useState<string>('');
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+
+
+
+  const formattedData = (giftCardStatusData || []).map((item: any) => ({
+    userId: item.user_id,
+    userName: item.user_name,
+    recentLead: item.recent_lead || "--",
+    leadSent: item.total_leads_sent,
+    giftReceived: item.total_gift_received,
+    lastGiftDate: item.last_gift_date,
+  }))
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPayload({
@@ -50,7 +70,11 @@ export default function RewardHome() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    giftCard(payload);
+    giftCard(payload).unwrap();
+    toast.success("Gift created successfully");
+    setPayload({
+      name: "",
+    });
   };
 
 
@@ -59,7 +83,7 @@ export default function RewardHome() {
   const endIndex = startIndex + itemsPerPage
 
   // Filter data based on search term
-  const filteredData = giftStatusData.filter(item =>
+  const filteredData = formattedData.filter(item =>
     item.userName.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.userId.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -106,7 +130,7 @@ export default function RewardHome() {
 
   // Handle bulk actions
   const handleBulkExport = () => {
-    const selectedData = Array.from(selectedRows).map(index => giftStatusData[index])
+    const selectedData = Array.from(selectedRows).map(index => formattedData[index])
     console.log('Export selected:', selectedData)
     // Implement your export logic here
   }
@@ -117,6 +141,50 @@ export default function RewardHome() {
     setSelectedRows(new Set()) // Clear selection after delete
   }
 
+  const handleSendReward = async () => {
+    if (!selectedGiftCardId) {
+      toast.error("Please select a gift card first");
+      return;
+    }
+
+    const selectedUserIds = Array.from(selectedRows).map(index => formattedData[index].userId);
+
+    if (selectedUserIds.length === 0) {
+      toast.error("Please select at least one user");
+      return;
+    }
+
+    try {
+      await sendGiftCard({
+        giftCardId: selectedGiftCardId,
+        userIds: selectedUserIds
+      }).unwrap();
+
+      setIsSuccessModalOpen(true);
+      setSelectedRows(new Set());
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to send reward");
+    }
+  }
+
+  const handleSingleSend = async (row: any) => {
+    if (!selectedGiftCardId) {
+      toast.error("Please select a gift card first");
+      return;
+    }
+
+    try {
+      await sendGiftCard({
+        giftCardId: selectedGiftCardId,
+        userIds: [row.userId]
+      }).unwrap();
+
+      setIsSuccessModalOpen(true);
+    } catch (error: any) {
+      toast.error(error?.data?.message || "Failed to send reward");
+    }
+  }
+
   // Get columns with selection props
   const columns = GiftStatusColumn({
     startIndex,
@@ -124,6 +192,7 @@ export default function RewardHome() {
     currentData,
     onSelectAll: handleSelectAll,
     onSelectRow: handleSelectRow,
+    onSend: handleSingleSend,
   })
 
   return (
@@ -194,41 +263,65 @@ export default function RewardHome() {
           {/* Dynamic Table */}
           <DynamicTable
             columns={columns}
-            data={currentData}
+            data={formattedData}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
             onPageChange={handlePageChange}
             totalpage={totalPages}
-            totalItems={filteredData.length}
+            totalItems={formattedData.length}
             setItemsPerPage={setItemsPerPage}
             border={true}
             showPagination={true}
             noDataMessage="No gift status data found!"
           />
 
-          <Dialog >
+          <div className='flex items-center gap-4 mt-6'>
+            <div className='w-full max-w-xs'>
+              <Select onValueChange={setSelectedGiftCardId} value={selectedGiftCardId}>
+                <SelectTrigger className="w-full bg-white border-[#D2D2D5] h-[52px] rounded-[8px]">
+                  <SelectValue placeholder="Select a Gift Card" />
+                </SelectTrigger>
+                <SelectContent>
+                  {availableGiftCards?.map((card: any) => (
+                    <SelectItem key={card.id} value={card.id}>
+                      {card.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
 
-            <DialogTrigger asChild>
-              <button className=' mt-4 py-4 px-6 bg-[#0b7680] text-base text-white rounded-[8px] cursor-pointer'>Send Reward</button>
-            </DialogTrigger>
-            <DialogContent className=" p-16">
-              <div className=" flex justify-center items-center">
-                <div className=" relative">
-                  <Image src={confirmImg} alt="confirm img" />
+            <button
+              onClick={handleSendReward}
+              disabled={isSendingReward || selectedRows.size === 0}
+              className='py-4 px-10 bg-[#0b7680] text-base font-medium text-white rounded-[8px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all'
+            >
+              {isSendingReward ? "Sending..." : "Send Reward"}
+            </button>
+          </div>
 
-                  <Image src={bigStar} alt="big star" className=" absolute top-10 left-0" />
-                  <Image src={bigStar} alt="big star" className=" absolute top-28 right-0" />
-
-
-                  <Image src={smallStar} alt="little star" className="  absolute top-28 left-5" />
-                  <Image src={smallStar} alt="little star" className="  absolute top-8 right-5" />
-
-
+          <Dialog open={isSuccessModalOpen} onOpenChange={setIsSuccessModalOpen}>
+            <DialogContent className="p-16 max-w-lg rounded-[20px] border-none shadow-2xl overflow-hidden">
+              <div className="flex justify-center items-center">
+                <div className="relative">
+                  <Image src={confirmImg} alt="confirm img" className="z-10 relative" />
+                  <Image src={bigStar} alt="big star" className="absolute -top-10 -left-10 animate-pulse" />
+                  <Image src={bigStar} alt="big star" className="absolute -bottom-10 -right-10 animate-pulse delay-700" />
+                  <Image src={smallStar} alt="little star" className="absolute top-0 right-0" />
+                  <Image src={smallStar} alt="little star" className="absolute bottom-0 left-0" />
                 </div>
               </div>
-              <h2 className=' text-center text-2xl  font-medium mt-8'>Reward Sent Successfully</h2>
+              <div className="text-center mt-10">
+                <h2 className='text-3xl font-bold text-[#111827]'>Reward Sent!</h2>
+                <p className='text-gray-500 mt-3 text-lg'>Selected users have received their gift cards successfully.</p>
+                <button
+                  onClick={() => setIsSuccessModalOpen(false)}
+                  className="mt-10 bg-[#0b7680] text-white px-10 py-4 rounded-xl font-bold hover:bg-[#095f67] transition-all w-full shadow-lg shadow-[#0b7680]/20"
+                >
+                  Great!
+                </button>
+              </div>
             </DialogContent>
-
           </Dialog>
 
         </div>

@@ -10,15 +10,18 @@ import {
 } from "@/components/ui/dropdown-menu";
 import TopRightArrow from "../icons/admin/TopRightArrow";
 
-// UserResponse type based on userResponsesData
+// UserResponse type based on API response
 export interface UserResponse {
-    user_id: number;
-    lead_id: number;
+    user_id: string;
+    lead_id: string;
     user_name: string;
     trade: string;
-    he_sent: string;
-    total_leads: number;
-    res_from_user: 'yes' | 'no';
+    last_lead_he_sent: string;
+    total_leads_he_sent: number;
+    response_from_user: 'YES' | 'NO';
+    num_connection_sent_by_us: number;
+    total_assigned_connection: number;
+    location?: string; // Add if available
 }
 
 interface ColumnConfig<T = any> {
@@ -64,6 +67,126 @@ import {
     DialogContent,
     DialogClose
 } from "@/components/ui/dialog";
+import { useGetSingleRequesStatusQuery } from "@/redux/features/connection/connections";
+
+
+const LeadIdCell = ({ value, row }: { value: string, row: UserResponse }) => {
+    const { data: leadData, isLoading } = useGetSingleRequesStatusQuery(row.lead_id);
+    const detail = leadData?.data;
+
+    return (
+        <div className="flex items-center justify-between">
+            <span className="text-sm text-[#06030C]">{value}</span>
+            <Dialog>
+                <DialogTrigger asChild>
+                    <button className="ml-2 p-1 rounded-full hover:bg-gray-200">
+                        <TopRightArrow />
+                    </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[890px] w-full bg-white p-6">
+                    {isLoading ? (
+                        <div className="text-center py-10">Loading...</div>
+                    ) : (
+                        <>
+                            <h2 className=" text-[32px] text-[#070707]  font-medium text-center">Lead ID #{detail?.lead_id || value}</h2>
+                            <div className=" flex gap-8 mt-8">
+                                <div className=" flex-3/5  ">
+                                    <div className=" space-y-8">
+                                        <div className=" space-y-2.5">
+                                            <div className=" border-b  border-[#E9E9EA] pb-2.5">
+                                                <h3 className=" text-base text-[#070707] font-medium">City:</h3>
+                                                <p className=" text-sm text-[#777980] mt-2.5">{detail?.city || detail?.location || "N/A"}</p>
+                                            </div>
+                                            <div className=" border-b  border-[#E9E9EA] pb-2.5">
+                                                <h3 className=" text-base text-[#070707] font-medium">Trade:</h3>
+                                                <p className=" text-sm text-[#777980] mt-2.5">{detail?.trade || "N/A"}</p>
+                                            </div>
+                                        </div>
+                                        <div className=" border-b  border-[#E9E9EA] pb-2.5">
+                                            <h3 className=" text-base text-[#070707] font-medium">Note:</h3>
+                                            <p className=" text-sm text-[#777980] mt-2.5">{detail?.note || detail?.description || "No notes available."}</p>
+                                        </div>
+
+                                        <div>
+                                            <h3 className=" text-base text-[#070707] font-medium">Images ({detail?.files?.length || 0})</h3>
+                                            <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
+                                                {detail?.files && detail.files.length > 0 ? (
+                                                    detail.files.map((file: any, idx: number) => (
+                                                        <div key={idx} className="flex flex-col items-center min-w-[120px]">
+                                                            <div className="w-full h-32 rounded-md bg-gray-200 overflow-hidden border border-gray-300">
+                                                                <img src={file.url || file.path} alt={`Lead ${idx}`} className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <span className="mt-2 text-xs text-gray-600">image {idx + 1}</span>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <p className="text-sm text-gray-400">No images</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className=" flex-2/5 border p-6 rounded-[12px] h-fit">
+                                    <h2 className=" text-2xl text-[#111827] font-medium">User Details</h2>
+                                    <div className="mt-8 space-y-6">
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">Sent to</h3>
+                                            <p className=" text-base text-[#777980]">{row.user_name} <span className=" text-[#D2D2D5]"> (ID {row.user_id})</span> </p>
+                                        </div>
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">User’s Response</h3>
+                                            <p className={`text-base px-3 inline-block rounded-full ${row.response_from_user === 'YES' ? 'text-[#006557] bg-[#B0E4DD]' : 'text-[#990000] bg-[#FFB0B0]'}`}>
+                                                {row.response_from_user}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">User’s Trade</h3>
+                                            <p className=" text-base text-[#777980]">{row.trade}</p>
+                                        </div>
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">Connection Assigned</h3>
+                                            <p className=" text-base text-[#777980]">{row.num_connection_sent_by_us} time(s)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+};
+
+const UserNameCell = ({ value, row }: { value: string, row: UserResponse }) => {
+    return (
+        <div className="flex items-center justify-between">
+            <span className="text-sm text-[#06030C]">{value}</span>
+            <Dialog>
+                <DialogTrigger asChild>
+                    <button className="ml-2 p-1 rounded-full hover:bg-gray-200">
+                        <TopRightArrow />
+                    </button>
+                </DialogTrigger>
+                <DialogContent className="sm:max-w-[400px] w-full bg-white p-6">
+                    <h2 className="text-2xl text-[#111827] font-medium mb-6">User Quick View</h2>
+                    <div className="space-y-4">
+
+                        <div className="flex justify-between border-b pb-2">
+                            <span className="text-sm font-medium text-gray-500">Name</span>
+                            <span className="text-sm text-gray-900">{row.user_name}</span>
+                        </div>
+                        <div className="flex justify-between border-b pb-2">
+                            <span className="text-sm font-medium text-gray-500">City</span>
+                            <span className="text-sm text-gray-900">{row.location || "N/A"}</span>
+                        </div>
+
+                    </div>
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+};
 
 export function UserResponsesColumn({ onEdit }: UserResponsesColumnProps): ColumnConfig<UserResponse>[] {
     return [
@@ -71,109 +194,24 @@ export function UserResponsesColumn({ onEdit }: UserResponsesColumnProps): Colum
             label: "User ID",
             accessor: "user_id",
             width: "100px",
-            formatter: (value: number) => (
+            formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>
             ),
         },
         {
             label: "Lead ID",
             accessor: "lead_id",
-            width: "100px",
-            formatter: (value: number, row: UserResponse) => (
-                <div className="flex items-center justify-between">
-                    <span className="text-sm text-[#06030C]">{value}</span>
-                    <Dialog>
-                        <DialogTrigger asChild>
-                            <button className="ml-2 p-1 rounded-full hover:bg-gray-200">
-                                <TopRightArrow />
-                            </button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[890px] w-full bg-white p-6">
-
-                            <h2 className=" text-[32px] text-[#070707]  font-medium text-center">Lead ID #2001</h2>
-                            <div className=" flex   gap-8">
-                                <div className=" flex-3/5  ">
-                                    <div className=" space-y-8">
-                                        <div className=" space-y-2.5">
-                                            <div className=" border-b  border-[#E9E9EA] pb-2.5">
-                                                <h3 className=" text-base text-[#070707] font-medium">City:</h3>
-                                                <p className=" text-sm text-[#777980] mt-2.5">123 Main St, Los Angeles</p>
-
-                                            </div>
-                                            <div className=" border-b  border-[#E9E9EA] pb-2.5">
-                                                <h3 className=" text-base text-[#070707] font-medium">Trade:</h3>
-                                                <p className=" text-sm text-[#777980] mt-2.5">Electrician</p>
-
-                                            </div>
-
-                                        </div>
-                                        <div className=" border-b  border-[#E9E9EA] pb-2.5">
-                                            <h3 className=" text-base text-[#070707] font-medium">Note:</h3>
-                                            <p className=" text-sm text-[#777980] mt-2.5">The lead is located on 123 Main St. The owner’s name is John Smith. He has some roof leaking issue. I’ve shared some images based on specific objective.
-
-                                                Please see the images below for this specific lead.... See More</p>
-                                        </div>
-
-                                        <div>
-                                            <h3 className=" text-base text-[#070707] font-medium">Images (3)</h3>
-                                            <div className="flex gap-4 mt-4">
-                                                {/* Example image placeholders using divs */}
-                                                <div className="flex flex-col items-center w-1/3">
-                                                    <div className="w-full h-32 rounded-md bg-gray-200 flex items-center justify-center text-gray-400 text-lg font-semibold border border-gray-300">Image 1</div>
-                                                    <span className="mt-2 text-xs text-gray-600">Caption 1</span>
-                                                </div>
-                                                <div className="flex flex-col items-center w-1/3">
-                                                    <div className="w-full h-32 rounded-md bg-gray-200 flex items-center justify-center text-gray-400 text-lg font-semibold border border-gray-300">Image 2</div>
-                                                    <span className="mt-2 text-xs text-gray-600">Caption 2</span>
-                                                </div>
-                                                <div className="flex flex-col items-center w-1/3">
-                                                    <div className="w-full h-32 rounded-md bg-gray-200 flex items-center justify-center text-gray-400 text-lg font-semibold border border-gray-300">Image 3</div>
-                                                    <span className="mt-2 text-xs text-gray-600">Caption 3</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className=" flex-2/5 border p-6 rounded-[12px]">
-                                    <h2 className=" text-2xl text-[#111827] font-medium">User Details</h2>
-                                    <div className="mt-8 space-y-6">
-                                        <div>
-                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5">Sent to</h3>
-                                            <p className=" text-base text-[#777980]">Floyd Miles <span className=" text-[#D2D2D5]"> (ID 1235)</span> </p>
-                                        </div>
-                                        <div>
-                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5">User’s Response</h3>
-                                            <p className=" text-base text-[#006557] bg-[#B0E4DD] px-3 inline-block rounded-full">YES</p>
-                                        </div>
-                                        <div>
-                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5">User’s Phone</h3>
-                                            <p className=" text-base text-[#777980]">F+32 231242134</p>
-                                        </div>
-                                        <div>
-                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5">User’s Trade</h3>
-                                            <p className=" text-base text-[#777980]">Plumbing, Electrician</p>
-                                        </div>
-                                        <div>
-                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5">Connection Sent to User</h3>
-                                            <p className=" text-base text-[#777980]">Feb 17, 2026</p>
-                                        </div>
-
-                                    </div>
-                                </div>
-                            </div>
-
-
-                        </DialogContent>
-                    </Dialog>
-                </div>
+            width: "120px",
+            formatter: (value: string, row: UserResponse) => (
+                <LeadIdCell value={value} row={row} />
             ),
         },
         {
             label: "User Name",
             accessor: "user_name",
-            width: "140px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+            width: "180px",
+            formatter: (value: string, row: UserResponse) => (
+                <UserNameCell value={value} row={row} />
             ),
         },
         {
@@ -206,15 +244,15 @@ export function UserResponsesColumn({ onEdit }: UserResponsesColumnProps): Colum
         },
         {
             label: "Response",
-            accessor: "res_from_user",
+            accessor: "response_from_user",
             width: "100px",
-            formatter: (value: 'yes' | 'no') => (
+            formatter: (value: string) => (
                 <span className={` uppercase px-3 py-0.5 text-base rounded-full
-                    ${value === 'yes'
+                    ${value === 'YES'
                         ? "text-[#006557] text-sm bg-[#b0e4dd]"
                         : "text-[#990000] text-sm bg-[#ffb0b0]"
                     }`}>
-                    {value === 'yes' ? 'Yes' : 'No'}
+                    {value}
                 </span>
             ),
         },

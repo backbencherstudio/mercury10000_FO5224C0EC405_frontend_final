@@ -34,6 +34,16 @@ export const Connection = baseApi.injectEndpoints({
             providesTags: ["requestconnection"],
         }),
 
+        getSingleRequesStatus: builder.query({
+            query: (id) => ({
+                url: `/connection-requests/${id}`,
+                method: "GET",
+
+            }),
+            providesTags: ["requestconnection"],
+
+        }),
+
         updateUserRequestSent: builder.mutation({
             query: ({ id, data }) => ({
                 url: `/connection-requests/${id}/assign-users`,
@@ -47,8 +57,23 @@ export const Connection = baseApi.injectEndpoints({
 
 
 
+        deleteConnectionRequest: builder.mutation({
+            query: (id) => ({
+                url: `/connection-requests/admin/${id}`,
+                method: "DELETE",
+            }),
+            invalidatesTags: ["requestconnection"],
+        }),
+
     }),
 });
 
 // hook export (naming important)
-export const { usePostConnectionRequestMutation, useGetRequestPoolQuery, useGetCunnectionStausQuery, useUpdateUserRequestSentMutation } = Connection;
+export const {
+    usePostConnectionRequestMutation,
+    useGetRequestPoolQuery,
+    useGetCunnectionStausQuery,
+    useGetSingleRequesStatusQuery,
+    useUpdateUserRequestSentMutation,
+    useDeleteConnectionRequestMutation
+} = Connection;

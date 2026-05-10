@@ -8,6 +8,7 @@ import CrossIcon from '@/components/icons/admin/CrossIcon'
 import { TradeColumn } from '@/components/columns/TradeColumn'
 import { Skeleton } from "@/components/ui/skeleton"
 import { useGetTradesQuery, useCreateTradeMutation, useDeleteTradeMutation, useUpdateTradeMutation } from '@/redux/features/user/user'
+import toast from 'react-hot-toast'
 
 type Trade = {
   id: string;
@@ -138,6 +139,7 @@ export default function CreateTrade() {
         title: 'Trade Created',
         message: data?.message || `A trade named ${name} has been created successfully!`,
       });
+      toast.success('Trade created successfully');
     } catch (error: any) {
       const source = error?.response?.data?.message || error?.response?.data || error?.message;
       setAlert({
@@ -166,6 +168,7 @@ export default function CreateTrade() {
         title: 'Trade Deleted',
         message: 'The trade has been successfully deleted.',
       });
+      toast.success('Trade deleted successfully');
     } catch (error: any) {
       const source = error?.data?.message || error?.message || 'Failed to delete trade';
       setAlert({

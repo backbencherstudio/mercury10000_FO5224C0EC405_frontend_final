@@ -17,6 +17,10 @@ export default function SettingsNav() {
       href: "/dashboard/settings",
     },
     {
+      label: "Email Notification",
+      href: "/dashboard/settings/email-notification",
+    },
+    {
       label: 'Security & Password',
       href: "/dashboard/settings/security-password"
     },
@@ -30,11 +34,11 @@ export default function SettingsNav() {
     if (pathname === href) {
       return true;
     }
-    
+
     if (href !== "/dashboard/settings" && pathname?.startsWith(href + "/")) {
       return true;
     }
-    
+
     return false;
   };
 
@@ -43,7 +47,7 @@ export default function SettingsNav() {
       <div className="flex items-center min-w-max md:min-w-0 md:flex-wrap md:gap-2 lg:gap-4 xl:gap-8 px-1">
         {navItems.map((item) => {
           const isActive = isItemActive(item.href);
-          
+
           return (
             <Link
               key={item.href}
@@ -51,8 +55,8 @@ export default function SettingsNav() {
               className={cn(
                 "flex items-center whitespace-nowrap px-3 py-2.5 text-sm sm:text-base md:text-lg font-medium transition-colors duration-200",
                 "border-b-2 border-transparent",
-                isActive 
-                  ? "text-[#0e93a1] border-[#1d9aa7]" 
+                isActive
+                  ? "text-[#0e93a1] border-[#1d9aa7]"
                   : "text-[#111827] hover:text-[#1d9aa7] hover:border-[#1d9aa7]/30"
               )}
             >

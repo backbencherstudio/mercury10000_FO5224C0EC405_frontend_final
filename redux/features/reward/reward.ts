@@ -14,6 +14,35 @@ export const RewardApi = baseApi.injectEndpoints({
             invalidatesTags: ["reward"],
         }),
 
+        //get gift card
+        getGiftCardStatus: builder.query({
+            query: () => ({
+                url: "/giftcard/all-gift-status",
+                method: "GET",
+            }),
+            providesTags: ["reward"],
+        }),
+
+        // get all gift cards
+        getGiftCards: builder.query({
+            query: () => ({
+                url: "/giftcard",
+                method: "GET",
+            }),
+            transformResponse: (response: any) => response?.data || [],
+            providesTags: ["reward"],
+        }),
+
+        //send gift card
+        sendGiftCard: builder.mutation({
+            query: (body) => ({
+                url: "/giftcard/send-reward",
+                method: "POST",
+                body
+            }),
+            invalidatesTags: ["reward"],
+        }),
+
         // GET → use query
         getRward: builder.query({
             query: () => ({
@@ -37,4 +66,4 @@ export const RewardApi = baseApi.injectEndpoints({
 });
 
 // hook export (naming important)
-export const { useGiftCardMutation, useGetRwardQuery, useUpdataStatusMutation } = RewardApi;
+export const { useGiftCardMutation, useSendGiftCardMutation, useGetRwardQuery, useUpdataStatusMutation, useGetGiftCardStatusQuery, useGetGiftCardsQuery } = RewardApi;

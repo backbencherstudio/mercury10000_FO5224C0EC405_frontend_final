@@ -3,8 +3,9 @@ import { FinancialActivityColumn } from '@/components/columns/FinancialActivityC
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { FinancialActivityData } from '@/public/demoData/FinancialActivityData'
 import { useParams, useRouter } from 'next/navigation'
-import { useGetSingleUserDetailsQuery, useUpdateUserMutation } from '@/redux/features/dashboardOverview/dashboardOverView'
+import { useGetLeadsSubmitionQuery, useGetSingleUserDetailsQuery, useUpdateUserMutation } from '@/redux/features/dashboardOverview/dashboardOverView'
 import { CloudCog } from 'lucide-react'
+import { useGetFinancilaActivityQuery } from '@/redux/features/user/user'
 
 interface User {
   id: string;
@@ -30,8 +31,14 @@ export default function UserDetails({ user }: UserDetailsProps) {
     skip: !id,
   });
 
-  console.log("datasdfsdfsdfsd: ", data);
 
+
+  const {
+    data: leadsSubmition,
+    isLoading: leadsSubmitionLoading,
+    error: leadsSubmitionError,
+  } = useGetFinancilaActivityQuery({ id: id, });
+  console.log(leadsSubmition, 'leadsSubmition')
 
   // Editable state for each field
   const [editState, setEditState] = useState({
@@ -65,7 +72,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
         id: data.data.id,
         phone_number: data.data.phone_number,
         city: data.data.city,
-        trade: data.data.trades || '',
+        trade: data.data.trades?.name || '',
         role: data.data.type,
         work: data.data.work || '',
         qualify: data.data.qualified_leads_fee || '',
@@ -87,9 +94,23 @@ export default function UserDetails({ user }: UserDetailsProps) {
 
   const handleSave = async () => {
     try {
+
+      const payload = {
+        username: inputState.username,
+        phone_number: inputState.phone_number,
+        city: inputState.city,
+        work_at_company: inputState.work,
+        type: inputState.role,
+        trades: inputState.trade ? [inputState.trade] : [],
+        qualified_leads_fee: Number(inputState.qualify),
+        conversion_fee: Number(inputState.conversion_fee),
+      };
+
+      console.log(payload);
+
       await updateUser({
         id,
-        body: inputState,
+        body: payload,
       }).unwrap();
 
       setEditState({
@@ -103,6 +124,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
         qualify: false,
         conversion_fee: false,
       });
+
     } catch (err) {
       console.error(err);
     }
@@ -129,7 +151,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
                   <input
                     className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
                     value={inputState.username}
-                    onChange={e => handleInputChange('user_name', e.target.value)}
+                    onChange={e => handleInputChange('username', e.target.value)}
                   />
                 ) : (
                   <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.username}</p>
@@ -140,7 +162,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
               )}
             </div>
             {/* User ID */}
-            <div className="border-b pb-2 flex justify-between items-end">
+            {/* <div className="border-b pb-2 flex justify-between items-end">
               <div>
                 <h3 className="text-lg text-[#1D1F2C] font-semibold">User ID</h3>
                 {editState.id ? (
@@ -156,7 +178,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
               {!editState.id && (
                 <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('id')}>Edit</button>
               )}
-            </div>
+            </div> */}
             {/* Phone No. */}
             <div className="border-b pb-2 flex justify-between items-end">
               <div>
@@ -165,7 +187,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
                   <input
                     className="text-base text-[#777980] mt-1.5 py-2 px-0 w-full bg-white border-0 border-b border-[#D2D2D5] focus:outline-none focus:border-[#0b7680] transition-colors"
                     value={inputState.phone_number}
-                    onChange={e => handleInputChange('phone_no', e.target.value)}
+                    onChange={e => handleInputChange('phone_number', e.target.value)}
                   />
                 ) : (
                   <p className="text-base text-[#777980] mt-1.5 pb-2 min-h-[40px]">{inputState.phone_number}</p>
@@ -337,7 +359,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
         <div className='overflow-x-auto'>
           <DynamicTable
             columns={FinancialActivityColumn({ onView: handleView })}
-            data={FinancialActivityData}
+            data={leadsSubmition?.data || []}
             showPagination={false}
           />
         </div>

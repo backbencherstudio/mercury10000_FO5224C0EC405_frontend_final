@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import { useUpdateScheduleTimeMutation } from "@/redux/features/dashboardOverview/dashboardOverView";
+import toast from "react-hot-toast";
 
 interface LeadProcessCalendarDialogProps {
   isOpen: boolean;
@@ -59,6 +60,7 @@ export function LeadProcessCalendarDialog({
         id: ID,
         scheduled_time: scheduledTime.toISOString(),
       }).unwrap();
+      toast.success("Schedule updated successfully");
 
       if (onSave) onSave(scheduledTime);
       onClose();

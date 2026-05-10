@@ -31,6 +31,7 @@ interface GiftStatusColumnProps {
     onView?: (row: GiftStatus) => void;
     onEdit?: (row: GiftStatus) => void;
     onDelete?: (row: GiftStatus) => void;
+    onSend?: (row: GiftStatus) => void;
 }
 
 // Date formatter for consistent date display
@@ -50,7 +51,8 @@ export function GiftStatusColumn({
     onSelectRow,
     onView,
     onEdit,
-    onDelete
+    onDelete,
+    onSend
 }: GiftStatusColumnProps): ColumnConfig[] {
 
     // Check if all rows are selected
@@ -136,7 +138,7 @@ export function GiftStatusColumn({
             formatter: (value: string) => (
                 <div className="flex items-center">
                     <span className="text-sm  text-[#06030C]">{value}</span>
-                  
+
                 </div>
             ),
         },
@@ -149,7 +151,7 @@ export function GiftStatusColumn({
             formatter: (value: string) => (
                 <div className="flex items-center">
                     <span className="text-sm text-[#06030C] ">{value}</span>
-                    
+
                 </div>
             ),
         },
@@ -164,12 +166,12 @@ export function GiftStatusColumn({
         //         const sent = parseInt(row.leadSent);
         //         const received = parseInt(row.giftReceived);
         //         const percentage = Math.round((received / sent) * 100);
-                
+
         //         let colorClass = "text-gray-600";
         //         if (percentage >= 30) colorClass = "text-green-600";
         //         else if (percentage >= 20) colorClass = "text-yellow-600";
         //         else colorClass = "text-red-600";
-                
+
         //         return (
         //             <span className={`text-sm font-medium ${colorClass}`}>
         //                 {percentage}%
@@ -181,12 +183,12 @@ export function GiftStatusColumn({
         // 8. Last Gift Column
         {
             label: "Last Gift Date",
-            accessor: "lastGiftReceived",
+            accessor: "last_gift_date",
             width: "150px",
             formatter: (value: string, row: GiftStatus) => (
                 <div className="flex flex-col">
-                  
-                    <span className="text-sm text-[#06030C] ">{DateFormatter(row?.lastGiftDate)}</span>
+
+                    <span className="text-sm text-[#06030C] ">{DateFormatter(value || "--")}</span>
                 </div>
             ),
         },
@@ -204,15 +206,31 @@ export function GiftStatusColumn({
         },
 
         // 10. Last Gift Date Column (separate if needed)
-        {
-            label: "Next Planned Gift",
-            accessor: "lastGiftDate",
-            width: "120px",
-            formatter: (value: string) => (
-                <div className=" flex items-center justify-between">
-                    <span className="text-sm text-[#06030C] ">{DateFormatter(value)}</span>
-                    <DownArrowIcon/>
+        // {
+        //     label: "Next Planned Gift",
+        //     accessor: "lastGiftDate",
+        //     width: "120px",
+        //     formatter: (value: string) => (
+        //         <div className=" flex items-center justify-between">
+        //             <span className="text-sm text-[#06030C] ">{DateFormatter(value)}</span>
+        //             <DownArrowIcon />
 
+        //         </div>
+        //     ),
+        // },
+
+        {
+            label: "Action",
+            accessor: "action",
+            width: "120px",
+            formatter: (_: string, row: GiftStatus) => (
+                <div className="flex items-center justify-center">
+                    <button
+                        onClick={() => onSend?.(row)}
+                        className="text-[#0b7680] font-semibold hover:underline cursor-pointer"
+                    >
+                        Send
+                    </button>
                 </div>
             ),
         },

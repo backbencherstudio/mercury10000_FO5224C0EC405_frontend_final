@@ -12,9 +12,13 @@ import {
 // Admin type definition based on the data structure
 interface Admin {
   id: string;
-  user_name: string;
-  password: string;
-  Phone: string;
+  name: string | null;
+  phone_number: string | null;
+  email: string;
+  type: string;
+  trades: any[];
+  city: string | null;
+  country: string | null;
 }
 
 interface ColumnConfig<T = any> {
@@ -57,18 +61,6 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
             className="cursor-pointer"
           >
             View
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => onDelete?.(row)}
-            className="cursor-pointer"
-          >
-            Delete
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            onClick={() => onEdit?.(row)}
-            className="cursor-pointer"
-          >
-            Edit
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -124,8 +116,8 @@ export function AllAdminColumn({
         <ActionDropdown
           row={row}
           onView={onView}
-          onDelete={onDelete}
-          onEdit={onEdit}
+        // onDelete={onDelete}
+        // onEdit={onEdit}
         />
       ),
     },

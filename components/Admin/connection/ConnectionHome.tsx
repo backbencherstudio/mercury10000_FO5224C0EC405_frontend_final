@@ -11,6 +11,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import toast from 'react-hot-toast';
 export default function ConnectionHome() {
     const { data: tradesData, isLoading: isLoadingTrades } =
         useGetTradesQuery(undefined);
@@ -55,31 +56,46 @@ export default function ConnectionHome() {
         });
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const payload = new FormData();
+        try {
+            const payload = new FormData();
 
-        // trade id jabe
-        payload.append('trade_id', formData.trade);
+            payload.append('trade_id', formData.trade);
+            payload.append('location', formData.location);
 
-        payload.append('location', formData.location);
-
-        if (formData.city) {
-            payload.append('city', formData.city);
-        }
-
-        if (formData.description) {
-            payload.append('description', formData.description);
-        }
-
-        images.forEach((file) => {
-            if (file) {
-                payload.append('files', file);
+            if (formData.city) {
+                payload.append('city', formData.city);
             }
-        });
 
-        postconnections({ data: payload });
+            if (formData.description) {
+                payload.append('description', formData.description);
+            }
+
+            images.forEach((file) => {
+                if (file) {
+                    payload.append('files', file);
+                }
+            });
+
+            await postconnections({ data: payload }).unwrap();
+
+            toast.success("Request created successfully");
+
+            //  RESET FORM AFTER SUCCESS
+            setFormData({
+                trade: '',
+                location: '',
+                city: '',
+                description: '',
+            });
+
+            setImages([null, null, null]);
+
+        } catch (error) {
+            toast.error("Failed to create request");
+        }
     };
 
     return (

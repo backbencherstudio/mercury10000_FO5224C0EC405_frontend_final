@@ -406,7 +406,7 @@ export default function UserHome() {
                                             name=""
                                             id="qualified_leads_fee"
                                             className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
-                                            placeholder='100'
+                                            placeholder='$ 100'
                                             value={feeFormData.qualified_leads_fee}
                                             onChange={handleFeeInputChange}
                                         />
@@ -419,7 +419,7 @@ export default function UserHome() {
                                             name=""
                                             id="conversion_fee"
                                             className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
-                                            placeholder='10'
+                                            placeholder='$ 500'
                                             value={feeFormData.conversion_fee}
                                             onChange={handleFeeInputChange}
                                         />

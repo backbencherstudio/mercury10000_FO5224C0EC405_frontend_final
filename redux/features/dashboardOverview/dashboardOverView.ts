@@ -3,6 +3,16 @@ import { baseApi } from "../../api/baseApi";
 export const dashboardOverviewApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
 
+
+    //get staus card
+
+    getDashboardstatusCard: builder.query({
+      query: () => ({
+        url: "/leads/dashboard-stats-count",
+        method: "GET",
+      }),
+
+    }),
     // GET → use query
     getDashboardOverview: builder.query({
       query: (params) => ({
@@ -29,7 +39,7 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { status }
       }),
-      invalidatesTags: ["AllLeads"],
+      invalidatesTags: ["LeadsStatus"],
     }),
 
     //update user
@@ -100,4 +110,4 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
 });
 
 // hook export (naming important)
-export const { useGetDashboardOverviewQuery, useGetLeadsProcessQuery, useUpdateUserMutation, useGetSingleUserDetailsQuery, useGetLeadsSubmitionQuery, useGetLeadsHistoryQuery, useUpdateScheduleTimeMutation, useUpdateStausLeadsProcessMutation, useGetLeadsHistorySecrateryQuery, } = dashboardOverviewApi;
+export const { useGetDashboardstatusCardQuery, useGetDashboardOverviewQuery, useGetLeadsProcessQuery, useUpdateUserMutation, useGetSingleUserDetailsQuery, useGetLeadsSubmitionQuery, useGetLeadsHistoryQuery, useUpdateScheduleTimeMutation, useUpdateStausLeadsProcessMutation, useGetLeadsHistorySecrateryQuery, } = dashboardOverviewApi;
