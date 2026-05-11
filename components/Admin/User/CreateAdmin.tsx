@@ -230,12 +230,12 @@ export default function CreateAdmin() {
       </div>
 
       <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-        <DialogContent className="max-w-2xl border-none shadow-2xl p-0 overflow-hidden bg-white rounded-2xl">
-          <DialogHeader className="bg-[#0b7680] p-6 text-white">
+        <DialogContent className="max-w-2xl md:max-w-2xl w-full lg:max-w-3xl border-none shadow-2xl p-0 overflow-hidden bg-white rounded-2xl">
+          <DialogHeader className=" p-6 ">
             <div className="flex items-center gap-4">
 
               <div>
-                <DialogTitle className="text-2xl font-bold text-white">Secretary/Admin Details</DialogTitle>
+                <DialogTitle className="text-2xl font-bold ">Secretary/Admin Details</DialogTitle>
                 {/* <p className="text-white/80 text-sm mt-1">Full profile information and settings</p> */}
               </div>
             </div>

@@ -39,7 +39,7 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
         method: "PATCH",
         body: { status }
       }),
-      invalidatesTags: ["LeadsStatus"],
+      invalidatesTags: ["LeadsStatus", "AllLeads"],
     }),
 
     //update user

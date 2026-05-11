@@ -113,10 +113,10 @@ const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
         </div>
 
         <div className="flex gap-5">
-          <button className="flex items-center gap-2.5 bg-[#F59F00] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer">
+          {/* <button className="flex items-center gap-2.5 bg-[#F59F00] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer">
             <MessageIcon />
             Contact User Now
-          </button>
+          </button> */}
           <p className="flex items-center gap-2.5 bg-[#0b7680] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer">
 
             {row?.status}

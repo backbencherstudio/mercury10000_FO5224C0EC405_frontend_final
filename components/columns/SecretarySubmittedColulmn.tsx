@@ -88,9 +88,10 @@ export function SecretarySubmittedColumn({
     },
     {
       label: "User Name",
-      accessor: "user",
-      width: "140px",
-      formatter: (value: any) => <span className="text-sm text-[#06030C]">{value?.name || "--"}</span>,
+      accessor: "name",
+      formatter: (value: string) => (
+        <span className="text-sm text-[#06030C]">{value || "--"}</span>
+      ),
     },
     {
       label: "Homeowner Name",
@@ -114,7 +115,13 @@ export function SecretarySubmittedColumn({
       label: "Trade",
       accessor: "trade",
       width: "110px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value || "--"}</span>,
+      formatter: (value: any) => (
+        <span className="text-sm text-[#06030C]">
+          {Array.isArray(value) && value.length > 0
+            ? value.map((t: any) => t.name).join(", ")
+            : "--"}
+        </span>
+      ),
     },
     {
       label: "Lead Sent to Us",

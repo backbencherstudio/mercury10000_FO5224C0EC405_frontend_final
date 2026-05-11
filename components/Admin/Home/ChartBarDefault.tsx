@@ -54,7 +54,7 @@ export function ChartBarDefault() {
       month: "",
     });
   const leadData = data?.data || [];
-  console.log(leadData, 'leadsSubmition')
+
 
   return (
     <Card className="border border-[#E9E9EA] shadow-none py-3 sm:py-6">

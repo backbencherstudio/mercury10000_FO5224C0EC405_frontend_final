@@ -6,15 +6,28 @@ import React, { useState } from 'react'
 import { RewardStatusColumn } from '@/components/columns/RewardStatusColumn'
 import { rewardStatusData } from '@/public/demoData/RewardStatusData'
 import DynamicTable from '@/components/reusable/DynamicTable'
+import { useGetGiftCardStatusQuery } from '@/redux/features/reward/reward'
 
 export default function Rewards() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
 
-  const totalItems = rewardStatusData.length;
+  const { data: giftCardStatusData } = useGetGiftCardStatusQuery({});
+
+
+  const data = giftCardStatusData || [];
+  console.log(data, "data")
+
+  const filteredData = data.filter((item: any) =>
+    item.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    item.user_id.toString().includes(searchTerm)
+  );
+
+  const totalItems = filteredData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = rewardStatusData.slice(startIndex, startIndex + itemsPerPage);
+  const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
 
   return (
     <div className='border border-[#E9E9EA] p-4 sm:p-6 rounded-[12px] mt-6 w-full'>
@@ -24,10 +37,12 @@ export default function Rewards() {
           <div className='flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2'>
             <div className='relative w-full sm:w-auto'>
               <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
-              <input 
-                type="text" 
-                className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500' 
-                placeholder='Search user here' 
+              <input
+                type="text"
+                className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500'
+                placeholder='Search user here'
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
             <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>

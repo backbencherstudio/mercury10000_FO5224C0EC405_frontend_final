@@ -52,15 +52,27 @@ export const authApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
 
+
+
     getAuthme: builder.query({
-      query: () => {
-        return {
-          url: "/auth/me",
-          method: "GET"
-        }
-      },
-      providesTags: ["Admin"],
+      query: () => ({
+        url: `/auth/me`,
+        method: "GET",
+      }),
     }),
+
+
+    // getAuthme: builder.query({
+    //   query: () => {
+    //     return {
+    //       url: "/auth/me",
+    //       method: "GET"
+    //     }
+    //   },
+    //   providesTags: ["Admin"],
+    // }),
+
+
     updateUserProfile: builder.mutation({
       query: ({ id, body }) => ({
         url: `/auth/update/${id}`,
@@ -70,9 +82,19 @@ export const authApi = baseApi.injectEndpoints({
       invalidatesTags: ["Admin"],
     }),
 
+    //password update
+    updatePassword: builder.mutation({
+      query: ({ body }) => ({
+        url: `/auth/change-password`,
+        method: "POST",
+        body
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+
   }),
 
-  overrideExisting: false,
+  // overrideExisting: false,
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetAllUsersQuery, useGetAuthmeQuery, useUpdateUserProfileMutation } = authApi;
+export const { useLoginMutation, useRegisterMutation, useGetAllUsersQuery, useGetAuthmeQuery, useUpdateUserProfileMutation, useUpdatePasswordMutation } = authApi;

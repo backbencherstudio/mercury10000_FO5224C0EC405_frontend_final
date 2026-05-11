@@ -38,7 +38,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
     isLoading: leadsSubmitionLoading,
     error: leadsSubmitionError,
   } = useGetFinancilaActivityQuery({ id: id, });
-  console.log(leadsSubmition, 'leadsSubmition')
+
 
   // Editable state for each field
   const [editState, setEditState] = useState({

@@ -1,9 +1,9 @@
 "use client";
 
-import { Menu, X } from "lucide-react";
+import { CloudCog, Menu, X } from "lucide-react";
 import Image from "next/image";
 import { useRouter, usePathname } from "next/navigation";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { IoIosArrowDown } from "react-icons/io";
 import { MdNotifications } from "react-icons/md";
 import {
@@ -16,6 +16,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import Search from "./Search";
 import { CookieHelper } from "@/helper/cookie.helper";
+import { useGetAuthmeQuery } from "@/redux/features/auth/authApi";
 
 interface HeaderProps {
   onNotificationClick?: () => void;
@@ -37,18 +38,34 @@ const Header: React.FC<HeaderProps> = ({
   const routeToTitle: { [key: string]: string } = {
     "/dashboard": "Home",
     "/dashboard/user": "User Management",
-    '/dashboard/lead':"Lead ",
+    '/dashboard/lead': "Lead ",
     "/dashboard/lead-history": "Lead History",
     "/dashboard/connection": "Connection",
     "/dashboard/reward": "Rewards Management",
     "/dashboard/support": "Support",
     "/dashboard/settings": "Setting and Notification",
     "/secretary-dashboard": "Home",
-    "/secretary-dashboard/lead-history":'All Management'
+    "/secretary-dashboard/lead-history": 'All Management'
   };
   // Dynamically change the title based on the base route
   const safePathname = pathname ?? "";
   const headerTitle: string = routeToTitle[safePathname] || "Dashboard"; // Default to "Dashboard"
+
+  // Eta correct
+  const { data: authData, isLoading: isAuthLoading, error: authError } = useGetAuthmeQuery({})
+
+  // Extract user data safely
+  const user = authData?.data
+  console.log(authData, "authdataauthdatadatadatadatadatadatadatadata")
+
+  // Handle loading and error states
+  useEffect(() => {
+    if (authError) {
+      console.error("Failed to fetch auth data:", authError)
+    }
+  }, [authError])
+
+
 
   return (
     <nav className=" text-blackColor border-b  border-borderColor  py-6">
@@ -140,10 +157,10 @@ const Header: React.FC<HeaderProps> = ({
                 <DropdownMenuContent align="end" className="w-48">
                   <div className="px-4 py-2">
                     <p className="text-sm font-semibold text-headerColor">
-                      {"User"}
+                      {user?.type}
                     </p>
                     <p className="text-xs text-textColor">
-                      {"admin@company.com"}
+                      {user?.email}
                     </p>
                   </div>
                   <DropdownMenuSeparator />

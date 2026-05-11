@@ -43,7 +43,6 @@ export default function RewardHome() {
   const [sendGiftCard, { isLoading: isSendingReward }] = useSendGiftCardMutation();
 
   const { data: giftCardStatusData } = useGetGiftCardStatusQuery({});
-  const { data: availableGiftCards } = useGetGiftCardsQuery({});
 
   const [selectedGiftCardId, setSelectedGiftCardId] = useState<string>('');
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -57,7 +56,9 @@ export default function RewardHome() {
     recentLead: item.recent_lead || "--",
     leadSent: item.total_leads_sent,
     giftReceived: item.total_gift_received,
-    lastGiftDate: item.last_gift_date,
+    last_gift_date: item.last_gift_date,
+    giftCardId: item.giftcard_id,
+    giftcard_name: item.giftcard_name,
   }))
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -79,8 +80,6 @@ export default function RewardHome() {
 
 
   // Calculate pagination
-  const startIndex = (currentPage - 1) * itemsPerPage
-  const endIndex = startIndex + itemsPerPage
 
   // Filter data based on search term
   const filteredData = formattedData.filter(item =>
@@ -89,8 +88,15 @@ export default function RewardHome() {
   )
 
   // Get current page data
-  const currentData = filteredData.slice(startIndex, endIndex)
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage)
+  const totalItems = filteredData.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+
+  const startIndex = (currentPage - 1) * itemsPerPage;
+
+  const currentData = filteredData.slice(
+    startIndex,
+    startIndex + itemsPerPage
+  );
 
   // Handle select all rows on current page
   const handleSelectAll = (checked: boolean) => {
@@ -135,11 +141,16 @@ export default function RewardHome() {
     // Implement your export logic here
   }
 
-  const handleBulkDelete = () => {
-    console.log('Delete selected:', Array.from(selectedRows))
-    // Implement your delete logic here
-    setSelectedRows(new Set()) // Clear selection after delete
-  }
+  const [rowSelections, setRowSelections] = useState<Record<string, string>>({});
+
+  const { data: availableGiftCards } = useGetGiftCardsQuery({});
+
+  const handleRowGiftSelect = (userId: string, giftCardId: string) => {
+    setRowSelections(prev => ({
+      ...prev,
+      [userId]: giftCardId
+    }));
+  };
 
   const handleSendReward = async () => {
     if (!selectedGiftCardId) {
@@ -168,14 +179,17 @@ export default function RewardHome() {
   }
 
   const handleSingleSend = async (row: any) => {
-    if (!selectedGiftCardId) {
-      toast.error("Please select a gift card first");
+    // Priority: row-specific selection > global selection > row.giftCardId
+    const giftCardId = rowSelections[row.userId] || selectedGiftCardId || row.giftCardId;
+
+    if (!giftCardId) {
+      toast.error("Please select a gift card for this user first");
       return;
     }
 
     try {
       await sendGiftCard({
-        giftCardId: selectedGiftCardId,
+        giftCardId: giftCardId,
         userIds: [row.userId]
       }).unwrap();
 
@@ -193,40 +207,55 @@ export default function RewardHome() {
     onSelectAll: handleSelectAll,
     onSelectRow: handleSelectRow,
     onSend: handleSingleSend,
+    availableGiftCards: availableGiftCards || [],
+    rowSelections,
+    onRowGiftSelect: handleRowGiftSelect
   })
 
   return (
 
     <div>
+
+
       <div className=' p-2.5 border-b border-[#11BECF] inline-block mb-8'>
         <h3 className=' text-lg text-[#0E93A1] font-medium'>All Rewards</h3>
       </div>
 
-      <div >
+      <div className="bg-white w-full flex flex-col gap-6 p-8 rounded-2xl border border-gray-100 shadow-sm mb-8">
+        <div>
+          <h3 className='text-2xl text-[#111827] font-semibold'>Create Gift Card</h3>
+          <p className='text-gray-500 text-sm mt-1'>Add a new gift card to the system for rewards.</p>
+        </div>
+        <div className="flex-1">
+          <form onSubmit={handleSubmit} className='flex flex-col md:flex-row items-end gap-4'>
+            <div className='flex-1 flex flex-col gap-2 w-full'>
+              <label htmlFor="giftName" className='text-sm font-medium text-gray-700 ml-1'>Gift Name</label>
+              <input
+                id="giftName"
+                name="name"
+                type="text"
+                value={payload.name}
+                onChange={handleChange}
+                placeholder='Gift Card Name'
+                className='border border-gray-200 h-12 rounded-xl px-4 outline-none focus:ring-1 focus:ring-[#0E93A1]/20 focus:border-[#0E93A1] transition-all'
+                required
+              />
 
-        <div className=' border border-[#D2D2D5] p-6 mb-4 rounded-[8px]'>
-          <h2 className=' text-2xl text-[#111827] font-medium mb-6'>Create a Gift</h2>
-          <form onSubmit={handleSubmit} className='flex flex-col gap-2.5'>
-            <label htmlFor="gift-name">Gift Name</label>
+              <button
+                type="submit"
+                disabled={isLoading}
+                className='h-12 px-8 rounded-xl bg-[#0B7680] text-white font-medium hover:bg-[#176f77] disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-[#0E93A1]/20 whitespace-nowrap cursor-pointer'
+              >
+                {isLoading ? "Creating..." : "Create Card"}
+              </button>
+            </div>
 
-            <input
-              name="name"
-              onChange={handleChange}
-              value={payload.name}
-              type="text"
-              id="gift-name"
-              className='border border-[#D2D2D5] py-2 px-4 rounded-[8px] placeholder:text-base placeholder:text-[#161721]'
-              placeholder='Bus Ticket'
-            />
-
-            <button
-              type="submit"
-              className='text-base text-white bg-[#0b7680] py-4 w-full rounded-[8px] mt-6 cursor-pointer'
-            >
-              {isLoading ? "Loading..." : "Create Gift"}
-            </button>
           </form>
         </div>
+      </div>
+
+      <div >
+
         <div className='p-6 border rounded-[12px]'>
           {/* Header with title and filters */}
           <div className='flex items-center justify-between mb-4'>
@@ -263,7 +292,7 @@ export default function RewardHome() {
           {/* Dynamic Table */}
           <DynamicTable
             columns={columns}
-            data={formattedData}
+            data={currentData}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
             onPageChange={handlePageChange}
@@ -276,28 +305,28 @@ export default function RewardHome() {
           />
 
           <div className='flex items-center gap-4 mt-6'>
-            <div className='w-full max-w-xs'>
+            {/* <div className='w-full max-w-xs'>
               <Select onValueChange={setSelectedGiftCardId} value={selectedGiftCardId}>
                 <SelectTrigger className="w-full bg-white border-[#D2D2D5] h-[52px] rounded-[8px]">
                   <SelectValue placeholder="Select a Gift Card" />
                 </SelectTrigger>
                 <SelectContent>
                   {availableGiftCards?.map((card: any) => (
-                    <SelectItem key={card.id} value={card.id}>
+                    <SelectItem key={card._id || card.id} value={card._id || card.id}>
                       {card.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-            </div>
+            </div> */}
 
-            <button
+            {/* <button
               onClick={handleSendReward}
               disabled={isSendingReward || selectedRows.size === 0}
               className='py-4 px-10 bg-[#0b7680] text-base font-medium text-white rounded-[8px] cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all'
             >
               {isSendingReward ? "Sending..." : "Send Reward"}
-            </button>
+            </button> */}
           </div>
 
           <Dialog open={isSuccessModalOpen} onOpenChange={setIsSuccessModalOpen}>

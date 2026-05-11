@@ -5,33 +5,44 @@ import React, { useState, useEffect } from 'react'
 
 interface EditableField {
   name: string;
-  address: string;
+
   email: string;
 }
 
 export default function SettingsHome() {
   const [isEditing, setIsEditing] = useState<{
     name: boolean;
-    address: boolean;
+
     email: boolean;
   }>({
     name: false,
-    address: false,
+
     email: false
   });
 
-  const { data: authData } = useGetAuthmeQuery({})
+  const { data: authData, isLoading: isAuthLoading, error: authError } = useGetAuthmeQuery({})
+
+  // Extract user data safely
   const user = authData?.data
+
+  console.log(authData, "authdataauthdatadatadatadatadatadatadatadata")
+
+  // Handle loading and error states
+  useEffect(() => {
+    if (authError) {
+      console.error("Failed to fetch auth data:", authError)
+    }
+  }, [authError])
 
   const [formData, setFormData] = useState<EditableField>({
     name: "",
-    address: "",
+
     email: ""
   });
 
   const [tempData, setTempData] = useState<EditableField>({
     name: "",
-    address: "",
+
     email: ""
   });
 
@@ -39,12 +50,10 @@ export default function SettingsHome() {
     if (user) {
       setFormData({
         name: user.name || "",
-        address: user.address || "",
         email: user.email || ""
       });
       setTempData({
         name: user.name || "",
-        address: user.address || "",
         email: user.email || ""
       });
     }
@@ -64,7 +73,6 @@ export default function SettingsHome() {
 
     const bodyMap: Record<keyof EditableField, string> = {
       name: 'name',
-      address: 'address',
       email: 'email',
     };
 
@@ -138,7 +146,7 @@ export default function SettingsHome() {
       </div>
 
       {/* Location Field */}
-      <div className='flex items-end justify-between border-b border-[#E9E9EA] pb-2'>
+      {/* <div className='flex items-end justify-between border-b border-[#E9E9EA] pb-2'>
         <div className='flex-1'>
           <h3 className='text-lg text-[#1D1F2C] font-semibold'>Location</h3>
           {isEditing.address ? (
@@ -177,7 +185,7 @@ export default function SettingsHome() {
             Edit
           </button>
         )}
-      </div>
+      </div> */}
 
       {/* Email Field */}
       <div className='flex items-end justify-between border-b border-[#E9E9EA] pb-2'>
