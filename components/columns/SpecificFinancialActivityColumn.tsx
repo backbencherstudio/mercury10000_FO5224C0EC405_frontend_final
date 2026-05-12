@@ -10,9 +10,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import DownArrowIcon from "@/components/icons/admin/DownArrowIcon";
 import EditIcon from "@/components/icons/admin/EditIcon";
+import { useUpdateLeadStatusMutation } from "@/redux/features/user/user";
+import toast from "react-hot-toast";
 
 // Update the interface to match SpecificFinancialActivityData structure
 interface SpecificFinancialActivity {
+    id: string;
     lead_submitted: string;
     qualified_leads: string;
     Conversion: string;
@@ -48,35 +51,59 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
     onDownload,
     onPrint
 }) => {
+
+    const [updateLeadStatus, { isLoading }] = useUpdateLeadStatusMutation();
+    const handleUpdateStatus = async (id: string, status: string) => {
+        try {
+            await updateLeadStatus({ id, body: { status } }).unwrap();
+            toast.success("Status updated successfully");
+        } catch (error) {
+            console.error("Failed to update status:", error);
+        }
+    };
+
+    const toggleStatus = async (row: SpecificFinancialActivity) => {
+        try {
+            const newStatus = row.collected ? false : true;
+
+            await updateLeadStatus({
+                id: row.id,
+                body: { collected: newStatus }
+            }).unwrap();
+
+            toast.success(`Status updated successfully`);
+        } catch (error) {
+            console.log(error);
+            toast.error("Failed to update status");
+        }
+    };
+
+
     return (
         <div className=" ">
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <button className="cursor-pointer hover:bg-[#e9e9ea] px-3 py-1.5 rounded-full focus:outline-none">
-                        <DownArrowIcon/>
+                        <DownArrowIcon />
                     </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-48 border border-[#d2d2d5] shadow-none">
                     <DropdownMenuItem
-                        onClick={() => onView?.(row)}
+                        onClick={() => toggleStatus(row)}
                         className="cursor-pointer"
                     >
-                        YES
+                        <span className="text-sm text-[#06030C]">
+                            {row.collected ? "YES" : "NO"}
+                        </span>
                     </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() => onDownload?.(row)}
-                        className="cursor-pointer"
-                    >
-                        N/A
-                    </DropdownMenuItem>
-                    
+
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
     );
 };
 
- 
+
 
 export function SpecificFinancialActivityColumn({
     onView,
@@ -84,10 +111,20 @@ export function SpecificFinancialActivityColumn({
     onPrint
 }: SpecificFinancialColumnProps): ColumnConfig<SpecificFinancialActivity>[] {
 
+    const formatDate = (date: string) => {
+        if (!date) return "--"
+
+        return new Date(date).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+        })
+    }
+
     return [
         {
             label: "Lead Submitted",
-            accessor: "lead_submitted",
+            accessor: "lead_submitted_addr",
             width: "150px",
             formatter: (value: string) => (
                 <span className="text-base text-[#040C0B]  ">{value}</span>
@@ -95,7 +132,7 @@ export function SpecificFinancialActivityColumn({
         },
         {
             label: "Qualified Leads",
-            accessor: "qualified_leads",
+            accessor: "qualified_leads_addr",
             width: "150px",
             formatter: (value: string) => (
                 <span className="text-base text-[#040C0B]  ">{value}</span>
@@ -103,10 +140,10 @@ export function SpecificFinancialActivityColumn({
         },
         {
             label: "Conversion",
-            accessor: "Conversion",
+            accessor: "conversation_addr",
             width: "150px",
             formatter: (value: string) => (
-                <span className="text-base text-[#040C0B]  ">{value}</span>
+                <span className="text-base text-[#040C0B]  ">{value || "--"}</span>
             ),
         },
         {
@@ -119,14 +156,14 @@ export function SpecificFinancialActivityColumn({
         },
         {
             label: "Check Number",
-            accessor: "check_number",
+            accessor: "lead_no",
             width: "130px",
             formatter: (value: string) => (
                 <div className=" flex items-center justify-between">
                     <span className="text-sm text-[#06030C] font-mono">{value}</span>
                     <button className=" cursor-pointer">
 
-                    <EditIcon/>
+                        <EditIcon />
                     </button>
 
                 </div>
@@ -134,27 +171,29 @@ export function SpecificFinancialActivityColumn({
         },
         {
             label: "Date",
-            accessor: "date",
+            accessor: "created_at",
             width: "120px",
             formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">{formatDate(value)}</span>
             ),
         },
         {
             label: "Collected",
             accessor: "collected",
             width: "100px", // Increased width to accommodate both badge and dropdown
-            formatter: (value: 'YES' | 'NO', row: SpecificFinancialActivity) => (
+            formatter: (value: boolean, row: SpecificFinancialActivity) => (
                 <div className="flex items-center justify-center gap-2.5">
-                  
-                <span className="text-sm text-[#06030C]">{value}</span>
+
+                    <span className="text-sm text-[#06030C]">
+                        {value ? "NO" : "YES"}
+                    </span>
+
                     <ActionDropdown
                         row={row}
                         onView={onView}
                         onDownload={onDownload}
                         onPrint={onPrint}
                     />
-                    
                 </div>
             ),
         }

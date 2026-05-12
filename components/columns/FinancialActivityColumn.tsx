@@ -8,13 +8,14 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useGetLeadsSubmitionQuery } from "@/redux/features/dashboardOverview/dashboardOverView";
 
 // User type definition based on the data structure
 interface FinancialActivity {
     month: string;
     qualified_leads: string;
     Conversion: string;
-    
+
 }
 
 interface ColumnConfig<T = any> {
@@ -26,20 +27,22 @@ interface ColumnConfig<T = any> {
 
 interface FinancialColumnProps {
     onView?: (row: FinancialActivity) => void;
- 
+
 }
 
 interface ActionDropdownProps {
     row: FinancialActivity;
     onView?: (row: FinancialActivity) => void;
-    
+
 }
 
 const ActionDropdown: React.FC<ActionDropdownProps> = ({
     row,
     onView,
-   
+
 }) => {
+
+
     return (
         <div className="flex justify-center w-full">
             <DropdownMenu>
@@ -53,27 +56,31 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                         onClick={() => onView?.(row)}
                         className="cursor-pointer"
                     >
-                       Monthly Detailed View
+                        Monthly Detailed View
                     </DropdownMenuItem>
-                    
+
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
     );
 };
 
- 
+
 
 export function FinancialActivityColumn({
     onView,
-   
+
 }: FinancialColumnProps): ColumnConfig<FinancialActivity>[] {
+
+
+
+
 
     // Return all columns configuration with proper typing
     return [
         {
             label: "Month",
-            accessor: "month",
+            accessor: "month_name",
             width: "100px",
             formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>
@@ -81,7 +88,7 @@ export function FinancialActivityColumn({
         },
         {
             label: "Qualified leads",
-            accessor: "qualified_leads",
+            accessor: "month",
             width: "140px",
             formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>
@@ -89,22 +96,22 @@ export function FinancialActivityColumn({
         },
         {
             label: "Conversion",
-            accessor: "Conversion",
+            accessor: "count",
             width: "140px",
             formatter: (value: string) => (
                 <span className="text-sm text-[#06030C]">{value}</span>
             ),
         },
-   
+
         {
             label: "Action",
-            accessor: "action", // Changed from "status" to "action" for clarity
+            accessor: "collected", // Changed from "status" to "action" for clarity
             width: "20px",
             formatter: (_: any, row: FinancialActivity) => (
                 <ActionDropdown
                     row={row}
                     onView={onView}
-                    
+
                 />
             ),
         },

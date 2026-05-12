@@ -11,6 +11,7 @@ import { toast } from 'react-hot-toast';
 import { setCookie } from 'nookies';
 import { getDashboardPathByRole, normalizeAppRole } from '@/helper/auth.helper';
 import { useLoginMutation } from '@/redux/features/auth/authApi';
+import { Eye, EyeOff } from 'lucide-react';
 
 
 type LoginResponse = {
@@ -34,6 +35,7 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [showPassword, setShowPassword] = useState(false);
   const pathname = usePathname();
 
   const getCookieMaxAge = () => (remember ? 30 * 24 * 60 * 60 : 24 * 60 * 60);
@@ -175,22 +177,42 @@ export default function Login() {
               />
               {fieldErrors.email && <span className="text-red-600 text-sm">{fieldErrors.email}</span>}
             </div>
-            <div className=' flex flex-col  w-full gap-2'>
+            <div className='flex flex-col w-full gap-2'>
               <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                className='    border border-[#c5c5c5] rounded-[8px] p-3'
-                placeholder='Enter your password'
-                value={password}
-                onChange={e => {
-                  setPassword(e.target.value);
-                  if (fieldErrors.password) {
-                    setFieldErrors(prev => ({ ...prev, password: undefined }));
-                  }
-                }}
-              />
-              {fieldErrors.password && <span className="text-red-600 text-sm">{fieldErrors.password}</span>}
+
+              <div className='relative w-full'>
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  id="password"
+                  className='w-full border border-[#c5c5c5] rounded-[8px] p-3 pr-12'
+                  placeholder='Enter your password'
+                  value={password}
+                  onChange={e => {
+                    setPassword(e.target.value);
+
+                    if (fieldErrors.password) {
+                      setFieldErrors(prev => ({
+                        ...prev,
+                        password: undefined,
+                      }));
+                    }
+                  }}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className='absolute right-3 top-1/2 -translate-y-1/2 text-gray-500'
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
+              {fieldErrors.password && (
+                <span className="text-red-600 text-sm">
+                  {fieldErrors.password}
+                </span>
+              )}
             </div>
             <div className=' flex justify-between items-center'>
               <div className='  flex items-center gap-2.5'>
@@ -203,7 +225,7 @@ export default function Login() {
               {loading ? 'Signing in...' : 'Login'}
             </button>
           </form>
-          <div className={`flex items-center justify-center w-full my-5`}>
+          {/* <div className={`flex items-center justify-center w-full my-5`}>
             <div className="flex-1 h-[1px] bg-[#e9e9ea]"></div>
             <span className="px-2.5 text-sm lg:text-base text-[#777980]">Or</span>
             <div className="flex-1 h-[1px] bg-[#e9e9ea]"></div>
@@ -211,7 +233,7 @@ export default function Login() {
           <div className=' flex flex-col lg:flex-row items-center  gap-5'>
             <button className=' flex items-center gap-2.5 py-4 px-6 bg-[#5583ec] rounded-[8px] text-white cursor-pointer'> <GoogleIcon className=' bg-white rounded-full ' /> Login with Google </button>
             <button className=' flex items-center gap-2.5 py-4 px-6 border border-[#e9e9ea] cursor-pointer    rounded-[8px] text-[#1D1F2C]'>  <AppleIcon /> Login with Apple </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

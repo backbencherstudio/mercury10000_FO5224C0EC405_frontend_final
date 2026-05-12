@@ -19,14 +19,24 @@ interface ColumnConfig<T = any> {
 	formatter?: (value: any, row?: T, index?: number) => React.ReactNode;
 }
 
+const formatDate = (value: string) => {
+	const date = new Date(value);
+
+	const formattedDate = `${date.getDate()}/${date.getMonth() + 1
+		}/${date.getFullYear()}`;
+
+	return formattedDate;
+};
 export function RewardStatusColumn(): ColumnConfig<RewardStatus>[] {
 	return [
 		{
 			label: "ID",
 			accessor: "id",
 			width: "80px",
-			formatter: (value: number) => (
-				<span className="text-sm text-[#06030C]">{value}</span>
+			formatter: (_: any, __: any, index?: number) => (
+				<span className="text-sm text-[#06030C]">
+					{index !== undefined ? index + 1 : "-"}
+				</span>
 			),
 		},
 		{
@@ -42,12 +52,12 @@ export function RewardStatusColumn(): ColumnConfig<RewardStatus>[] {
 			accessor: "recent_lead",
 			width: "120px",
 			formatter: (value: string) => (
-				<span className="text-sm text-[#06030C]">{value}</span>
+				<span className="text-sm text-[#06030C]">{formatDate(value) || "--"}</span>
 			),
 		},
 		{
 			label: "Total Leads Sent",
-			accessor: "total_leads_sent_us",
+			accessor: "total_leads_sent",
 			width: "120px",
 			formatter: (value: number) => (
 				<span className="text-sm text-[#06030C]">{value}</span>
@@ -66,24 +76,24 @@ export function RewardStatusColumn(): ColumnConfig<RewardStatus>[] {
 			accessor: "last_gift_date",
 			width: "120px",
 			formatter: (value: string) => (
-				<span className="text-sm text-[#06030C]">{value}</span>
+				<span className="text-sm text-[#06030C]">{formatDate(value)}</span>
 			),
 		},
 		{
 			label: "Last Gift Received",
-			accessor: "last_gift_received",
+			accessor: "giftcard_name",
 			width: "140px",
 			formatter: (value: string) => (
 				<span className="text-sm text-[#06030C]">{value}</span>
 			),
 		},
-		{
-			label: "Next Planned Gift",
-			accessor: "next_planned_gift",
-			width: "140px",
-			formatter: (value: string) => (
-				<span className="text-sm text-[#06030C]">{value}</span>
-			),
-		},
+		// {
+		// 	label: "Next Planned Gift",
+		// 	accessor: "next_planned_gift",
+		// 	width: "140px",
+		// 	formatter: (value: string) => (
+		// 		<span className="text-sm text-[#06030C]">{value}</span>
+		// 	),
+		// },
 	];
 }

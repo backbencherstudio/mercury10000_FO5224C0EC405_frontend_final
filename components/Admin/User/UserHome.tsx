@@ -11,8 +11,10 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import TagCrossIcon from '@/components/icons/admin/TagCrossIcon';
-import { UserService } from '@/service/user/user.service';
+// import { UserService } from '@/service/user/user.service';
 import { useRegisterMutation } from '@/redux/features/auth/authApi'
+import { useGetTradesQuery } from '@/redux/features/user/user'
+import { CloudCog, Eye, EyeOff } from 'lucide-react'
 
 
 interface FormData {
@@ -50,9 +52,10 @@ const emptyFormData: FormData = {
     trades: [],
 };
 type Trade = {
-  id: string;
-  name: string;
+    id: string;
+    name: string;
 };
+
 const emptyFeeFormData: FeeFormData = {
     qualified_leads_fee: '',
     conversion_fee: '',
@@ -67,6 +70,21 @@ export default function UserHome() {
     const [feeFieldErrors, setFeeFieldErrors] = useState<FeeFieldErrors>({});
     const [appliedFeeData, setAppliedFeeData] = useState<AppliedFeeData>({});
     const [tradeIdMap, setTradeIdMap] = useState<Record<string, string>>({});
+    const [tradesData, setTradesData] = useState<any>([]);
+
+    const [showPassword, setShowPassword] = useState(false);
+
+
+    const { data, isLoading: isLoadingTrades } = useGetTradesQuery([]);
+
+    useEffect(() => {
+        if (data) {
+            setTradesData(data);
+        }
+    }, [data]);
+
+    // API data array
+    const trades = Array.isArray(tradesData) ? tradesData : tradesData?.data || [];
 
     const [registerUser, { isLoading }] = useRegisterMutation();
     const setUserField = (field: keyof FormData, value: string | string[]) => {
@@ -135,50 +153,49 @@ export default function UserHome() {
     };
 
     const handleCountryChange = (value: string) => {
-        setFormData((prev) => ({
-            ...prev,
-            country: value,
-            city: '',
-        }));
+        setFormData((prev) => {
+            if (prev.country === value) return prev; // prevent loop
 
-        setFieldErrors((prev) => ({
-            ...prev,
-            country: undefined,
-            city: undefined,
-        }));
-    };
-
-    const countryOptions = Country.getAllCountries();
-    const cityOptions = formData.country ? City.getCitiesOfCountry(formData.country) ?? [] : [];
-
-    useEffect(() => {
-        const loadTradeIds = async () => {
-            const map = await UserService.getTradeIdMap();
-            setTradeIdMap(map);
-        };
-
-        loadTradeIds();
-    }, []);
-
-    // For multi-select trades
- const handleTradeSelect = (value: string) => {
-    setFormData((prev) => {
-        if (value === "na") {
             return {
                 ...prev,
-                trades: ["na"], 
+                country: value,
+                city: '',
             };
-        }
+        });
+    };
+    const countryOptions = Country.getAllCountries();
+    const cityOptions = React.useMemo(() => {
+        if (!formData.country) return [];
+        return City.getCitiesOfCountry(formData.country) ?? [];
+    }, [formData.country]);
+    // useEffect(() => {
+    //     const loadTradeIds = async () => {
+    //         const map = await UserService.getTradeIdMap();
+    //         setTradeIdMap(map);
+    //     };
 
-        const exists = prev.trades.includes(value);
-        if (exists) return prev;
+    //     loadTradeIds();
+    // }, []);
 
-        return {
-            ...prev,
-            trades: [...prev.trades, value],
-        };
-    });
-};
+    // For multi-select trades
+    const handleTradeSelect = (value: string) => {
+        setFormData((prev) => {
+            if (value === "na") {
+                return {
+                    ...prev,
+                    trades: ["na"],
+                };
+            }
+
+            const exists = prev.trades.includes(value);
+            if (exists) return prev;
+
+            return {
+                ...prev,
+                trades: [...prev.trades, value],
+            };
+        });
+    };
 
     const handleRemoveTrade = (value: string) => {
         setFormData((prev) => ({
@@ -187,74 +204,74 @@ export default function UserHome() {
         }));
     };
 
-   const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
 
-  const selectedCountry = countryOptions.find(
-    (country) => country.isoCode === formData.country
-  );
+        const selectedCountry = countryOptions.find(
+            (country) => country.isoCode === formData.country
+        );
 
-  const selectedTradesPayload = formData.trades
-    .filter((trade) => trade !== "na")
-    .map((trade) => tradeIdMap[trade] || trade);
+        const selectedTradesPayload = formData.trades
+            .filter((trade) => trade !== "na")
+            .map((trade) => tradeIdMap[trade] || trade);
 
-  const payload = {
-    username: formData.user_name.trim(),
-    phone_number: formData.phone.trim(),
-    email: formData.email.trim(),
-    password: formData.password,
-    work_at_company: formData.work.trim(),
-    city: formData.city,
-    country: selectedCountry?.name || formData.country,
-    qualified_leads_fee: feeFormData?.qualified_leads_fee || 0,
-    conversion_fee: feeFormData?.conversion_fee || 0,
-    type: "USER",
-    trades: selectedTradesPayload,
-    ...appliedFeeData,
-  };
+        const payload = {
+            username: formData.user_name.trim(),
+            phone_number: formData.phone.trim(),
+            email: formData.email.trim(),
+            password: formData.password,
+            work_at_company: formData.work.trim(),
+            city: formData.city,
+            country: selectedCountry?.name || formData.country,
+            qualified_leads_fee: feeFormData?.qualified_leads_fee || 0,
+            conversion_fee: feeFormData?.conversion_fee || 0,
+            type: "USER",
+            trades: selectedTradesPayload,
+            ...appliedFeeData,
+        };
 
-  const nextFieldErrors: FieldErrors = {};
+        const nextFieldErrors: FieldErrors = {};
 
-  if (!payload.username) nextFieldErrors.user_name = "User name is required";
-  if (!payload.phone_number) nextFieldErrors.phone = "Phone number is required";
-  if (!payload.email) nextFieldErrors.email = "Email is required";
-  if (!payload.password) nextFieldErrors.password = "Password is required";
-  if (!payload.work_at_company) nextFieldErrors.work = "Work is required";
-  if (!payload.country) nextFieldErrors.country = "Country is required";
-  if (!payload.city) nextFieldErrors.city = "City is required";
-  if (payload.trades.length === 0) nextFieldErrors.trades = "At least one trade is required";
+        if (!payload.username) nextFieldErrors.user_name = "User name is required";
+        if (!payload.phone_number) nextFieldErrors.phone = "Phone number is required";
+        if (!payload.email) nextFieldErrors.email = "Email is required";
+        if (!payload.password) nextFieldErrors.password = "Password is required";
+        if (!payload.work_at_company) nextFieldErrors.work = "Work is required";
+        if (!payload.country) nextFieldErrors.country = "Country is required";
+        if (!payload.city) nextFieldErrors.city = "City is required";
+        if (payload.trades.length === 0) nextFieldErrors.trades = "At least one trade is required";
 
-  const nextFeeErrors: FeeFieldErrors = {};
-  if (!feeFormData.qualified_leads_fee) nextFeeErrors.qualified_leads_fee = "Qualified leads fee is required";
-  if (!feeFormData.conversion_fee) nextFeeErrors.conversion_fee = "Conversion fee is required";
+        const nextFeeErrors: FeeFieldErrors = {};
+        if (!feeFormData.qualified_leads_fee) nextFeeErrors.qualified_leads_fee = "Qualified leads fee is required";
+        if (!feeFormData.conversion_fee) nextFeeErrors.conversion_fee = "Conversion fee is required";
 
-  if (Object.keys(nextFieldErrors).length > 0 || Object.keys(nextFeeErrors).length > 0) {
-    setFieldErrors(nextFieldErrors);
-    setFeeFieldErrors(nextFeeErrors);
-    return;
-  }
+        if (Object.keys(nextFieldErrors).length > 0 || Object.keys(nextFeeErrors).length > 0) {
+            setFieldErrors(nextFieldErrors);
+            setFeeFieldErrors(nextFeeErrors);
+            return;
+        }
 
-  setFieldErrors({});
-  setFeeFieldErrors({});
+        setFieldErrors({});
+        setFeeFieldErrors({});
 
-  try {
-    const res = await registerUser(payload).unwrap();
+        try {
+            const res = await registerUser(payload).unwrap();
 
-    toast.success(res?.message || "User created successfully");
+            toast.success(res?.message || "User created successfully");
 
-    setFormData(emptyFormData);
-    setFeeFormData(emptyFeeFormData);
-    setAppliedFeeData({});
-    setFeeFieldErrors({});
-  } catch (error: any) {
-    const message =
-      error?.data?.message ||
-      error?.message ||
-      "Failed to create user";
+            setFormData(emptyFormData);
+            setFeeFormData(emptyFeeFormData);
+            setAppliedFeeData({});
+            setFeeFieldErrors({});
+        } catch (error: any) {
+            const message =
+                error?.data?.message ||
+                error?.message ||
+                "Failed to create user";
 
-    toast.error(message);
-  }
-};
+            toast.error(message);
+        }
+    };
 
 
     return (
@@ -263,158 +280,171 @@ export default function UserHome() {
             <div className='border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 flex-[3_3_0%] w-full'>
                 <h2 className=' text-2xl  text-[#111827] font-medium'>Create a User </h2>
                 <form action="" className=' mt-6 space-y-6' onSubmit={handleSubmit}>
-                   <div className="flex gap-4">
-                    <div className='w-2/3'>
- <div className=' flex flex-col gap-1.5'>
-                        <label htmlFor="user_name">User Name</label>
-                        <input type="text" name="" id="user_name" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.user_name} onChange={handleInputChange} />
-                        {fieldErrors.user_name && <span className='text-red-600 text-sm'>{fieldErrors.user_name}</span>}
-                    </div>
-                    <div className=' flex flex-col gap-1.5'>
-                        <label htmlFor="phone">Phone No.</label>
-                        <input type="text" name="" id="phone" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.phone} onChange={handleInputChange} />
-                        {fieldErrors.phone && <span className='text-red-600 text-sm'>{fieldErrors.phone}</span>}
-                    </div>
-                    <div className=' flex flex-col gap-1.5'>
-                        <label htmlFor="email">Email</label>
-                        <input type="email" name="" id="email" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.email} onChange={handleInputChange} />
-                        {fieldErrors.email && <span className='text-red-600 text-sm'>{fieldErrors.email}</span>}
-                    </div>
-                    <div className=' flex flex-col gap-1.5'>
-                        <label htmlFor="password">Password</label>
-                        <input type="password" name="" id="password" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.password} onChange={handleInputChange} />
-                        {fieldErrors.password && <span className='text-red-600 text-sm'>{fieldErrors.password}</span>}
-                    </div>
-                    <div className=' flex flex-col gap-1.5'>
-                        <label htmlFor="work">Work at Company</label>
-                        <input type="text" name="" id="work" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.work} onChange={handleInputChange} />
-                        {fieldErrors.work && <span className='text-red-600 text-sm'>{fieldErrors.work}</span>}
-                    </div>
-                    <div className='flex flex-col gap-1.5'>
-                        <label htmlFor="trade">Trade</label>
-        <Select onValueChange={handleTradeSelect}>
-                            <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
-                                <SelectValue placeholder="Select a trade" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
-                            </SelectTrigger>
-                            <SelectContent>
-                                <SelectGroup>
-                                    <SelectItem value="na">N/A</SelectItem>
-                                    <SelectItem value="plumbing">Plumbing</SelectItem>
-                                    <SelectItem value="painting">Painting</SelectItem>
-                                </SelectGroup>
-                            </SelectContent>
-                        </Select>
-                        {/* Show selected trades as tags */}
-                <div className="flex flex-wrap gap-2 mt-2">
-    {formData.trades.length === 0 && (
-        <span className="text-gray-400 text-sm">No trade selected</span>
-    )}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <div className='w-full lg:w-full'>
+                            <div className=' flex flex-col gap-1.5'>
+                                <label htmlFor="user_name">User Name</label>
+                                <input type="text" name="" id="user_name" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.user_name} onChange={handleInputChange} />
+                                {fieldErrors.user_name && <span className='text-red-600 text-sm'>{fieldErrors.user_name}</span>}
+                            </div>
+                            <div className=' flex flex-col gap-1.5'>
+                                <label htmlFor="phone">Phone No.</label>
+                                <input type="text" name="" id="phone" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.phone} onChange={handleInputChange} />
+                                {fieldErrors.phone && <span className='text-red-600 text-sm'>{fieldErrors.phone}</span>}
+                            </div>
+                            <div className=' flex flex-col gap-1.5'>
+                                <label htmlFor="email">Email</label>
+                                <input type="email" name="" id="email" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.email} onChange={handleInputChange} />
+                                {fieldErrors.email && <span className='text-red-600 text-sm'>{fieldErrors.email}</span>}
+                            </div>
+                            <div className='flex flex-col gap-1.5'>
+                                <label htmlFor="password">Password</label>
 
-    {formData.trades.map((trade) => (
-        <span
-            key={trade}
-            className="flex items-center bg-[#e0f7fa] px-3 py-2 rounded-full border"
-        >
-            {trade === "na"
-                ? "N/A"
-                : trade.charAt(0).toUpperCase() + trade.slice(1)}
+                                <div className="relative">
+                                    <input
+                                        type={showPassword ? "text" : "password"}
+                                        id="password"
+                                        className='py-2 px-2.5 pr-12 rounded-[8px] border border-[#D2D2D5] w-full'
+                                        value={formData.password}
+                                        onChange={handleInputChange}
+                                    />
 
-            <button
-                type="button"
-                onClick={() => handleRemoveTrade(trade)}
-                className="ml-2"
-            >
-                <TagCrossIcon />
-            </button>
-        </span>
-    ))}
-</div>
-                        {fieldErrors.trades && <span className='text-red-600 text-sm'>{fieldErrors.trades}</span>}
-                    </div>
-                    <div className='flex flex-col sm:flex-row items-stretch gap-3 sm:gap-6'>
-                        <div className='flex-1'>
-                            <label htmlFor="country">Country</label>
-                            <Select onValueChange={handleCountryChange} value={formData.country}>
-                                <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
-                                    <SelectValue placeholder="Select a country" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        {countryOptions.map((country) => (
-                                            <SelectItem key={country.isoCode} value={country.isoCode}>
-                                                {country.name}
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+                                    >
+                                        {showPassword ? (
+                                            <EyeOff size={20} />
+                                        ) : (
+                                            <Eye size={20} />
+                                        )}
+                                    </button>
+                                </div>
+
+                                {fieldErrors.password && (
+                                    <span className='text-red-600 text-sm'>
+                                        {fieldErrors.password}
+                                    </span>
+                                )}
+                            </div>
+                            <div className=' flex flex-col gap-1.5'>
+                                <label htmlFor="work">Work at Company</label>
+                                <input type="text" name="" id="work" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.work} onChange={handleInputChange} />
+                                {fieldErrors.work && <span className='text-red-600 text-sm'>{fieldErrors.work}</span>}
+                            </div>
+                            <div>
+                                <label
+                                    htmlFor="trade"
+                                    className='text-base text-[#161721]'
+                                >
+                                    Trade <span className='text-red-500'>*</span>
+                                </label>
+
+                                <Select onValueChange={handleTradeSelect}>
+                                    <SelectTrigger className="w-full mt-1.5 h-[48px] py-5 border border-[#D2D2D5] rounded-[8px]">
+                                        <SelectValue placeholder="Select Trade" />
+                                    </SelectTrigger>
+
+                                    <SelectContent>
+                                        {trades?.map((trade: Trade) => (
+                                            <SelectItem
+                                                key={trade.id}
+                                                value={trade.id}
+                                            >
+                                                {trade.name}
                                             </SelectItem>
                                         ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            {fieldErrors.country && <span className='text-red-600 text-sm mt-1 block'>{fieldErrors.country}</span>}
+                                    </SelectContent>
+                                </Select>
+                            </div>
+                            <div className='flex flex-col sm:flex-row items-stretch gap-3 sm:gap-6'>
+                                <div className='flex-1'>
+                                    <label htmlFor="country">Country</label>
+                                    <Select
+                                        value={formData.country}
+                                        onValueChange={handleCountryChange}
+                                    >
+                                        <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
+                                            <SelectValue placeholder="Select a country" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {countryOptions.map((country) => (
+                                                    <SelectItem key={country.isoCode} value={country.isoCode}>
+                                                        {country.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    {fieldErrors.country && <span className='text-red-600 text-sm mt-1 block'>{fieldErrors.country}</span>}
+                                </div>
+                                <div className='flex-1 mt-3 sm:mt-0'>
+                                    <label htmlFor="city">City</label>
+                                    <Select onValueChange={(value) => handleSelectChange('city', value)} value={formData.city}>
+                                        <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
+                                            <SelectValue placeholder="Select a city" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
+                                        </SelectTrigger>
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {cityOptions.map((city) => (
+                                                    <SelectItem key={`${city.name}-${city.latitude}-${city.longitude}`} value={city.name}>
+                                                        {city.name}
+                                                    </SelectItem>
+                                                ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select>
+                                    {fieldErrors.city && <span className='text-red-600 text-sm mt-1 block'>{fieldErrors.city}</span>}
+                                </div>
+                            </div>
                         </div>
-                        <div className='flex-1 mt-3 sm:mt-0'>
-                            <label htmlFor="city">City</label>
-                            <Select onValueChange={(value) => handleSelectChange('city', value)} value={formData.city}>
-                                <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
-                                    <SelectValue placeholder="Select a city" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectGroup>
-                                        {cityOptions.map((city) => (
-                                            <SelectItem key={`${city.name}-${city.latitude}-${city.longitude}`} value={city.name}>
-                                                {city.name}
-                                            </SelectItem>
-                                        ))}
-                                    </SelectGroup>
-                                </SelectContent>
-                            </Select>
-                            {fieldErrors.city && <span className='text-red-600 text-sm mt-1 block'>{fieldErrors.city}</span>}
+
+                        <div className='w-full lg:w-full lg:mt-7'>
+                            <div className='flex-[1_1_0%] w-full border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 h-auto self-start mt-6 lg:mt-0'>
+                                <h2 className=' text-2xl  text-[#111827] font-medium'>Set Fee Rate </h2>
+
+                                <form className=' mt-6 space-y-6' onSubmit={handleSetFeeSubmit}>
+                                    <div className=' flex flex-col gap-1.5'>
+                                        <label htmlFor="leads_fee">Qualified Leads Fee</label>
+                                        <input
+                                            type="number"
+                                            name=""
+                                            id="qualified_leads_fee"
+                                            className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
+                                            placeholder='$ 100'
+                                            value={feeFormData.qualified_leads_fee}
+                                            onChange={handleFeeInputChange}
+                                        />
+                                    </div>
+                                    {feeFieldErrors.qualified_leads_fee && <span className='text-red-600 text-sm'>{feeFieldErrors.qualified_leads_fee}</span>}
+                                    <div className=' flex flex-col gap-1.5'>
+                                        <label htmlFor="conversion_fee">Conversion Fee</label>
+                                        <input
+                                            type="number"
+                                            name=""
+                                            id="conversion_fee"
+                                            className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
+                                            placeholder='$ 500'
+                                            value={feeFormData.conversion_fee}
+                                            onChange={handleFeeInputChange}
+                                        />
+                                    </div>
+                                    {feeFieldErrors.conversion_fee && <span className='text-red-600 text-sm'>{feeFieldErrors.conversion_fee}</span>}
+                                    {/* <button type='submit' className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Set Fee</button> */}
+
+                                </form>
+                            </div>
                         </div>
                     </div>
-                    </div>
-
-                    <div className='w-1/3 mt-7'>
- <div className='flex-[1_1_0%] w-full border border-[#E9E9EA] rounded-[8px] p-4 sm:p-6 h-auto self-start mt-6 lg:mt-0'>
-                <h2 className=' text-2xl  text-[#111827] font-medium'>Set Fee Rate </h2>
-
-                <form action="" className=' mt-6 space-y-6' onSubmit={handleSetFeeSubmit}>
-                    <div className=' flex flex-col gap-1.5'>
-                        <label htmlFor="leads_fee">Qualified Leads Fee</label>
-                        <input
-                            type="number"
-                            name=""
-                            id="qualified_leads_fee"
-                            className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
-                            placeholder='100'
-                            value={feeFormData.qualified_leads_fee}
-                            onChange={handleFeeInputChange}
-                        />
-                    </div>
-                    {feeFieldErrors.qualified_leads_fee && <span className='text-red-600 text-sm'>{feeFieldErrors.qualified_leads_fee}</span>}
-                    <div className=' flex flex-col gap-1.5'>
-                        <label htmlFor="conversion_fee">Conversion Fee</label>
-                        <input
-                            type="number"
-                            name=""
-                            id="conversion_fee"
-                            className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
-                            placeholder='10'
-                            value={feeFormData.conversion_fee}
-                            onChange={handleFeeInputChange}
-                        />
-                    </div>
-                    {feeFieldErrors.conversion_fee && <span className='text-red-600 text-sm'>{feeFieldErrors.conversion_fee}</span>}
-                    {/* <button type='submit' className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Set Fee</button> */}
-
-                </form>
-            </div>
-                    </div>
-                   </div>
 
                     <button disabled={isSubmitting} className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed'>
                         {isSubmitting ? 'Creating...' : 'Create User'}
                     </button>
                 </form>
             </div>
-           
+
         </div>
     )
 }

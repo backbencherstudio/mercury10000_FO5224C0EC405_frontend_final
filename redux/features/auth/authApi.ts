@@ -1,5 +1,6 @@
 import { baseApi } from "@/redux/api/baseApi";
 import { setCredentials } from "@/redux/features/auth/authSlice";
+import { url } from "inspector";
 
 export const authApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -51,9 +52,49 @@ export const authApi = baseApi.injectEndpoints({
       providesTags: ["User"],
     }),
 
+
+
+    getAuthme: builder.query({
+      query: () => ({
+        url: `/auth/me`,
+        method: "GET",
+      }),
+    }),
+
+
+    // getAuthme: builder.query({
+    //   query: () => {
+    //     return {
+    //       url: "/auth/me",
+    //       method: "GET"
+    //     }
+    //   },
+    //   providesTags: ["Admin"],
+    // }),
+
+
+    updateUserProfile: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/auth/update/${id}`,
+        method: "PATCH",
+        body
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+
+    //password update
+    updatePassword: builder.mutation({
+      query: ({ body }) => ({
+        url: `/auth/change-password`,
+        method: "POST",
+        body
+      }),
+      invalidatesTags: ["Admin"],
+    }),
+
   }),
 
-  overrideExisting: false,
+  // overrideExisting: false,
 });
 
-export const { useLoginMutation, useRegisterMutation, useGetAllUsersQuery } = authApi;
+export const { useLoginMutation, useRegisterMutation, useGetAllUsersQuery, useGetAuthmeQuery, useUpdateUserProfileMutation, useUpdatePasswordMutation } = authApi;

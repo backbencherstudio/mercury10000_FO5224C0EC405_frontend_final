@@ -1,4 +1,5 @@
-import React from "react";
+"use client"
+import React, { useState } from "react";
 import Dot3Icon from "@/components/icons/admin/Dot3Icon";
 import {
   DropdownMenu,
@@ -32,6 +33,10 @@ interface ContactRequestColumnProps {
 
 // Secretary Note Dialog Component
 const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
+
+  const [expanded, setExpanded] = useState(false);
+
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -49,12 +54,34 @@ const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
 
         <div className="space-y-6 mt-6">
 
-        <div>
+          <div className="max-w-xl bg-[#F8FAFB]  p-2">
+            <p
+              className={`text-sm text-gray-700 ${!expanded ? "line-clamp-2" : ""
+                }`}
+            >
+              <p className="text-base text-[#777980] mt-2">
+                {row?.secretary_note || "-"}
+              </p>
+            </p>
+
+            <button
+              onClick={() => setExpanded(!expanded)}
+              className="text-black text-sm mt-1"
+            >
+              {expanded ? "View Less" : "View More"}
+            </button>
+          </div>
+          <div>
+
+
+          </div>
+
+          <div>
             <h2 className="text-lg font-semibold">Requested Date</h2>
             <p className="text-base text-[#777980] mt-2">
               {new Date(row?.created_at).toLocaleString()}
             </p>
-          </div>  
+          </div>
 
           <div>
             <h2 className="text-lg font-semibold">User Name</h2>
@@ -63,11 +90,11 @@ const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
             </p>
           </div>
 
-         
-          <div>
+
+          {/* <div>
             <h2 className="text-lg font-semibold">Request ID</h2>
             <p className="text-base text-[#777980] mt-2">{row?.id}</p>
-          </div>
+          </div> */}
 
           <div>
             <h2 className="text-lg font-semibold">Phone No.</h2>
@@ -85,10 +112,16 @@ const SecretaryNoteDialog: React.FC<{ row: any }> = ({ row }) => {
 
         </div>
 
-        <button className="flex items-center gap-2.5 bg-[#0b7680] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer">
-          <MessageIcon />
-          Contact User Now
-        </button>
+        <div className="flex gap-5">
+          {/* <button className="flex items-center gap-2.5 bg-[#F59F00] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer">
+            <MessageIcon />
+            Contact User Now
+          </button> */}
+          <p className="flex items-center gap-2.5 bg-[#0b7680] justify-center text-white text-base py-4 w-full mt-8 rounded-[8px] cursor-pointer">
+
+            {row?.status}
+          </p>
+        </div>
 
       </DialogContent>
     </Dialog>
@@ -111,18 +144,18 @@ const ActionDropdown: React.FC<{
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none">
-          
+
           {row.status === 'pending' && (
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onResolve?.(row)}
               className="cursor-pointer"
             >
               Resolved
             </DropdownMenuItem>
           )}
-          
+
           {row.status === 'resolved' && (
-            <DropdownMenuItem 
+            <DropdownMenuItem
               onClick={() => onPending?.(row)}
               className="cursor-pointer"
             >
@@ -130,7 +163,7 @@ const ActionDropdown: React.FC<{
             </DropdownMenuItem>
           )}
 
-          <DropdownMenuItem 
+          <DropdownMenuItem
             onClick={() => onViewDetails?.(row)}
             className="cursor-pointer"
           >
@@ -158,7 +191,7 @@ export function ContactRequestColumn({
 
     const [updateStatus] = useUpdataStatusMutation();
 
-    
+
 
     return (
       <div className="flex items-center justify-center">
@@ -169,17 +202,22 @@ export function ContactRequestColumn({
     );
   };
 
-  const DateFormatter = (date: string) => {
-    if (!date) return "-";
-    return new Date(date).toLocaleString();
+  const DateFormatter = (value: string) => {
+    const date = new Date(value);
+
+    const formattedDate = `${date.getDate()}/${date.getMonth() + 1
+      }/${date.getFullYear()}`;
+    return formattedDate;
   };
 
   return [
     {
-      label: "Request ID",
-      accessor: "id",
-      formatter: (value: string) => (
-        <span className="text-base text-[#040C0B]">{value}</span>
+      label: "City",
+      accessor: "city",
+      formatter: (_: any, row: any) => (
+        <span className="text-base text-[#040C0B]">
+          {row?.user?.city || "-"}
+        </span>
       ),
     },
 

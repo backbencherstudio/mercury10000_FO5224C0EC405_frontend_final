@@ -9,12 +9,18 @@ import { AllAdminColumn } from '@/components/columns/AllAdminColumn';
 import { useRegisterMutation } from '@/redux/features/auth/authApi';
 import { toast } from 'react-hot-toast';
 import { useGetAllscrateryQuery } from "@/redux/features/user/user";
-import { CloudCog } from "lucide-react";
+import { CloudCog, Eye, EyeOff, User, Mail, Phone, MapPin, Briefcase, Shield } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 
 export default function CreateAdmin() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
-  
+  const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     phone: '',
@@ -23,14 +29,21 @@ export default function CreateAdmin() {
   });
   const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof typeof formData, string>>>({});
   const [showSuccess, setShowSuccess] = useState(false);
+  const [selectedAdmin, setSelectedAdmin] = useState<any>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
 
   // 1. Hooks MUST be called at the top level
   const [registerAdmin, { isLoading }] = useRegisterMutation();
   const { data: allSecretary, refetch, isLoading: allScrateryLoading } = useGetAllscrateryQuery(undefined);
 
+  const handleView = (admin: any) => {
+    setSelectedAdmin(admin);
+    setIsViewModalOpen(true);
+  };
+
   // 2. Derive data from the query results
   const allSecretaryData = allSecretary?.data || [];
-  console.log(allSecretaryData,'ddddddddd')
+  // console.log(allSecretaryData, 'ddddddddd')
 
   // 3. Setup pagination variables based on the fetched data
   const totalItems = allSecretaryData?.length || 0;
@@ -63,7 +76,7 @@ export default function CreateAdmin() {
     if (!formData.phone) nextFieldErrors.phone = "Phone number is required";
     if (!formData.password) nextFieldErrors.password = "Password is required";
     if (!formData.email) nextFieldErrors.email = "Email is required";
-    
+
     if (Object.keys(nextFieldErrors).length > 0) {
       setFieldErrors(nextFieldErrors);
       return;
@@ -132,16 +145,34 @@ export default function CreateAdmin() {
             {fieldErrors.phone && <span className='text-red-600 text-sm'>{fieldErrors.phone}</span>}
           </div>
           <div className='flex flex-col gap-1.5'>
-            <label htmlFor='password' className='text-base text-[#1D1F2C]'>Password</label>
-            <input
-              id='password'
-              type='password'
-              className='py-2 px-2.5 rounded-[8px] border border-[#D2D2D5] w-full text-base text-[#161721]'
-              placeholder='Enter password'
-              value={formData.password}
-              onChange={handleInputChange}
-            />
-            {fieldErrors.password && <span className='text-red-600 text-sm'>{fieldErrors.password}</span>}
+            <label htmlFor='password' className='text-base text-[#1D1F2C]'>
+              Password
+            </label>
+
+            <div className="relative">
+              <input
+                id='password'
+                type={showPassword ? "text" : "password"}
+                className='py-2 px-2.5 pr-10 rounded-[8px] border border-[#D2D2D5] w-full text-base text-[#161721]'
+                placeholder='Enter password'
+                value={formData.password}
+                onChange={handleInputChange}
+              />
+
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500"
+              >
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+              </button>
+            </div>
+
+            {fieldErrors.password && (
+              <span className='text-red-600 text-sm'>
+                {fieldErrors.password}
+              </span>
+            )}
           </div>
           <div className='flex flex-col gap-1.5'>
             <label htmlFor='email' className='text-base text-[#1D1F2C]'>Email</label>
@@ -183,7 +214,7 @@ export default function CreateAdmin() {
         </div>
         <div className='mt-8 overflow-x-auto'>
           <DynamicTable
-            columns={AllAdminColumn({})}
+            columns={AllAdminColumn({ onView: handleView })}
             data={currentData}
             currentPage={currentPage}
             itemsPerPage={itemsPerPage}
@@ -197,6 +228,101 @@ export default function CreateAdmin() {
           />
         </div>
       </div>
+
+      <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+        <DialogContent className="max-w-2xl md:max-w-2xl w-full lg:max-w-3xl border-none shadow-2xl p-0 overflow-hidden bg-white rounded-2xl">
+          <DialogHeader className=" p-6 ">
+            <div className="flex items-center gap-4">
+
+              <div>
+                <DialogTitle className="text-2xl font-bold ">Secretary/Admin Details</DialogTitle>
+                {/* <p className="text-white/80 text-sm mt-1">Full profile information and settings</p> */}
+              </div>
+            </div>
+          </DialogHeader>
+
+          <div className="p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              {/* Left Column: Basic Info */}
+              <div className="space-y-6">
+                <div>
+
+                  <div className="space-y-4">
+                    <div className="group transition-all">
+                      <p className="text-sm text-gray-500 mb-1">Full Name</p>
+                      <p className="text-lg font- text-gray-900 bg-gray-50 p-3 rounded-xl border border-gray-100 group-hover:border-[#0b7680]/30 group-hover:bg-white transition-all">
+                        {selectedAdmin?.name || "N/A"}
+                      </p>
+                    </div>
+                    <div className="group transition-all">
+                      <p className="text-sm text-gray-500 mb-1">Email Address</p>
+                      <div className="flex items-center gap-2 text-lg font- text-gray-900 bg-gray-50 p-3 rounded-xl border border-gray-100 group-hover:border-[#0b7680]/30 group-hover:bg-white transition-all">
+
+                        {selectedAdmin?.email || "N/A"}
+                      </div>
+                    </div>
+                    <div className="group transition-all">
+                      <p className="text-sm text-gray-500 mb-1">Phone Number</p>
+                      <div className="flex items-center gap-2 text-lg font- text-gray-900 bg-gray-50 p-3 rounded-xl border border-gray-100 group-hover:border-[#0b7680]/30 group-hover:bg-white transition-all">
+
+                        {selectedAdmin?.phone_number || "N/A"}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Column: Role & Location */}
+              <div className="space-y-6">
+                <div>
+
+                  <div className="space-y-4">
+                    <div className="group transition-all">
+                      <p className="text-sm text-gray-500 mb-1">Role Type</p>
+                      <p className="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold bg-[#0b7680]/10 text-[#0b7680] uppercase tracking-wide">
+                        {selectedAdmin?.type || "SECRETARY"}
+                      </p>
+                    </div>
+                    <div className="group transition-all">
+                      <p className="text-sm text-gray-500 mb-1">Location</p>
+                      <div className="flex items-center gap-2 text-lg  text-gray-900 bg-gray-50 p-3 rounded-xl border border-gray-100 group-hover:border-[#0b7680]/30 group-hover:bg-white transition-all">
+
+                        {selectedAdmin?.city || "N/A"}, {selectedAdmin?.country || "N/A"}
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Trades Section if applicable */}
+            {selectedAdmin?.trades && selectedAdmin.trades.length > 0 && (
+              <div className="mt-8 pt-8 border-t border-gray-100">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-gray-400 mb-4 flex items-center gap-2">
+                  <Briefcase className="w-3 h-3" /> Assigned Trades
+                </h4>
+                <div className="flex flex-wrap gap-2">
+                  {selectedAdmin.trades.map((trade: any, index: number) => (
+                    <span key={index} className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg text-sm font-medium border border-gray-200">
+                      {trade?.name || trade}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="mt-10 flex justify-end">
+              <button
+                onClick={() => setIsViewModalOpen(false)}
+                className="px-8 py-3 bg-[#0b7680] text-white rounded-xl font-bold hover:bg-[#095f67] transition-all shadow-lg shadow-[#0b7680]/20"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

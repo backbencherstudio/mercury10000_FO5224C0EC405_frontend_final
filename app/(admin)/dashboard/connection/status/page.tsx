@@ -7,39 +7,46 @@ import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { useRouter } from 'next/navigation'
 import React, { useState, useMemo } from 'react'
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from '@/components/ui/select';
+import { useGetCunnectionStausQuery } from '@/redux/features/connection/connections'
 
 
 export default function UserResponsesPage() {
     const router = useRouter();
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
-    const [viewRow, setViewRow] = useState({ isOpen: false, rowData: null });
-    const [isEditOpen, setIsEditOpen] = useState(false);
     const [search, setSearch] = useState('');
     const [tradeFilter, setTradeFilter] = useState('all');
+    const [viewRow, setViewRow] = useState({ isOpen: false, rowData: null });
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
-    // Get all unique trades for filter dropdown
-    const allTrades = useMemo(() => {
-        const set = new Set(userResponsesData.map(u => u.trade));
-        return Array.from(set);
-    }, []);
+
+    const { data: cunnectionStatus, isLoading } =
+        useGetCunnectionStausQuery(
+            {
+                page: currentPage,
+                limit: itemsPerPage,
+                search,
+                trade_id: tradeFilter === "all" ? undefined : tradeFilter,
+            },
+            {
+                refetchOnMountOrArgChange: true,
+            }
+        );
+    // console.log("cunnectionStatus: ", cunnectionStatus)
+
+    const Alltrades = cunnectionStatus?.data?.map(
+        (item: any) => item?.trade
+    );
+
 
     // Filtered data based on search and trade
-    const filteredData = useMemo(() => {
-        return userResponsesData.filter(row => {
-            const matchesSearch =
-                row.user_name.toLowerCase().includes(search.toLowerCase()) ||
-                row.trade.toLowerCase().includes(search.toLowerCase()) ||
-                row.he_sent.toLowerCase().includes(search.toLowerCase());
-            const matchesTrade = tradeFilter === 'all' || row.trade === tradeFilter;
-            return matchesSearch && matchesTrade;
-        });
-    }, [search, tradeFilter]);
+    const currentData = cunnectionStatus?.data || [];
 
-    const totalItems = filteredData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = filteredData.slice(startIndex, startIndex + itemsPerPage);
+    const totalItems = cunnectionStatus?.meta?.total_items || 0;
+
+    const totalPages = cunnectionStatus?.meta?.total_pages || 1;
+
+
 
     const handleView = (row: any) => {
         setViewRow({ isOpen: true, rowData: row });
@@ -47,7 +54,7 @@ export default function UserResponsesPage() {
     const handleEdit = (row: any) => {
         setIsEditOpen(true);
     };
-    const handleDelete = (row: any) => {};
+    const handleDelete = (row: any) => { };
     const handleViewClose = () => {
         setViewRow({ isOpen: false, rowData: null });
     };
@@ -69,8 +76,10 @@ export default function UserResponsesPage() {
                                 type="text"
                                 className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500'
                                 placeholder='Search user here'
-                                value={search}
-                                onChange={e => { setSearch(e.target.value); setCurrentPage(1); }}
+                                onChange={(e) => {
+                                    setSearch(e.target.value);
+                                    setCurrentPage(1);
+                                }}
                             />
                         </div>
                         <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
@@ -78,13 +87,19 @@ export default function UserResponsesPage() {
                             <span className='hidden sm:inline'>Filter</span>
                         </button>
                         <div className='w-full sm:w-auto'>
-                            <Select value={tradeFilter} onValueChange={value => { setTradeFilter(value); setCurrentPage(1); }}>
+                            <Select
+                                value={tradeFilter}
+                                onValueChange={(value) => {
+                                    setTradeFilter(value);
+                                    setCurrentPage(1);
+                                }}
+                            >
                                 <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px]'>
                                     <SelectValue placeholder="Trade Filter" />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectItem value="all">All Trades</SelectItem>
-                                    {allTrades.map(trade => (
+                                    {Alltrades?.map(trade => (
                                         <SelectItem key={trade} value={trade}>{trade}</SelectItem>
                                     ))}
                                 </SelectContent>

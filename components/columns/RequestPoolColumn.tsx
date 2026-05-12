@@ -5,88 +5,82 @@ import { format } from 'path';
 
 export interface RequestPoolColumnOptions {
 	selectedRows: Set<string>;
-	handleSelectAll: (checked: boolean) => void;
 	handleSelectRow: (id: string, checked: boolean) => void;
 	handleView: (row: any) => void;
-	handleEdit: (row: any) => void;
 	handleDelete: (row: any) => void;
 	currentData: any[];
-	setViewNote: (note: string) => void;
+	lockedTrade: string | null;
 }
 
 export function RequestPoolColumn({
 	selectedRows,
-	handleSelectAll,
 	handleSelectRow,
 	handleView,
-	handleEdit,
 	handleDelete,
 	currentData,
-	setViewNote,
+	lockedTrade,
 }: RequestPoolColumnOptions) {
 	return [
 		{
 			label: (
-				<div className="flex items-center justify-center">
-					<input
-						type="checkbox"
-						checked={selectedRows.size === currentData.length && currentData.length > 0}
-						ref={el => {
-							if (el) el.indeterminate = selectedRows.size > 0 && selectedRows.size < currentData.length;
-						}}
-						onChange={e => handleSelectAll(e.target.checked)}
-						onClick={e => e.stopPropagation()}
-						className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-					/>
+				<div className="flex items-center justify-center text-sm font-medium text-[#111827]">
+					Select
 				</div>
 			),
 			accessor: 'checkbox',
 			width: '50px',
-			formatter: (_: any, row: any) => (
-				<div className="flex items-center justify-center">
-					<input
-						type="checkbox"
-						checked={selectedRows.has(row.id)}
-						onChange={e => handleSelectRow(row.id, e.target.checked)}
-						onClick={e => e.stopPropagation()}
-						className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-					/>
-				</div>
-			),
+			formatter: (_: any, row: any) => {
+				const isSelected = selectedRows.has(row.id);
+				const isDisabled = selectedRows.size > 0 && !isSelected;
+
+				return (
+					<div className={`flex items-center justify-center ${isDisabled ? 'opacity-50' : ''}`}>
+						<input
+							type="checkbox"
+							checked={isSelected}
+							onChange={e => handleSelectRow(row.id, e.target.checked)}
+							onClick={e => e.stopPropagation()}
+							disabled={isDisabled}
+							className={`w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 ${isDisabled ? 'cursor-not-allowed' : 'cursor-pointer'
+								}`}
+						/>
+					</div>
+				);
+			},
 		},
 		{
 			label: 'ID',
 			accessor: 'id',
 			width: '60px',
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
+			formatter: (value: string) => (
+				<span className="text-sm text-[#06030C]">{value}</span>
+			),
 		},
 		{
 			label: 'City',
-			accessor: 'city',
+			accessor: 'location',
 			width: '120px',
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
+			formatter: (value: string) => (
+				<span className="text-sm text-[#06030C]">{value}</span>
+			),
 		},
 		{
 			label: 'Trade',
-			accessor: 'Trade',
+			accessor: 'trade',
 			width: '120px',
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
+			formatter: (value: any) => (
+				<span className="text-sm text-[#06030C]">{value?.name || (typeof value === 'string' ? value : 'N/A')}</span>
+			),
 		},
 		{
 			label: 'Note',
-			accessor: 'note',
+			accessor: 'description',
 			width: '200px',
 			formatter: (value: string, row: any) => (
 				<>
-					<span>
+					{/* <span>
 						{value.length > 60 ? value.slice(0, 60) + '......' : value}
-					</span>
+					</span> */}
 					{/* {value.length > 60 && (
 						<button
 							className="ml-2 text-xs underline text-blue-600 hover:text-blue-800"
@@ -96,6 +90,8 @@ export function RequestPoolColumn({
 							View More
 						</button>
 					)} */}
+					<span className="text-sm text-[#06030C]">{value}</span>
+
 				</>
 			),
 		},
@@ -107,7 +103,6 @@ export function RequestPoolColumn({
 				<CustomDropdown
 					items={[
 						{ label: 'View', onClick: () => handleView(row) },
-						{ label: 'Edit', onClick: () => handleEdit(row) },
 						{ label: 'Delete', onClick: () => handleDelete(row), className: 'text-red-600' },
 					]}
 				/>

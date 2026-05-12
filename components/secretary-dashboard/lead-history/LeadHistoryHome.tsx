@@ -1,22 +1,26 @@
 'use client'
 import { SecretaryUsersColumn } from '@/components/columns/SecretaryUsersColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
- 
+
 import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
 import React, { useState } from 'react'
 import { secretaryUsersData } from '@/public/demoData/SecretaryUsersData'
- 
+import { useGetAllUsersQuery } from '@/redux/features/auth/authApi'
+
 
 export default function SecretaryUsersHome() {
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
 
-    const totalItems = secretaryUsersData.length;
-    const totalPages = Math.ceil(totalItems / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const currentData = secretaryUsersData.slice(startIndex, startIndex + itemsPerPage);
+    const { data, isLoading } = useGetAllUsersQuery({
+        page: currentPage,
+        limit: itemsPerPage,
+    });
 
+    const Allusers = data?.data || [];
+    const totalItems = data?.meta?.total_items || 0;
+    const totalPages = data?.meta?.total_pages || 1;
     return (
         <div className='mt-8 border border-[#E9E9EA] rounded-[12px] p-4 sm:p-6'>
             <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4'>
@@ -41,7 +45,7 @@ export default function SecretaryUsersHome() {
             <div className='overflow-x-auto'>
                 <DynamicTable
                     columns={SecretaryUsersColumn()}
-                    data={currentData}
+                    data={Allusers}
                     currentPage={currentPage}
                     itemsPerPage={itemsPerPage}
                     totalpage={totalPages}
@@ -49,7 +53,7 @@ export default function SecretaryUsersHome() {
                     onPageChange={setCurrentPage}
                     setItemsPerPage={setItemsPerPage}
                     noDataMessage="No secretary users found"
-                    loading={false}
+                    loading={isLoading}
                 />
             </div>
         </div>

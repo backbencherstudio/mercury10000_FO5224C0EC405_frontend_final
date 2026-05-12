@@ -31,14 +31,14 @@ export class Fetch {
    * @param header
    * @returns
    */
-  static async get(url: string, header?: any) {
-    if (this._adapter == "axios") {
-      return await axios.get(`${this._baseUrl}${url}`, header);
-    } else {
-      const res = await fetch(`${this._baseUrl}${url}`, header);
-      return await res.json();
-    }
-  }
+  // static async get(url: string, header?: any) {
+  //   if (this._adapter == "axios") {
+  //     return await axios.get(`${this._baseUrl}${url}`, header);
+  //   } else {
+  //     const res = await fetch(`${this._baseUrl}${url}`, header);
+  //     return await res.json();
+  //   }
+  // }
 
   /**
    * post request

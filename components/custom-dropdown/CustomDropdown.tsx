@@ -47,7 +47,7 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ trigger, items, contain
   return (
     <div className={`relative flex  justify-end   ${containerClassName}`} ref={ref}>
       <button
-        className="cursor-pointer hover:bg-[#e9e9ea] px-3 py-1.5 rounded-full focus:outline-none"
+        className="cursor-pointer  px-3 py-1.5 rounded-full focus:outline-none"
         onClick={() => setOpen((v) => !v)}
         type="button"
       >

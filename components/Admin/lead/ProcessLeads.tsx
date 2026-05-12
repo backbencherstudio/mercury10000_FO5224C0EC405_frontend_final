@@ -13,7 +13,7 @@ import { LeadHistoryColumn } from '@/components/columns/LeadHistoryColumn';
 import { leadHistoryData } from '@/public/demoData/LeadHistoryData';
 import DynamicTable from '@/components/reusable/DynamicTable';
 import { ProcessLeadsColumn } from '@/components/columns/ProcessLeadsColumn';
-import { useGetLeadsProcessQuery } from '@/redux/features/dashboardOverview/dashboardOverView';
+import { useGetLeadsProcessQuery, useUpdateStausLeadsProcessMutation } from '@/redux/features/dashboardOverview/dashboardOverView';
 
 
 export default function ProcessLeads() {
@@ -49,6 +49,8 @@ export default function ProcessLeads() {
     return p;
   }, [currentPage, itemsPerPage, statusFilter, debouncedSearch]);
 
+  const [updateStausLeadsProcess] = useUpdateStausLeadsProcessMutation();
+
   const { data, isLoading, error } = useGetLeadsProcessQuery(params);
 
   const apiData = data?.data || [];
@@ -77,6 +79,9 @@ export default function ProcessLeads() {
     currentData: apiData,
     onSelectAll: handleSelectAll,
     onSelectRow: handleSelectRow,
+    onStatusChange: (id, newStatus) => {
+      updateStausLeadsProcess({ id, status: newStatus });
+    }
   });
 
   return (
@@ -99,7 +104,7 @@ export default function ProcessLeads() {
               <SelectContent>
                 <SelectItem value="all">All Status</SelectItem>
                 <SelectItem value="Scheduled">Scheduled</SelectItem>
-                <SelectItem value="Active_Work">Active Work</SelectItem>
+                <SelectItem value="Active">Active</SelectItem>
                 <SelectItem value="Closed">Closed</SelectItem>
                 <SelectItem value="Invalid">Invalid</SelectItem>
               </SelectContent>

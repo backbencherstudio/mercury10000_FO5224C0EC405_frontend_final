@@ -161,7 +161,7 @@ export function DashboardUserColumn({
     
     {
       label: "Created At",
-      accessor: "created_at",
+      accessor: "updated_at",
       formatter: (value, row) => (
         <div className="flex items-center gap-2">
           <span>{DateFormatter(value)}</span>

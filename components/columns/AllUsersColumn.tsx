@@ -60,29 +60,29 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                         onClick={() => onView?.(row)}
                         className="cursor-pointer"
                     >
-                       View User 
+                        View User
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onClick={() => onDelete?.(row)}
                         className="cursor-pointer"
                     >
-                        Delete User 
+                        Delete User
                     </DropdownMenuItem>
                     <DropdownMenuItem
                         onClick={() => onEdit?.(row)}
                         className="cursor-pointer"
                     >
-Edit User                    </DropdownMenuItem>
+                        Edit User                    </DropdownMenuItem>
                 </DropdownMenuContent>
             </DropdownMenu>
         </div>
     );
 };
 
- 
+
 
 export function AllUsersColumn({
-   
+
     onView,
     onEdit,
     onDelete
@@ -94,8 +94,10 @@ export function AllUsersColumn({
             label: "ID",
             accessor: "id",
             width: "100px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value || '-'}</span>
+            formatter: (_: string, __: User, index?: number) => (
+                <span className="text-sm text-[#06030C]">
+                    {index !== undefined ? index + 1 : "-"}
+                </span>
             ),
         },
         {

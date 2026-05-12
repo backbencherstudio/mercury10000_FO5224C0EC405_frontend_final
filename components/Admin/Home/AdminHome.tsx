@@ -1,3 +1,4 @@
+"use client"
 import { Notebook } from "lucide-react";
 
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -6,32 +7,38 @@ import { ChartBarDefault } from "./ChartBarDefault";
 import StatCards from "./StateCards";
 import UpcomingGift from "./UpcomingGift";
 import Leads from "../Leads";
+import { useGetDashboardstatusCardQuery } from "@/redux/features/dashboardOverview/dashboardOverView";
 
 function AdminHome() {
+
+  const { data: statusCardData } = useGetDashboardstatusCardQuery({});
+
+
+
   const statCards = [
     {
       title: "Total Users",
-      value: 96,
+      value: statusCardData?.total_users,
       percentage: "100%",
     },
     {
       title: "New Lead Received",
-      value: 2,
+      value: statusCardData?.new_lead_received,
       percentage: "2%",
     },
     {
       title: "User Requests",
-      value: 18,
+      value: statusCardData?.user_requests,
       percentage: "18%",
     },
     {
       title: "Gifts Overview",
-      value: 12,
+      value: statusCardData?.gifts_overview,
       percentage: "12%",
     },
     {
       title: "Connection Request",
-      value: 12,
+      value: statusCardData?.connection_request,
       percentage: "12%",
     },
   ];

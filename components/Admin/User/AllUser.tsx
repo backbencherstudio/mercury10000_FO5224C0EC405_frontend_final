@@ -4,7 +4,7 @@ import DynamicTable from '@/components/reusable/DynamicTable'
 import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
 import { useRouter } from 'next/navigation'
- 
+
 import React, { useEffect, useState } from 'react'
 
 import { Skeleton } from '@/components/ui/skeleton'
@@ -14,14 +14,14 @@ import { useGetAllUsersQuery } from '@/redux/features/auth/authApi'
 export default function AllUser() {
 
     const [currentPage, setCurrentPage] = useState(1);
-const [itemsPerPage, setItemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
-const { data, isLoading, isFetching } = useGetAllUsersQuery({
-  page: currentPage,
-  limit: itemsPerPage,
-});
+    const { data, isLoading, isFetching } = useGetAllUsersQuery({
+        page: currentPage,
+        limit: itemsPerPage,
+    });
 
-     const router = useRouter()
+    const router = useRouter()
 
     const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
@@ -37,49 +37,49 @@ const { data, isLoading, isFetching } = useGetAllUsersQuery({
         return text ? text : '-';
     };
 
-const users = Array.isArray(data?.data)
-  ? data.data.map((user: any) => ({
-      id: user?.id ?? "-",
-      name: user?.name ?? "-",
-      phone_number: user?.phone_number ?? "-",
-      email: user?.email ?? "-",
-      trades:
-        Array.isArray(user?.trades) && user.trades.length > 0
-          ? user.trades
-              .map((t: any) => t?.name)
-              .filter(Boolean)
-              .join(", ")
-          : "-",
-      city: user?.city ?? "-",
-      country: user?.country ?? "-",
-      type: user?.type ?? "-",
-    }))
-  : [];
+    const users = Array.isArray(data?.data)
+        ? data.data.map((user: any) => ({
+            id: user?.id ?? "-",
+            name: user?.name ?? "-",
+            phone_number: user?.phone_number ?? "-",
+            email: user?.email ?? "-",
+            trades:
+                Array.isArray(user?.trades) && user.trades.length > 0
+                    ? user.trades
+                        .map((t: any) => t?.name)
+                        .filter(Boolean)
+                        .join(", ")
+                    : "-",
+            city: user?.city ?? "-",
+            country: user?.country ?? "-",
+            type: user?.type ?? "-",
+        }))
+        : [];
 
-const totalItems = data?.totalItems ?? ((currentPage - 1) * itemsPerPage + users.length + (users.length === itemsPerPage ? 1 : 0));
-const totalPages = data?.totalPages ?? (users.length === itemsPerPage ? currentPage + 1 : currentPage);
+    const totalItems = data?.totalItems ?? ((currentPage - 1) * itemsPerPage + users.length + (users.length === itemsPerPage ? 1 : 0));
+    const totalPages = data?.totalPages ?? (users.length === itemsPerPage ? currentPage + 1 : currentPage);
 
-const handlePageChange = (page: number) => {
-  setCurrentPage(page);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-};
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
-const handlePageSizeChange = (size: number) => {
-  setItemsPerPage(size);
-  setCurrentPage(1);
-  window.scrollTo({ top: 0, behavior: "smooth" });
-};
+    const handlePageSizeChange = (size: number) => {
+        setItemsPerPage(size);
+        setCurrentPage(1);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+    };
 
-console.log(data,'datta');
+    // console.log(data, 'datta');
 
 
 
     const handleViewDetails = (row: any) => {
-        router.push(`/dashboard/user/all-users/${row.id}` )
+        router.push(`/dashboard/user/all-users/${row.id}`)
     };
 
     const handleEdit = (row: any) => {
-        router.push(`/dashboard/user/all-users/${row.id}` )
+        router.push(`/dashboard/user/all-users/${row.id}`)
     };
 
     const handleDelete = (row: any) => {
@@ -117,14 +117,14 @@ console.log(data,'datta');
                 <h3 className='text-xl sm:text-2xl text-[#111827] font-medium'>See All Users</h3>
                 <div className='w-full sm:w-auto'>
                     <div className='flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-2'>
-                        <div className='relative w-full sm:w-auto'>
+                        {/* <div className='relative w-full sm:w-auto'>
                             <SearchIcon className='absolute top-1/2 -translate-y-1/2 left-4' />
                             <input type="text" className='bg-[#e9e9ea] py-2 pl-12 pr-4 rounded-[10px] w-full sm:w-[315px] outline-none focus:ring-1 focus:ring-blue-500' placeholder='Search user here' />
-                        </div>
-                        <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
+                        </div> */}
+                        {/* <button className='flex items-center gap-2 p-2.5 cursor-pointer hover:bg-gray-100 rounded-lg w-full sm:w-auto justify-center'>
                             <FilterIcon />
                             <span className='hidden sm:inline'>Filter</span>
-                        </button>
+                        </button> */}
                     </div>
                 </div>
             </div>

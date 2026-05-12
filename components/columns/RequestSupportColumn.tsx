@@ -8,7 +8,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import GreenDownArrow from "../icons/secretary/GreenDownArrow";
 import RedDownArrow from "../icons/secretary/RedDownArrow";
- 
+import Link from "next/link";
+
 
 // Type for a support request row
 export interface RequestSupportRow {
@@ -48,49 +49,74 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onView, onDelete }
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none">
-          <DropdownMenuItem
-            onClick={() => onView?.(row)}
-            className="cursor-pointer"
-          >
-            Write Note to Admin
-          </DropdownMenuItem>
+          <Link href={`/secretary-dashboard/write-note?id=${row.id}`}>
+            <DropdownMenuItem
+              onClick={() => onView?.(row)}
+              className="cursor-pointer"
+            >
+              <button>Write Note to Admin</button>
+            </DropdownMenuItem>
+          </Link>
         </DropdownMenuContent>
       </DropdownMenu>
     </div>
   );
 };
 
+const formatDate = (value: string) => {
+  const date = new Date(value);
+
+  const formattedDate = `${date.getDate()}/${date.getMonth() + 1
+    }/${date.getFullYear()}`;
+  return formattedDate;
+};
 export function RequestSupportColumn({ onView, onDelete }: RequestSupportColumnProps): ColumnConfig<RequestSupportRow>[] {
   return [
     {
       label: "ID",
       accessor: "id",
       width: "80px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (_: string, __: RequestSupportRow, index?: number) => (
+        <span className="text-sm text-[#06030C]">
+          {index !== undefined ? index + 1 : "-"}
+        </span>
+      ),
     },
     {
       label: "User Name",
-      accessor: "user_name",
-      width: "140px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      accessor: "user",
+      width: "180px",
+      formatter: (row: any) => (
+        <span className="text-sm text-[#06030C] font-medium truncate">
+          {row?.user?.name || row?.name || "N/A"}
+        </span>
+      ),
     },
     {
       label: "Phone No.",
-      accessor: "phone_no",
+      accessor: "user",
       width: "130px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (row: any) => (
+        <span className="text-sm text-[#06030C] font-medium truncate">
+          {row?.user?.phone_number || row?.phone_number || "N/A"}
+        </span>
+      ),
     },
     {
       label: "City",
-      accessor: "city",
+      accessor: "user",
       width: "120px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (row: any) => (
+        <span className="text-sm text-[#06030C] font-medium truncate">
+          {row?.user?.city || "N/A"}
+        </span>
+      ),
     },
     {
       label: "Support Request Date",
-      accessor: "supportReqDate",
+      accessor: "created_at",
       width: "130px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: string) => <span className="text-sm text-[#06030C]">{formatDate(value)}</span>,
     },
     {
       label: "Status",

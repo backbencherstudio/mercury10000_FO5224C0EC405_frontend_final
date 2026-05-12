@@ -1,6 +1,6 @@
 "use client";
 
-import DownArrowIcon from "@/components/icons/admin/DownArrowIcon";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import React from "react";
 
 // Gift Status type definition based on the giftStatusData structure
@@ -10,9 +10,11 @@ interface GiftStatus {
     recentLead: string;
     leadSent: string;
     giftReceived: string;
-    lastGiftDate: string;
+    last_gift_date: string;
     lastGiftReceived: string;
     nextPlannedGift: string;
+    giftCardId?: string;
+    giftcard_name?: string;
 }
 
 interface ColumnConfig {
@@ -31,10 +33,16 @@ interface GiftStatusColumnProps {
     onView?: (row: GiftStatus) => void;
     onEdit?: (row: GiftStatus) => void;
     onDelete?: (row: GiftStatus) => void;
+    onSend?: (row: GiftStatus) => void;
+    availableGiftCards: any[];
+    rowSelections: Record<string, string>;
+    onRowGiftSelect: (userId: string, giftCardId: string) => void;
 }
 
 // Date formatter for consistent date display
-const DateFormatter = (value: string) => {
+const DateFormatter = (value?: string) => {
+    if (!value || isNaN(Date.parse(value))) return "--";
+
     return new Date(value).toLocaleDateString("en-US", {
         year: "numeric",
         month: "short",
@@ -50,7 +58,11 @@ export function GiftStatusColumn({
     onSelectRow,
     onView,
     onEdit,
-    onDelete
+    onDelete,
+    onSend,
+    availableGiftCards,
+    rowSelections,
+    onRowGiftSelect
 }: GiftStatusColumnProps): ColumnConfig[] {
 
     // Check if all rows are selected
@@ -65,46 +77,48 @@ export function GiftStatusColumn({
 
     return [
         // 1. Checkbox Column
-        {
-            label: (
-                <div className="flex items-center justify-center">
-                    <input
-                        type="checkbox"
-                        checked={isAllSelected}
-                        ref={(el) => {
-                            if (el) el.indeterminate = isSomeSelected && !isAllSelected;
-                        }}
-                        onChange={(e) => onSelectAll(e.target.checked)}
-                        onClick={(e) => e.stopPropagation()}
-                        className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                    />
-                </div>
-            ),
-            accessor: "checkbox",
-            width: "50px",
-            formatter: (_: any, __: any, rowIndex: number) => {
-                const globalIndex = startIndex + rowIndex;
-                return (
-                    <div className="flex items-center justify-center">
-                        <input
-                            type="checkbox"
-                            checked={selectedRows.has(globalIndex)}
-                            onChange={(e) => onSelectRow(globalIndex, e.target.checked)}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-                        />
-                    </div>
-                );
-            },
-        },
+        // {
+        //     label: (
+        //         <div className="flex items-center justify-center">
+        //             <input
+        //                 type="checkbox"
+        //                 checked={isAllSelected}
+        //                 ref={(el) => {
+        //                     if (el) el.indeterminate = isSomeSelected && !isAllSelected;
+        //                 }}
+        //                 onChange={(e) => onSelectAll(e.target.checked)}
+        //                 onClick={(e) => e.stopPropagation()}
+        //                 className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+        //             />
+        //         </div>
+        //     ),
+        //     accessor: "checkbox",
+        //     width: "50px",
+        //     formatter: (_: any, __: any, rowIndex: number) => {
+        //         const globalIndex = startIndex + rowIndex;
+        //         return (
+        //             <div className="flex items-center justify-center">
+        //                 <input
+        //                     type="checkbox"
+        //                     checked={selectedRows.has(globalIndex)}
+        //                     onChange={(e) => onSelectRow(globalIndex, e.target.checked)}
+        //                     onClick={(e) => e.stopPropagation()}
+        //                     className="w-4 h-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
+        //                 />
+        //             </div>
+        //         );
+        //     },
+        // },
 
         // 2. User ID Column
         {
-            label: "User ID",
-            accessor: "userId",
+            label: "ID",
+            accessor: "id",
             width: "90px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C] ">{value}</span>
+            formatter: (_: any, __: any, index?: number) => (
+                <span className="text-sm text-[#06030C]">
+                    {index !== undefined ? index + 1 : "-"}
+                </span>
             ),
         },
 
@@ -123,8 +137,11 @@ export function GiftStatusColumn({
             label: "Recent Lead",
             accessor: "recentLead",
             width: "110px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+            formatter: (value: string, row: GiftStatus) => (
+                <div className="flex flex-col">
+
+                    <span className="text-sm text-[#06030C] ">{DateFormatter(value || "--")}</span>
+                </div>
             ),
         },
 
@@ -136,7 +153,7 @@ export function GiftStatusColumn({
             formatter: (value: string) => (
                 <div className="flex items-center">
                     <span className="text-sm  text-[#06030C]">{value}</span>
-                  
+
                 </div>
             ),
         },
@@ -149,7 +166,7 @@ export function GiftStatusColumn({
             formatter: (value: string) => (
                 <div className="flex items-center">
                     <span className="text-sm text-[#06030C] ">{value}</span>
-                    
+
                 </div>
             ),
         },
@@ -164,12 +181,12 @@ export function GiftStatusColumn({
         //         const sent = parseInt(row.leadSent);
         //         const received = parseInt(row.giftReceived);
         //         const percentage = Math.round((received / sent) * 100);
-                
+
         //         let colorClass = "text-gray-600";
         //         if (percentage >= 30) colorClass = "text-green-600";
         //         else if (percentage >= 20) colorClass = "text-yellow-600";
         //         else colorClass = "text-red-600";
-                
+
         //         return (
         //             <span className={`text-sm font-medium ${colorClass}`}>
         //                 {percentage}%
@@ -181,38 +198,58 @@ export function GiftStatusColumn({
         // 8. Last Gift Column
         {
             label: "Last Gift Date",
-            accessor: "lastGiftReceived",
+            accessor: "last_gift_date",
             width: "150px",
             formatter: (value: string, row: GiftStatus) => (
                 <div className="flex flex-col">
-                  
-                    <span className="text-sm text-[#06030C] ">{DateFormatter(row?.lastGiftDate)}</span>
+
+                    <span className="text-sm text-[#06030C] ">{DateFormatter(value)}</span>
                 </div>
             ),
         },
 
-        // 9. Next Planned Gift Column
+        // 9. Next Planned Gift Column (Select Dropdown)
         {
             label: "Last Gift Received",
-            accessor: "nextPlannedGift",
-            width: "140px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C] ">
-                    {value}
-                </span>
-            ),
+            accessor: "giftcard_name",
+            width: "180px",
+            formatter: (value: string, row: GiftStatus) => {
+                const currentSelection = rowSelections[row.userId] || "";
+
+                return (
+                    <div className="w-full min-w-[150px] text-black bg-none">
+                        <Select
+                            onValueChange={(val) => onRowGiftSelect(row.userId, val)}
+                            value={currentSelection}
+                        >
+                            <SelectTrigger className="h-9 text-xs border-none text-black bg-none shadow-none">
+                                <SelectValue placeholder={value || "Select Gift"} className="text-black bg-none shadow-none" />
+                            </SelectTrigger>
+                            <SelectContent className="text-black">
+                                {availableGiftCards.map((card: any) => (
+                                    <SelectItem key={card._id || card.id} value={card._id || card.id} className="text-black">
+                                        {card.name}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                );
+            },
         },
 
-        // 10. Last Gift Date Column (separate if needed)
         {
-            label: "Next Planned Gift",
-            accessor: "lastGiftDate",
+            label: "Action",
+            accessor: "action",
             width: "120px",
-            formatter: (value: string) => (
-                <div className=" flex items-center justify-between">
-                    <span className="text-sm text-[#06030C] ">{DateFormatter(value)}</span>
-                    <DownArrowIcon/>
-
+            formatter: (_: string, row: GiftStatus) => (
+                <div className="flex items-center justify-center">
+                    <button
+                        onClick={() => onSend?.(row)}
+                        className="text-[#0b7680] font-semibold hover:underline cursor-pointer"
+                    >
+                        Send
+                    </button>
                 </div>
             ),
         },
