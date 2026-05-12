@@ -22,7 +22,7 @@ export function SocketProvider({ children }: PropsWithChildren) {
         if (!token) return
         if (socketRef.current) return // Prevent duplicate connections
 
-        const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT as string, {
+        const socket = io(process.env.NEXT_PUBLIC_API_URL as string, {
             auth: { token: token },
             // query: { userId: userId },
             extraHeaders: {
