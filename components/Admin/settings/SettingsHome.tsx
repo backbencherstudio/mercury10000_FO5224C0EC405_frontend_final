@@ -25,7 +25,7 @@ export default function SettingsHome() {
   // Extract user data safely
   const user = authData?.data
 
-  console.log(authData, "authdataauthdatadatadatadatadatadatadatadata")
+  // console.log(authData, "authdataauthdatadatadatadatadatadatadatadata")
 
   // Handle loading and error states
   useEffect(() => {

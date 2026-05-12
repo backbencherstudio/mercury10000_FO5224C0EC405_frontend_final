@@ -38,7 +38,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
     isLoading: leadsSubmitionLoading,
     error: leadsSubmitionError,
   } = useGetFinancilaActivityQuery({ id: id, });
-
+  // console.log(leadsSubmition, 'leadsSubmition')
 
   // Editable state for each field
   const [editState, setEditState] = useState({
@@ -106,7 +106,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
         conversion_fee: Number(inputState.conversion_fee),
       };
 
-      console.log(payload);
+      // console.log(payload);
 
       await updateUser({
         id,
@@ -133,13 +133,15 @@ export default function UserDetails({ user }: UserDetailsProps) {
     router.push(`/dashboard/user/all-users/${id}/monthly-details`);
   };
 
+
+
   return (
     <div className="border border-[#E9E9EA] p-4 sm:p-6 rounded-[12px] mt-6">
       <div className="flex flex-col lg:flex-row gap-6 lg:gap-8">
         <div className="flex-[3_3_0%] w-full p-4 sm:p-6 border border-[#E9E9EA] rounded-[8px]">
           <div className="p-4 border border-[#11B0C1] bg-[#E6F6F4] rounded-[12px]">
             <h3 className="text-lg text-[#1D1F2C] font-semibold">User Created</h3>
-            <p className="text-base text-[#777980] mt-1.5">26 Feb, 2026</p>
+            {/* <p className="text-base text-[#777980] mt-1.5">{(data?.data?.created_at || '')}</p> */}
           </div>
           <h2 className="text-2xl text-[#111827] font-medium mt-6">Basic Details</h2>
           <div className="mt-6 space-y-6">

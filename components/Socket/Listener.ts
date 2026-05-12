@@ -1,47 +1,67 @@
 import { AppDispatch, store } from "@/redux/store"
-// import { INotificatinListItem, WithApiStatus } from "@/types"
 import { Socket } from "socket.io-client"
-// import notificationApi from "../dashboard/notificationApi"
+import { NotificationApi } from "@/redux/features/notification/notification"
 
-interface INotificatinListItem {
-    // Define the properties of a single notification item
-    // This is just an example, you should define it based on your actual data structure
+interface INotification {
     id: string;
-    title: string;
-    message: string;
-    createdAt: string;
-    read: boolean;
-}
-
-interface WithApiStatus<T> {
-    data: T;
-    status: 'success' | 'error' | 'loading';
-    meta_data?: {
-        total: number;
-        page: number;
-        limit: number;
+    sender_id: string;
+    receiver_id: string;
+    entity_id: string;
+    created_at: string;
+    sender?: {
+        name: string;
+        email: string;
+        avatar?: string;
+    };
+    notification_event?: {
+        message?: string;
     };
 }
 
-// const updateNotification = ({ data }: WithApiStatus<INotificatinListItem>) => {
+// const updateNotification = (payload: any) => {
+//     // Assuming the socket sends the notification object directly or wrapped in data
+//     const newNotification: INotification = payload.data || payload;
+
 //     store.dispatch(
-//         notificationApi.util.updateQueryData("getAllNotifications", {}, (draft) => {
-//             if (!draft?.data) return
+//         NotificationApi.util.updateQueryData("getSocketNotification", {}, (draft) => {
+//             if (!draft?.data) {
+//                 draft.data = [newNotification];
+//                 return;
+//             }
 
-//             const exists = draft.data.some((n) => n.id === data.id)
-//             if (exists) return
+//             const exists = draft.data.some((n: any) => n.id === newNotification.id);
+//             if (exists) return;
 
-//             draft.data.unshift(data)
-
-//             // if (draft.meta_data) {
-//             //     const meta = draft.meta_data
-//             //     meta.total += 1
-//             //     meta.page = Math.ceil(meta.total / meta.limit)
-//             // }
+//             draft.data.unshift(newNotification);
 //         })
 //     )
 // }
 
+const updateNotification = (payload: any) => {
+    const newNotification = payload?.data || payload;
+
+    store.dispatch(
+        NotificationApi.util.updateQueryData(
+            "getSocketNotification",
+            undefined,
+            (draft: any) => {
+
+                if (!draft.data) {
+                    draft.data = [];
+                }
+
+                const exists = draft.data.some(
+                    (item: any) => item.id === newNotification.id
+                );
+
+                if (!exists) {
+                    draft.data.unshift(newNotification);
+                }
+            }
+        )
+    );
+};
+
 export const initSocket = (socket: Socket, dispatch: AppDispatch) => {
-    // socket.on("receiveNotification", updateNotification)
+    socket.on("receiveNotification", updateNotification)
 }

@@ -43,7 +43,7 @@ export default function CreateAdmin() {
 
   // 2. Derive data from the query results
   const allSecretaryData = allSecretary?.data || [];
-  console.log(allSecretaryData, 'ddddddddd')
+  // console.log(allSecretaryData, 'ddddddddd')
 
   // 3. Setup pagination variables based on the fetched data
   const totalItems = allSecretaryData?.length || 0;

@@ -63,7 +63,7 @@ export default function OnBoard() {
 
         } catch (error) {
             toast.error("Something went wrong!")
-            console.log("Error:", error)
+
         }
     }
 

@@ -137,7 +137,7 @@ export default function RewardHome() {
   // Handle bulk actions
   const handleBulkExport = () => {
     const selectedData = Array.from(selectedRows).map(index => formattedData[index])
-    console.log('Export selected:', selectedData)
+    // console.log('Export selected:', selectedData)
     // Implement your export logic here
   }
 

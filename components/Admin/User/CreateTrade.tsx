@@ -153,11 +153,11 @@ export default function CreateTrade() {
   };
 
   const handleView = (row: TradeRow) => {
-    console.log('View trade:', row);
+    // console.log('View trade:', row);
   };
 
   const handleEdit = (row: TradeRow) => {
-    console.log('Edit trade:', row);
+    // console.log('Edit trade:', row);
   };
 
   const handleDelete = async (row: TradeRow) => {

@@ -89,6 +89,7 @@ export function SecretarySubmittedColumn({
     {
       label: "User Name",
       accessor: "name",
+      width: "80px",
       formatter: (value: string) => (
         <span className="text-sm text-[#06030C]">{value || "--"}</span>
       ),

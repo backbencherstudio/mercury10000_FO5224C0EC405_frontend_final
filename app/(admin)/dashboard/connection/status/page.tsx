@@ -32,7 +32,7 @@ export default function UserResponsesPage() {
                 refetchOnMountOrArgChange: true,
             }
         );
-    console.log("cunnectionStatus: ", cunnectionStatus)
+    // console.log("cunnectionStatus: ", cunnectionStatus)
 
     const Alltrades = cunnectionStatus?.data?.map(
         (item: any) => item?.trade

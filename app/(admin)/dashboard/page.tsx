@@ -2,7 +2,7 @@ import AdminHome from "@/components/Admin/Home/AdminHome";
 
 
 
-function page() {
+function AdminDashboard() {
 
   return (
 
@@ -11,4 +11,4 @@ function page() {
   );
 }
 
-export default page;
+export default AdminDashboard;

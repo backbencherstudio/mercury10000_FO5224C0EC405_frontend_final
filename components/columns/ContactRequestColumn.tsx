@@ -202,9 +202,12 @@ export function ContactRequestColumn({
     );
   };
 
-  const DateFormatter = (date: string) => {
-    if (!date) return "-";
-    return new Date(date).toLocaleString();
+  const DateFormatter = (value: string) => {
+    const date = new Date(value);
+
+    const formattedDate = `${date.getDate()}/${date.getMonth() + 1
+      }/${date.getFullYear()}`;
+    return formattedDate;
   };
 
   return [

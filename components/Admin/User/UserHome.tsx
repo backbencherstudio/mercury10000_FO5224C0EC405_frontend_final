@@ -14,7 +14,7 @@ import TagCrossIcon from '@/components/icons/admin/TagCrossIcon';
 // import { UserService } from '@/service/user/user.service';
 import { useRegisterMutation } from '@/redux/features/auth/authApi'
 import { useGetTradesQuery } from '@/redux/features/user/user'
-import { Eye, EyeOff } from 'lucide-react'
+import { CloudCog, Eye, EyeOff } from 'lucide-react'
 
 
 interface FormData {
@@ -70,11 +70,18 @@ export default function UserHome() {
     const [feeFieldErrors, setFeeFieldErrors] = useState<FeeFieldErrors>({});
     const [appliedFeeData, setAppliedFeeData] = useState<AppliedFeeData>({});
     const [tradeIdMap, setTradeIdMap] = useState<Record<string, string>>({});
+    const [tradesData, setTradesData] = useState<any>([]);
 
     const [showPassword, setShowPassword] = useState(false);
 
-    const { data: tradesData, isLoading: isLoadingTrades } =
-        useGetTradesQuery(undefined);
+
+    const { data, isLoading: isLoadingTrades } = useGetTradesQuery([]);
+
+    useEffect(() => {
+        if (data) {
+            setTradesData(data);
+        }
+    }, [data]);
 
     // API data array
     const trades = Array.isArray(tradesData) ? tradesData : tradesData?.data || [];

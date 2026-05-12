@@ -74,6 +74,7 @@ function DashboardAllLeadsTable() {
   const [updateStatus] = useUpdateStausLeadsProcessMutation();
 
   const apiData = data?.data || [];
+  // console.log(data, "--0-0--00")
   const meta = (data as any)?.meta;
 
   const totalItems = Number(meta?.total_items ?? 0);
@@ -210,7 +211,7 @@ function DashboardAllLeadsTable() {
         isOpen={leadProcessDialogOpen}
         onClose={() => setLeadProcessDialogOpen(false)}
         onSave={(dateTime) => {
-          console.log("Saved datetime:", dateTime);
+          // console.log("Saved datetime:", dateTime);
           setLeadProcessDialogOpen(false);
         }}
         ID={dialogRowData?.id}

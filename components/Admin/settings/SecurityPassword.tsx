@@ -13,7 +13,7 @@ export default function SecurityPassword() {
   // Extract user data safely
   const user = authData?.data
 
-  console.log(authData, "authdat")
+  // console.log(authData, "authdat")
 
   // Handle loading and error states
   useEffect(() => {

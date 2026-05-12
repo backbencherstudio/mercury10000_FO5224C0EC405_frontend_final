@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getDashboardPathByRole, normalizeAppRole } from "./helper/auth.helper";
 
-const AUTH_ROUTES = ["/log-in", "/login", "/sign-up", "/verify-email", "/verify-success", "/region"];
+const AUTH_ROUTES = ["/", "/log-in", "/login", "/sign-up", "/verify-email", "/verify-success", "/region"];
 const ADMIN_PREFIX = "/dashboard";
 const SECRETARY_PREFIX = "/secretary-dashboard";
 
@@ -44,6 +44,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/secretary-dashboard/:path*", "/log-in", "/login", "/sign-up", "/verify-email", "/verify-success", "/region"],
+  matcher: ["/", "/dashboard/:path*", "/secretary-dashboard/:path*", "/log-in", "/login", "/sign-up", "/verify-email", "/verify-success", "/region"],
 };
 

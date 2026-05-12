@@ -17,7 +17,7 @@ export default function Rewards() {
 
 
   const data = giftCardStatusData || [];
-  console.log(data, "data")
+  // console.log(data, "data")
 
   const filteredData = data.filter((item: any) =>
     item.user_name.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -16,7 +16,7 @@ export const dashboardOverviewApi = baseApi.injectEndpoints({
     // GET → use query
     getDashboardOverview: builder.query({
       query: (params) => ({
-        url: "/leads/all",
+        url: "/leads/all-submitted",
         method: "GET",
         params,
       }),

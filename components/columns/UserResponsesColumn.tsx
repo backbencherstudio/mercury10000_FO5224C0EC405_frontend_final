@@ -1,14 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import Dot3Icon from "@/components/icons/admin/Dot3Icon";
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import TopRightArrow from "../icons/admin/TopRightArrow";
+import {
+    Dialog,
+    DialogTrigger,
+    DialogContent,
+    DialogDescription,
+} from "@/components/ui/dialog";
+import { useGetSingleRequesStatusQuery } from "@/redux/features/connection/connections";
 
 // UserResponse type based on API response
 export interface UserResponse {
@@ -41,33 +42,103 @@ interface ActionDropdownProps {
 }
 
 
-const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onEdit }) => (
-    <div className="flex justify-center w-full">
-        <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-                <button className="cursor-pointer hover:bg-[#e9e9ea] px-3 py-1.5 rounded-full focus:outline-none">
-                    <Dot3Icon />
-                </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-40 border border-[#d2d2d5] shadow-none">
-                <DropdownMenuItem
-                    onClick={() => onEdit?.(row)}
-                    className="cursor-pointer"
-                >
-                    Assign Request
-                </DropdownMenuItem>
-            </DropdownMenuContent>
-        </DropdownMenu>
-    </div>
-);
+const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onEdit }) => {
+    const [open, setOpen] = useState(false);
 
-import {
-    Dialog,
-    DialogTrigger,
-    DialogContent,
-    DialogClose
-} from "@/components/ui/dialog";
-import { useGetSingleRequesStatusQuery } from "@/redux/features/connection/connections";
+    const {
+        data: leadData,
+        isLoading,
+    } = useGetSingleRequesStatusQuery(row.lead_id, {
+        skip: !open,
+    });
+    const detail = leadData?.data;
+
+    return (
+        <div className="flex justify-center w-full">
+            <Dialog open={open} onOpenChange={setOpen}>
+                <DialogTrigger asChild>
+                    <button
+                        onClick={() => setOpen(true)}
+                        className="cursor-pointer hover:bg-[#e9e9ea] px-3 py-1.5 rounded-full focus:outline-none"
+                    >
+                        <Dot3Icon />
+                    </button>
+                </DialogTrigger>
+
+                <DialogContent className="sm:max-w-[890px] w-full bg-white p-6">
+                    {isLoading ? (
+                        <div className="text-center py-10">Loading...</div>
+                    ) : (
+                        <>
+                            <div className=" flex gap-8 mt-8">
+                                <div className=" flex-3/5  ">
+                                    <div className=" space-y-8">
+                                        <div className=" space-y-2.5">
+                                            <div className=" border-b  border-[#E9E9EA] pb-2.5">
+                                                <h3 className=" text-base text-[#070707] font-medium">City:</h3>
+                                                <p className=" text-sm text-[#777980] mt-2.5">{detail?.city || detail?.location || "N/A"}</p>
+                                            </div>
+                                            <div className=" border-b  border-[#E9E9EA] pb-2.5">
+                                                <h3 className=" text-base text-[#070707] font-medium">Trade:</h3>
+                                                <p className=" text-sm text-[#777980] mt-2.5">{detail?.trade || "N/A"}</p>
+                                            </div>
+                                        </div>
+                                        <div className=" border-b  border-[#E9E9EA] pb-2.5">
+                                            <h3 className=" text-base text-[#070707] font-medium">Note:</h3>
+                                            <p className=" text-sm text-[#777980] mt-2.5">{detail?.note || detail?.description || "No notes available."}</p>
+                                        </div>
+
+                                        <div>
+                                            <h3 className=" text-base text-[#070707] font-medium">Images ({detail?.files?.length || 0})</h3>
+                                            <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
+                                                {detail?.files && detail.files.length > 0 ? (
+                                                    detail.files.map((file: any, idx: number) => (
+                                                        <div key={idx} className="flex flex-col items-center min-w-[120px]">
+                                                            <div className="w-full h-32 rounded-md bg-gray-200 overflow-hidden border border-gray-300">
+                                                                <img src={file.url || file.path} alt={`Lead ${idx}`} className="w-full h-full object-cover" />
+                                                            </div>
+                                                            <span className="mt-2 text-xs text-gray-600">image {idx + 1}</span>
+                                                        </div>
+                                                    ))
+                                                ) : (
+                                                    <p className="text-sm text-gray-400">No images</p>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className=" flex-2/5 border p-6 rounded-[12px] h-fit">
+                                    <h2 className=" text-2xl text-[#111827] font-medium">User Details</h2>
+                                    <div className="mt-8 space-y-6">
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">Sent to</h3>
+                                            <p className=" text-base text-[#777980]">{row.user_name} <span className=" text-[#D2D2D5]"> (ID {row.user_id})</span> </p>
+                                        </div>
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">User’s Response</h3>
+                                            <p className={`text-base px-3 inline-block rounded-full ${row.response_from_user === 'YES' ? 'text-[#006557] bg-[#B0E4DD]' : 'text-[#990000] bg-[#FFB0B0]'}`}>
+                                                {row.response_from_user}
+                                            </p>
+                                        </div>
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">User’s Trade</h3>
+                                            <p className=" text-base text-[#777980]">{row.trade}</p>
+                                        </div>
+                                        <div>
+                                            <h3 className=" text-base text-[#1D1F2C] mb-1.5 font-medium">Connection Assigned</h3>
+                                            <p className=" text-base text-[#777980]">{row.num_connection_sent_by_us} time(s)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+                </DialogContent>
+            </Dialog>
+        </div>
+    );
+};
+
 
 
 const LeadIdCell = ({ value, row }: { value: string, row: UserResponse }) => {

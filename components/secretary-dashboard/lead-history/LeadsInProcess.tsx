@@ -28,7 +28,7 @@ export default function LeadsInProcess() {
 
   const ApiData = data?.data || [];
 
-  console.log(ApiData);
+  // console.log(ApiData);
 
   const totalItems = ApiData.length;
   const totalPages = Math.ceil(totalItems / itemsPerPage);

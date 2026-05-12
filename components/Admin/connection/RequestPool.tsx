@@ -204,7 +204,7 @@ export default function RequestPool() {
             await deleteConnection(row.id).unwrap();
             toast.success('Connection request deleted successfully');
         } catch (err) {
-            console.error('Delete failed:', err);
+            // console.error('Delete failed:', err);
             toast.error('Failed to delete connection request');
         }
     };

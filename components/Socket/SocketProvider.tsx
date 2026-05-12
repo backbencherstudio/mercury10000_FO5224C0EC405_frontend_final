@@ -1,69 +1,66 @@
-// "use client"
+"use client"
 
-// import { APP_CONFIG } from "@/lib/constants"
-// import { useAuth } from "@/redux/features/auth/useAuth"
-// import { useAppDispatch } from "@/redux/store"
-// import { PropsWithChildren, useEffect, useMemo, useRef } from "react"
-// import { io, Socket } from "socket.io-client"
-// // import { useGetMeQuery } from "../auth/authApi"
-// import { initSocket } from "./socketListeners"
 
-// export const isDevEnv = () => {
-//     return process.env.NODE_ENV === 'development';
-// };
 
-// export function SocketProvider({ children }: PropsWithChildren) {
-//     const { token, isAuthenticated } = useAuth()
-//     const dispatch = useAppDispatch()
+import { PropsWithChildren, useEffect, useRef } from "react"
+import { io, Socket } from "socket.io-client"
+import { initSocket } from "./Listener"
+import { useAppDispatch } from "@/redux/hooks"
+import { StorageHelper } from "@/helper/storage.helper"
 
-//     const socketRef = useRef<Socket | null>(null)
-//     // const { data } = useGetMeQuery()
+export const isDevEnv = () => {
+    return process.env.NODE_ENV === 'development';
+};
 
-//     // const userId = useMemo(() => data?.id, [data])
+export function SocketProvider({ children }: PropsWithChildren) {
+    const token = StorageHelper.getAccessToken()
+    const dispatch = useAppDispatch()
 
-//     useEffect(() => {
-//         if (!isAuthenticated || !token) return
-//         if (socketRef.current) return // Prevent duplicate connections
+    const socketRef = useRef<Socket | null>(null)
 
-//         const socket = io(APP_CONFIG.socketUrl, {
-//             auth: { token: token },
-//             // query: { userId: userId },
-//             extraHeaders: {
-//                 authorization: `Bearer ${token}`,
-//             },
-//         })
+    useEffect(() => {
+        if (!token) return
+        if (socketRef.current) return // Prevent duplicate connections
 
-//         if (isDevEnv()) {
-//             socket.on("connect", () => {
-//                 console.log("Socket connected:", socket.id)
-//             })
+        const socket = io(process.env.NEXT_PUBLIC_API_ENDPOINT as string, {
+            auth: { token: token },
+            // query: { userId: userId },
+            extraHeaders: {
+                authorization: `Bearer ${token}`,
+            },
+        })
 
-//             socket.on("disconnect", () => {
-//                 console.log("Socket disconnected")
-//             })
+        if (isDevEnv()) {
+            socket.on("connect", () => {
+                console.log("Socket connected:", socket.id)
+            })
 
-//             socket.on("connect_error", (err) => {
-//                 console.error("Socket error:", err.message)
-//             })
+            socket.on("disconnect", () => {
+                console.log("Socket disconnected")
+            })
 
-//             socket.onAny((event, data) => {
-//                 console.log("=============== Event:", event, "====================")
-//                 console.log("Payload:", data)
-//             })
+            socket.on("connect_error", (err) => {
+                console.error("Socket error:", err.message)
+            })
 
-//             socket.on("error", (err) => {
-//                 console.error(err.message)
-//             })
-//         }
+            socket.onAny((event, data) => {
+                console.log("=============== Event:", event, "====================")
+                console.log("Payload:", data)
+            })
 
-//         socketRef.current = socket
-//         // initSocket(socket, dispatch)
+            socket.on("error", (err) => {
+                console.error(err.message)
+            })
+        }
 
-//         return () => {
-//             socket.disconnect()
-//             socketRef.current = null
-//         }
-//     }, [dispatch, isAuthenticated, token, userId])
+        socketRef.current = socket
+        initSocket(socket, dispatch)
 
-//     return <>{children}</>
-// }
+        return () => {
+            socket.disconnect()
+            socketRef.current = null
+        }
+    }, [dispatch, token])
+
+    return <>{children}</>
+}

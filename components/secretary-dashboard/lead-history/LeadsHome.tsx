@@ -35,7 +35,7 @@ export default function LeadsHome() {
   //  REAL API DATA
   const allProcess = history?.data || [];
 
-  console.log("history", allProcess);
+  // console.log("history", allProcess);
 
   //  FILTER DATA
   const filteredData = useMemo(() => {

@@ -37,7 +37,7 @@ export default function SecretaryHome() {
 
     const { data, isLoading, error } = useGetSupportQuery({});
     const SupportData = data?.data || [];
-    console.log(SupportData);
+    // console.log(SupportData);
 
     return (
         <div>

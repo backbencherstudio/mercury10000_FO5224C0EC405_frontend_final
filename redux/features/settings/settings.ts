@@ -15,6 +15,24 @@ export const SettingsApi = baseApi.injectEndpoints({
 
         }),
 
+        getSettingNotification: builder.query({
+            query: () => ({
+                url: "/admin/notification/notification-settings",
+                method: "GET",
+
+            }),
+            providesTags: ["settingNote"],
+
+        }),
+
+        updateSettingNotification: builder.mutation({
+            query: (data) => ({
+                url: "/admin/notification/update-settings",
+                method: "PATCH",
+                body: data,
+            }),
+        }),
+
         updataStatus: builder.mutation({
             query: ({ id, status }) => ({
                 url: `/support/${id}/resolve`,
@@ -28,4 +46,4 @@ export const SettingsApi = baseApi.injectEndpoints({
 });
 
 // hook export (naming important)
-export const { usePostOnboardingMutation, useUpdataStatusMutation } = SettingsApi;
+export const { usePostOnboardingMutation, useGetSettingNotificationQuery, useUpdateSettingNotificationMutation, useUpdataStatusMutation } = SettingsApi;

@@ -63,6 +63,13 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({ row, onView, onDelete }
   );
 };
 
+const formatDate = (value: string) => {
+  const date = new Date(value);
+
+  const formattedDate = `${date.getDate()}/${date.getMonth() + 1
+    }/${date.getFullYear()}`;
+  return formattedDate;
+};
 export function RequestSupportColumn({ onView, onDelete }: RequestSupportColumnProps): ColumnConfig<RequestSupportRow>[] {
   return [
     {
@@ -109,7 +116,7 @@ export function RequestSupportColumn({ onView, onDelete }: RequestSupportColumnP
       label: "Support Request Date",
       accessor: "created_at",
       width: "130px",
-      formatter: (value: string) => <span className="text-sm text-[#06030C]">{value}</span>,
+      formatter: (value: string) => <span className="text-sm text-[#06030C]">{formatDate(value)}</span>,
     },
     {
       label: "Status",

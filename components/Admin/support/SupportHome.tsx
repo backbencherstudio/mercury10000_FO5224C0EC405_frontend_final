@@ -9,33 +9,39 @@ import React from 'react'
 import { useGetSupportQuery, useUpdataStatusMutation } from '@/redux/features/Support/support'
 
 
-const statsData = [
-  {
-    title: 'Total Support Request',
-    value: '3'
-  },
-  {
-    title: 'Support Solved',
-    value: '2'
-  },
-  {
-    title: 'Remaining Support',
-    value: '1'
-  }
-]
+
 
 export default function SupportHome() {
 
   const handleViewDetails = () => {
-    console.log()
+    // console.log()
   }
 
 
   const { data, isLoading, error } = useGetSupportQuery({
 
   })
-  console.log(data, "support data")
+  // console.log(data, "support data")
   const SupportData = data?.data || [];
+
+  const statsData = [
+    {
+      title: "Total Support Request",
+      value: SupportData.length,
+    },
+    {
+      title: "Support Solved",
+      value: SupportData.filter(
+        (item: any) => item.status === "SOLVED"
+      ).length,
+    },
+    {
+      title: "Remaining Support",
+      value: SupportData.filter(
+        (item: any) => item.status === "PENDING"
+      ).length,
+    },
+  ];
 
   const [updateStatus] = useUpdataStatusMutation();
   const handleToggleStatus = (row: any) => {

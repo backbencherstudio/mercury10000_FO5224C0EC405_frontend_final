@@ -70,7 +70,7 @@ export default function AllUser() {
         window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
-    console.log(data, 'datta');
+    // console.log(data, 'datta');
 
 
 
