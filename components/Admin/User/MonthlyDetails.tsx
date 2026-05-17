@@ -1,32 +1,28 @@
 'use client'
-import { SpecificFinancialActivityColumn } from '@/components/columns/SpecificFinancialActivityColumn'
+import { SpecificFinancialActivity, SpecificFinancialActivityColumn } from '@/components/columns/SpecificFinancialActivityColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { SpecificFinancialActivityData } from '@/public/demoData/SpecificFinancialActivityData'
 import FilterIcon from '@/components/icons/admin/FilterIcon'
 import SearchIcon from '@/components/icons/admin/SearchIcon'
 import React, { useState } from 'react'
 import { useGetSpecificActivityQuery } from '@/redux/features/user/user'
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog"
 
-const statsData = [
-    {
-        title: 'Total Lead Submitted',
-        value: 6
-    },
-    {
-        title: 'Qualified Leads',
-        value: 4
-    },
-    {
-        title: 'Conversion',
-        value: 2
-    }
-]
+
 
 export default function MonthlyDetails() {
 
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage, setItemsPerPage] = useState(10);
     const [search, setSearch] = useState("")
+
+    const [selectedRow, setSelectedRow] = useState<any | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
@@ -41,12 +37,32 @@ export default function MonthlyDetails() {
 
 
     const SpecificData = data?.data || [];
-    console.log(SpecificData, 'SpecificData');
+
+    const statsData = [
+        {
+            title: 'Total Lead Submitted',
+            value: SpecificData?.length
+        },
+        {
+            title: 'Qualified Leads',
+            value: SpecificData.filter(
+                (item: any) => item.status === "pending"
+            ).length,
+        },
+        {
+            title: 'Conversion',
+            value: SpecificData.filter(
+                (item: any) => item.status === "RESOLVED"
+            ).length,
+        }
+    ]
+    // console.log(SpecificData, 'SpecificData');
 
     const totalPages = data?.pagination?.totalPages || 1;
     const totalItems = data?.pagination?.totalItems || 0;
-    const handleView = () => {
-        console.log('done')
+    const handleView = (row: any) => {
+        setSelectedRow(row);
+        setIsDialogOpen(true);
     }
     const handleDownload = () => {
         console.log('done')
@@ -139,6 +155,63 @@ export default function MonthlyDetails() {
                     loading={isLoading}
                 />
             </div>
+
+            {/* View Dialog */}
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                <DialogContent className="sm:max-w-[600px] w-full bg-white p-6">
+                    <DialogHeader>
+                        <DialogTitle className="text-2xl font-medium mb-4">Financial Activity Details</DialogTitle>
+                    </DialogHeader>
+                    {selectedRow && (
+                        <div className="space-y-4">
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Lead Number</span>
+                                <span className="text-sm text-gray-900">{selectedRow.lead_no}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Name</span>
+                                <span className="text-sm text-gray-900">{selectedRow.name}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Phone</span>
+                                <span className="text-sm text-gray-900">{selectedRow.phone}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Collected</span>
+                                <span className="text-sm text-gray-900">{selectedRow.collected ? 'Yes' : 'No'}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Lead Submitted Address</span>
+                                <span className="text-sm text-gray-900 text-right max-w-[60%]">{selectedRow.lead_submitted_addr || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Qualified Leads Address</span>
+                                <span className="text-sm text-gray-900 text-right max-w-[60%]">{selectedRow.qualified_leads_addr || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Conversation Address</span>
+                                <span className="text-sm text-gray-900 text-right max-w-[60%]">{selectedRow.conversation_addr || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">To Company</span>
+                                <span className="text-sm text-gray-900 text-right max-w-[60%]">{selectedRow.to_company || 'N/A'}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Starting Date</span>
+                                <span className="text-sm text-gray-900">{selectedRow.starting_date}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Status</span>
+                                <span className="text-sm text-gray-900">{selectedRow.status}</span>
+                            </div>
+                            <div className="flex justify-between border-b pb-2">
+                                <span className="text-sm font-medium text-gray-500">Created At</span>
+                                <span className="text-sm text-gray-900">{new Date(selectedRow.created_at).toLocaleString()}</span>
+                            </div>
+                        </div>
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     )
-}
+}   

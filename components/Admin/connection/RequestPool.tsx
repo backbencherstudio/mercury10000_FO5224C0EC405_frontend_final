@@ -4,10 +4,12 @@ import FilterIcon from '@/components/icons/admin/FilterIcon';
 import SearchIcon from '@/components/icons/admin/SearchIcon';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import DynamicTable from '@/components/reusable/DynamicTable';
-import { requestPoolData } from '@/public/demoData/RequestPoolData';
 import { RequestPoolColumn } from '@/components/columns/RequestPoolColumn';
 import { useGetAllUsersQuery } from '@/redux/features/auth/authApi';
 import { UsersColumn } from '@/components/columns/UsersColumn';
+import confirmImg from '@/public/images/admin/confirm-img.png'
+import bigStar from '@/public/images/admin/big-star.png'
+import smallStar from '@/public/images/admin/little-star.png'
 import {
     Dialog,
     DialogTrigger,
@@ -20,6 +22,7 @@ import {
 import { CloudCog } from 'lucide-react';
 import { useGetRequestPoolQuery, useUpdateUserRequestSentMutation, useDeleteConnectionRequestMutation } from '@/redux/features/connection/connections';
 import toast from 'react-hot-toast';
+import Image from 'next/image';
 
 
 export default function RequestPool() {
@@ -31,6 +34,10 @@ export default function RequestPool() {
     const [userCurrentPage, setUserCurrentPage] = useState(1);
     const [userItemsPerPage, setUserItemsPerPage] = useState(10);
     const [userTradeFilter, setUserTradeFilter] = useState('all');
+
+    const [successModalOpen, setSuccessModalOpen] = useState(false);
+
+    console.log("userTradeFilter", userTradeFilter)
     const [userSelectedRows, setUserSelectedRows] = useState<Set<string>>(new Set());
     const [userSearch, setUserSearch] = useState('');
 
@@ -48,10 +55,11 @@ export default function RequestPool() {
     }, [data]);
 
     const getTradeName = (row: any) => {
-        if (typeof row?.trade === 'string') return row.trade;
-        return row?.trade?.name || '';
+        if (!row) return "";
+        if (typeof row.trade === "string") return row.trade;
+        if (row.trade?.name) return row.trade.name;
+        return "";
     };
-
     const lockedTrade = useMemo(() => {
         if (selectedRows.size === 0) return null;
         const firstId = Array.from(selectedRows)[0];
@@ -68,15 +76,22 @@ export default function RequestPool() {
         if (userIds.length === 0 || requestIds.length === 0) return;
 
         try {
-            await Promise.all(requestIds.map(requestId =>
-                userSend({
-                    id: requestId,
-                    data: { user_ids: userIds }
-                }).unwrap()
-            ));
+            await Promise.all(
+                requestIds.map(requestId =>
+                    userSend({
+                        id: requestId,
+                        data: { user_ids: userIds }
+                    }).unwrap()
+                )
+            );
+
             setSendDialogOpen(false);
             setSelectedRows(new Set());
             setUserSelectedRows(new Set());
+
+
+            setSuccessModalOpen(true);
+
         } catch (err) {
             console.error('Bulk send failed:', err);
         }
@@ -156,9 +171,13 @@ export default function RequestPool() {
 
     // Get unique trades for filter dropdown
     const allTrades = useMemo(() => {
-        return Array.from(
-            new Set(requestPoolData.map((row: any) => getTradeName(row)).filter(Boolean))
-        );
+        if (!Array.isArray(requestPoolData)) return [];
+
+        const trades = requestPoolData
+            .map((row: any) => getTradeName(row))
+            .filter((t: string) => t && t.trim() !== "");
+
+        return Array.from(new Set(trades));
     }, [requestPoolData]);
 
     // Filter data by trade and search
@@ -415,6 +434,41 @@ export default function RequestPool() {
                             </div>
                         )}
                     </div>
+                </DialogContent>
+            </Dialog>
+
+            <Dialog open={successModalOpen} onOpenChange={setSuccessModalOpen}>
+                <DialogContent className="sm:max-w-md text-center p-8">
+
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center">
+                            <div className="flex justify-center items-center">
+                                <div className="relative ">
+                                    <Image src={confirmImg} alt="confirm img" className="z-10 relative  " />
+                                    {/* <Image src={bigStar} alt="big star" className="absolute -top-10 -left-10 animate-pulse" /> */}
+                                    {/* <Image src={bigStar} alt="big star" className="absolute -bottom-10 -right-10 animate-pulse delay-700" /> */}
+                                    <Image src={smallStar} alt="little star" className="absolute top-0 right-0" />
+                                    <Image src={smallStar} alt="little star" className="absolute bottom-0 left-0" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <h2 className="text-2xl font-semibold text-gray-900">
+                            Success!
+                        </h2>
+
+                        <p className="text-gray-500">
+                            Connection request sent successfully
+                        </p>
+
+                        <button
+                            onClick={() => setSuccessModalOpen(false)}
+                            className="mt-4 px-6 py-2 bg-[#0b7680] text-white rounded-md"
+                        >
+                            OK
+                        </button>
+                    </div>
+
                 </DialogContent>
             </Dialog>
         </div>

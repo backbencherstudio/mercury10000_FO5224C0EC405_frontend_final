@@ -14,7 +14,7 @@ import { useUpdateLeadStatusMutation } from "@/redux/features/user/user";
 import toast from "react-hot-toast";
 
 // Update the interface to match SpecificFinancialActivityData structure
-interface SpecificFinancialActivity {
+export interface SpecificFinancialActivity {
     id: string;
     lead_submitted: string;
     qualified_leads: string;
@@ -87,7 +87,7 @@ const ActionDropdown: React.FC<ActionDropdownProps> = ({
                         <DownArrowIcon />
                     </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-48 border border-[#d2d2d5] shadow-none">
+                <DropdownMenuContent align="end" className="w-20  border border-[#d2d2d5] shadow-none">
                     <DropdownMenuItem
                         onClick={() => toggleStatus(row)}
                         className="cursor-pointer"
@@ -151,17 +151,17 @@ export function SpecificFinancialActivityColumn({
             accessor: "to_company",
             width: "120px",
             formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
+                <span className="text-sm text-[#06030C]">{value || "--"}</span>
             ),
         },
         {
             label: "Check Number",
             accessor: "lead_no",
             width: "130px",
-            formatter: (value: string) => (
+            formatter: (value: string, row: SpecificFinancialActivity) => (
                 <div className=" flex items-center justify-between">
                     <span className="text-sm text-[#06030C] font-mono">{value}</span>
-                    <button className=" cursor-pointer">
+                    <button className=" cursor-pointer" onClick={() => onView?.(row)}>
 
                         <EditIcon />
                     </button>
@@ -185,7 +185,7 @@ export function SpecificFinancialActivityColumn({
                 <div className="flex items-center justify-center gap-2.5">
 
                     <span className="text-sm text-[#06030C]">
-                        {value ? "NO" : "YES"}
+                        {value ? <span className="text-[#990000]">NO</span> : <span className="text-[#006557] ">YES</span>}
                     </span>
 
                     <ActionDropdown

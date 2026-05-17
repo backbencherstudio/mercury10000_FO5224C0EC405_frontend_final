@@ -42,7 +42,7 @@ export default function CreateTrade() {
   const [deleteTradeMutation] = useDeleteTradeMutation();
   const [updateTradeMutation] = useUpdateTradeMutation();
   const { data: trades = [], isLoading: isLoadingTrades, error } = useGetTradesQuery(undefined);
-  console.log("trades: ", trades)
+  // console.log("trades: ", trades)
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
 

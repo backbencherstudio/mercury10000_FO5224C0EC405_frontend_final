@@ -6,7 +6,7 @@ import React, { useState } from "react";
 import { ToastContainer } from "react-toastify";
 
 function AdminMenu({ children }: { children: React.ReactNode }) {
-  console.log("rendered");
+
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);

@@ -49,9 +49,9 @@ function AdminHome() {
       </div>
 
       <div className="flex flex-col lg:flex-row items-stretch mt-5 gap-6">
-        <div className="lg:flex-[3_3_0%] w-full">
+        {/* <div className="lg:flex-[3_3_0%] w-full">
           <ChartBarDefault />
-        </div>
+        </div> */}
         {/* <div className="lg:flex-[1_1_0%] w-full">
             <UpcomingGift />
           </div> */}

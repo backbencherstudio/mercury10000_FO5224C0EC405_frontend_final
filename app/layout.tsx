@@ -21,10 +21,12 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.className}`}>
         <StoreProviders>
+          {/* <SocketProvider > */}
           <ToastProvider />
           {children}
+          {/* </SocketProvider> */}
         </StoreProviders>
       </body>
-    </html>
+    </html >
   );
 }
