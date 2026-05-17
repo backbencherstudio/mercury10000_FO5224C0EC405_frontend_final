@@ -14,7 +14,7 @@ import { useUpdateLeadStatusMutation } from "@/redux/features/user/user";
 import toast from "react-hot-toast";
 
 // Update the interface to match SpecificFinancialActivityData structure
-interface SpecificFinancialActivity {
+export interface SpecificFinancialActivity {
     id: string;
     lead_submitted: string;
     qualified_leads: string;

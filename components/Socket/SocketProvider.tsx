@@ -1,66 +1,75 @@
-"use client"
+// "use client";
 
+// import React, {
+//     createContext,
+//     useContext,
+//     useEffect,
+//     useRef,
+// } from "react";
 
+// import { io, Socket } from "socket.io-client";
+// import { CookieHelper } from "@/helper/cookie.helper";
 
-import { PropsWithChildren, useEffect, useRef } from "react"
-import { io, Socket } from "socket.io-client"
-import { initSocket } from "./Listener"
-import { useAppDispatch } from "@/redux/hooks"
-import { StorageHelper } from "@/helper/storage.helper"
+// interface SocketContextType {
+//     socket: Socket | null;
+// }
 
-export const isDevEnv = () => {
-    return process.env.NODE_ENV === 'development';
-};
+// const SocketContext =
+//     createContext<SocketContextType>({
+//         socket: null,
+//     });
 
-export function SocketProvider({ children }: PropsWithChildren) {
-    const token = StorageHelper.getAccessToken()
-    const dispatch = useAppDispatch()
+// export const useSocket = () =>
+//     useContext(SocketContext);
 
-    const socketRef = useRef<Socket | null>(null)
+// export default function SocketProvider({
+//     children,
+// }: {
+//     children: React.ReactNode;
+// }) {
+//     const socketRef = useRef<Socket | null>(
+//         null
+//     );
 
-    useEffect(() => {
-        if (!token) return
-        if (socketRef.current) return // Prevent duplicate connections
+//     useEffect(() => {
+//         if (socketRef.current) return;
 
-        const socket = io(process.env.NEXT_PUBLIC_API_URL as string, {
-            auth: { token: token },
-            // query: { userId: userId },
-            extraHeaders: {
-                authorization: `Bearer ${token}`,
-            },
-        })
+//         const SOCKET_URL =
+//             process.env.NEXT_PUBLIC_SOCKET_URL;
 
-        if (isDevEnv()) {
-            socket.on("connect", () => {
-                console.log("Socket connected:", socket.id)
-            })
+//         if (!SOCKET_URL) return;
 
-            socket.on("disconnect", () => {
-                console.log("Socket disconnected")
-            })
+//         const token = CookieHelper.get({
+//             key: "accessToken",
+//         });
 
-            socket.on("connect_error", (err) => {
-                console.error("Socket error:", err.message)
-            })
+//         socketRef.current = io(SOCKET_URL, {
+//             transports: ["websocket"],
+//             query: token
+//                 ? { token }
+//                 : undefined,
+//         });
 
-            socket.onAny((event, data) => {
-                console.log("=============== Event:", event, "====================")
-                console.log("Payload:", data)
-            })
+//         socketRef.current.on(
+//             "connect",
+//             () => {
+//                 console.log("connected");
+//             }
+//         );
 
-            socket.on("error", (err) => {
-                console.error(err.message)
-            })
-        }
+//         return () => {
+//             socketRef.current?.disconnect();
+//             socketRef.current = null;
+//         };
+//     }, []);
 
-        socketRef.current = socket
-        initSocket(socket, dispatch)
-
-        return () => {
-            socket.disconnect()
-            socketRef.current = null
-        }
-    }, [dispatch, token])
-
-    return <>{children}</>
-}
+//     return (
+//         <SocketContext.Provider
+//             value={{
+//                 socket: socketRef.current,
+//             }}
+//         >
+//             {children}
+//         </SocketContext.Provider>
+//     );
+// }

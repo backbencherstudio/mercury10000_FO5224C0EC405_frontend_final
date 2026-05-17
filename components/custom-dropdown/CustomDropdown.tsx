@@ -46,13 +46,14 @@ const CustomDropdown: React.FC<CustomDropdownProps> = ({ trigger, items, contain
 
   return (
     <div className={`relative flex  justify-end   ${containerClassName}`} ref={ref}>
-      <button
+      <div
         className="cursor-pointer  px-3 py-1.5 rounded-full focus:outline-none"
         onClick={() => setOpen((v) => !v)}
-        type="button"
+        role="button"
+        tabIndex={0}
       >
         {trigger || <Dot3Icon />}
-      </button>
+      </div>
       {open && (
         <div
           className={`absolute right-0 z-50 w-40 bg-popover text-popover-foreground border rounded-md p-1 shadow-md ${menuClassName} ${dropUp ? 'bottom-full mb-2' : 'mt-2'}`}

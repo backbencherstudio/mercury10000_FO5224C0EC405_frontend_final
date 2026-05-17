@@ -30,6 +30,7 @@
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "gsap": "^3.12.7",
+    "jwt-decode": "^4.0.0",
     "katex": "^0.16.21",
     "lightningcss": "^1.32.0",
     "lodash.debounce": "^4.0.8",

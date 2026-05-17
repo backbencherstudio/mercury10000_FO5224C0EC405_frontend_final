@@ -1,5 +1,5 @@
 'use client'
-import { SpecificFinancialActivityColumn } from '@/components/columns/SpecificFinancialActivityColumn'
+import { SpecificFinancialActivity, SpecificFinancialActivityColumn } from '@/components/columns/SpecificFinancialActivityColumn'
 import DynamicTable from '@/components/reusable/DynamicTable'
 import { SpecificFinancialActivityData } from '@/public/demoData/SpecificFinancialActivityData'
 import FilterIcon from '@/components/icons/admin/FilterIcon'
@@ -56,7 +56,7 @@ export default function MonthlyDetails() {
             ).length,
         }
     ]
-    console.log(SpecificData, 'SpecificData');
+    // console.log(SpecificData, 'SpecificData');
 
     const totalPages = data?.pagination?.totalPages || 1;
     const totalItems = data?.pagination?.totalItems || 0;
