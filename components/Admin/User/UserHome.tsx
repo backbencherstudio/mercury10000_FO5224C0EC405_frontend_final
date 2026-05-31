@@ -347,14 +347,17 @@ export default function UserHome() {
                                     </SelectTrigger>
 
                                     <SelectContent>
-                                        {trades?.map((trade: Trade) => (
-                                            <SelectItem
-                                                key={trade.id}
-                                                value={trade.id}
-                                            >
-                                                {trade.name}
-                                            </SelectItem>
-                                        ))}
+                                        {trades && trades.length > 0 ? (
+                                            trades.map((trade: Trade) => (
+                                                <SelectItem key={trade.id} value={trade.id}>
+                                                    {trade.name}
+                                                </SelectItem>
+                                            ))
+                                        ) : (
+                                            <div className="p-2 text-sm text-gray-500 text-center">
+                                                Not found
+                                            </div>
+                                        )}
                                     </SelectContent>
                                 </Select>
                             </div>
@@ -382,7 +385,7 @@ export default function UserHome() {
                                 </div>
                                 <div className='flex-1 mt-3 sm:mt-0'>
                                     <label htmlFor="city">City</label>
-                                    <Select onValueChange={(value) => handleSelectChange('city', value)} value={formData.city}>
+                                    {/* <Select onValueChange={(value) => handleSelectChange('city', value)} value={formData.city}>
                                         <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
                                             <SelectValue placeholder="Select a city" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
                                         </SelectTrigger>
@@ -393,6 +396,37 @@ export default function UserHome() {
                                                         {city.name}
                                                     </SelectItem>
                                                 ))}
+                                            </SelectGroup>
+                                        </SelectContent>
+                                    </Select> */}
+
+                                    <Select
+                                        onValueChange={(value) => handleSelectChange('city', value)}
+                                        value={formData.city}
+                                    >
+                                        <SelectTrigger className="w-full py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
+                                            <SelectValue
+                                                placeholder="Select a city"
+                                                className="text-base text-[#161721] font-medium"
+                                            />
+                                        </SelectTrigger>
+
+                                        <SelectContent>
+                                            <SelectGroup>
+                                                {cityOptions?.length > 0 ? (
+                                                    cityOptions.map((city) => (
+                                                        <SelectItem
+                                                            key={`${city.name}-${city.latitude}-${city.longitude}`}
+                                                            value={city.name}
+                                                        >
+                                                            {city.name}
+                                                        </SelectItem>
+                                                    ))
+                                                ) : (
+                                                    <SelectItem value="__empty" disabled>
+                                                        No cities found
+                                                    </SelectItem>
+                                                )}
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
@@ -406,31 +440,51 @@ export default function UserHome() {
                                 <h2 className=' text-2xl  text-[#111827] font-medium'>Set Fee Rate </h2>
 
                                 <form className=' mt-6 space-y-6' onSubmit={handleSetFeeSubmit}>
-                                    <div className=' flex flex-col gap-1.5'>
-                                        <label htmlFor="leads_fee">Qualified Leads Fee</label>
-                                        <input
-                                            type="number"
-                                            name=""
-                                            id="qualified_leads_fee"
-                                            className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
-                                            placeholder='$ 100'
-                                            value={feeFormData.qualified_leads_fee}
-                                            onChange={handleFeeInputChange}
-                                        />
+                                    <div className="flex flex-col gap-1.5">
+                                        <label htmlFor="qualified_leads_fee">Qualified Leads Fee</label>
+
+                                        <div className="relative">
+                                            {/* Fixed $ sign */}
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#161721] font-medium">
+                                                $
+                                            </span>
+
+                                            <input
+                                                type="number"
+                                                id="qualified_leads_fee"
+                                                className="py-2 pl-7 pr-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium"
+                                                placeholder="100"
+                                                value={feeFormData.qualified_leads_fee}
+                                                onChange={handleFeeInputChange}
+                                            />
+                                        </div>
                                     </div>
                                     {feeFieldErrors.qualified_leads_fee && <span className='text-red-600 text-sm'>{feeFieldErrors.qualified_leads_fee}</span>}
-                                    <div className=' flex flex-col gap-1.5'>
+                                    <div className="flex flex-col gap-1.5">
                                         <label htmlFor="conversion_fee">Conversion Fee</label>
-                                        <input
-                                            type="number"
-                                            name=""
-                                            id="conversion_fee"
-                                            className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium'
-                                            placeholder='$ 500'
-                                            value={feeFormData.conversion_fee}
-                                            onChange={handleFeeInputChange}
-                                        />
+
+                                        <div className="relative">
+                                            {/* $ fixed icon */}
+                                            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[#161721] font-medium">
+                                                $
+                                            </span>
+
+                                            <input
+                                                type="number"
+                                                id="conversion_fee"
+                                                className="py-2 pl-7 pr-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium"
+                                                placeholder="500"
+                                                value={feeFormData.conversion_fee}
+                                                onChange={handleFeeInputChange}
+                                            />
+                                        </div>
                                     </div>
+
+                                    {feeFieldErrors.conversion_fee && (
+                                        <span className="text-red-600 text-sm">
+                                            {feeFieldErrors.conversion_fee}
+                                        </span>
+                                    )}
                                     {feeFieldErrors.conversion_fee && <span className='text-red-600 text-sm'>{feeFieldErrors.conversion_fee}</span>}
                                     {/* <button type='submit' className=' bg-[#0b7680] w-full text-white py-4  rounded-[8px] cursor-pointer'>Set Fee</button> */}
 

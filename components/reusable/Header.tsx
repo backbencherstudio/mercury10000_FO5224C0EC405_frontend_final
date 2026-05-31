@@ -141,7 +141,7 @@ const Header: React.FC<HeaderProps> = ({
     return () => {
       if (socketRef.current) {
         socketRef.current.off("notification");
-        socketRef.current.disconnect();
+        // socketRef.current.disconnect();
         socketRef.current = null;
       }
     };
@@ -175,12 +175,12 @@ const Header: React.FC<HeaderProps> = ({
           </div>
 
           {/* Connection Status Indicator */}
-          <div className="hidden md:flex items-center gap-2">
+          {/* <div className="hidden md:flex items-center gap-2">
             <div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`} />
             <span className="text-xs text-gray-500">
-              {isConnected ? 'Live' : connectionError || 'Disconnected'}
+              {isConnected ? 'Live' : "" || ''}
             </span>
-          </div>
+          </div> */}
 
           <div className="flex items-center gap-2 lg:gap-5 justify-between">
             <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
