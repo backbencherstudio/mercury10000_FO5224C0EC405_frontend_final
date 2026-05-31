@@ -218,7 +218,7 @@ export function GiftStatusColumn({
 
                 return (
                     <div className="w-full min-w-[150px] text-black bg-none">
-                        <Select
+                        {/* <Select
                             onValueChange={(val) => onRowGiftSelect(row.userId, val)}
                             value={currentSelection}
                         >
@@ -231,6 +231,33 @@ export function GiftStatusColumn({
                                         {card.name}
                                     </SelectItem>
                                 ))}
+                            </SelectContent>
+                        </Select> */}
+
+                        <Select
+                            onValueChange={(val) => onRowGiftSelect(row.userId, val)}
+                            value={currentSelection}
+                        >
+                            <SelectTrigger className="h-9 text-xs border-none text-black bg-none shadow-none">
+                                <SelectValue placeholder={value || "Select Gift"} />
+                            </SelectTrigger>
+
+                            <SelectContent className="text-black">
+                                {availableGiftCards?.length > 0 ? (
+                                    availableGiftCards.map((card: any) => (
+                                        <SelectItem
+                                            key={card._id || card.id}
+                                            value={card._id || card.id}
+                                            className="text-black"
+                                        >
+                                            {card.name}
+                                        </SelectItem>
+                                    ))
+                                ) : (
+                                    <SelectItem value="__empty" disabled>
+                                        Not found
+                                    </SelectItem>
+                                )}
                             </SelectContent>
                         </Select>
                     </div>
