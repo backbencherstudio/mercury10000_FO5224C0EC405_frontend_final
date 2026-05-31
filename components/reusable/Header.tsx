@@ -70,9 +70,24 @@ const Header: React.FC<HeaderProps> = ({
     }
   }, [authError]);
 
+  // useEffect(() => {
+  //   if (notificationsData?.data) {
+  //     setLiveNotifications(notificationsData.data);
+  //   }
+  // }, [notificationsData]);
+
   useEffect(() => {
     if (notificationsData?.data) {
-      setLiveNotifications(notificationsData.data);
+      setLiveNotifications((prev) => {
+        const merged = [...notificationsData.data, ...prev];
+
+        // remove duplicates
+        const unique = Array.from(
+          new Map(merged.map(item => [item.id, item])).values()
+        );
+
+        return unique;
+      });
     }
   }, [notificationsData]);
 
@@ -93,22 +108,26 @@ const Header: React.FC<HeaderProps> = ({
     socketRef.current = socket;
 
     socket.on("connect", () => {
-      // console.log("✅ Socket connected with ID:", socket.id);
+      // console.log(" Socket connected with ID:", socket.id);
       setIsConnected(true);
       setConnectionError(null);
     });
 
+    // socket.on("notification", (newData) => {
+    //   // console.log(" New Real-time Notification:", newData);
+
+    //   setLiveNotifications((prev) => [newData, ...prev]);
+
+
+    // });
+
     socket.on("notification", (newData) => {
-      // console.log("📩 New Real-time Notification:", newData);
-
       setLiveNotifications((prev) => [newData, ...prev]);
-
-
     });
 
 
     socket.on("connect_error", (err) => {
-      // console.error("❌ Connection Error:", err.message);
+      // console.error(" Connection Error:", err.message);
       setIsConnected(false);
       setConnectionError(err.message);
     });
