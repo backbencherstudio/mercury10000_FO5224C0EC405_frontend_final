@@ -298,7 +298,7 @@ const Header: React.FC<HeaderProps> = ({
                       {user?.type}
                     </p>
                     <p className="text-xs text-textColor">{user?.email}</p>
-                    <p className="text-xs text-gray-400 mt-1">ID: {userId}</p>
+
                   </div>
                   <DropdownMenuSeparator />
 
