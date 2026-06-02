@@ -4,7 +4,7 @@ export const HomeIcon = (props: SVGProps<SVGSVGElement>) => {
     return (
 
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="22" viewBox="0 0 20 22" fill="none" {...props}>
-            <path d="M5.75 14.75C8.92154 16.0955 10.6864 16.0711 13.75 14.75M18.75 8.90033V16.7168C18.75 18.9443 16.9591 20.75 14.75 20.75H4.75C2.54086 20.75 0.75 18.9443 0.75 16.7168V8.90033C0.75 7.68937 1.28964 6.5425 2.21986 5.77652L7.21986 1.65935C8.6923 0.446886 10.8077 0.446883 12.2801 1.65935L17.2801 5.77652C18.2104 6.5425 18.75 7.68937 18.75 8.90033Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
+            <path d="M5.75 14.75C8.92154 16.0955 10.6864 16.0711 13.75 14.75M18.75 8.90033V16.7168C18.75 18.9443 16.9591 20.75 14.75 20.75H4.75C2.54086 20.75 0.75 18.9443 0.75 16.7168V8.90033C0.75 7.68937 1.28964 6.5425 2.21986 5.77652L7.21986 1.65935C8.6923 0.446886 10.8077 0.446883 12.2801 1.65935L17.2801 5.77652C18.2104 6.5425 18.75 7.68937 18.75 8.90033Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
     )
 }
@@ -12,7 +12,7 @@ export const HomeIcon = (props: SVGProps<SVGSVGElement>) => {
 export const SecondaryHome = (props: SVGProps<SVGSVGElement>) => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="20" viewBox="0 0 18 20" fill="none" {...props}>
-            <path fillRule="evenodd" clip-rule="evenodd" d="M6.46973 0.909345C7.94217 -0.303114 10.0578 -0.303116 11.5303 0.909345L16.5303 5.02653C17.4605 5.79251 18 6.9396 18 8.15056V15.967C18 18.1944 16.2091 20.0002 14 20.0002H4C1.79086 20.0002 0 18.1944 0 15.967V8.15056C0 6.9396 0.539512 5.79251 1.46973 5.02653L6.46973 0.909345ZM13.6885 13.7033C13.5245 13.3229 13.0835 13.1477 12.7031 13.3117C11.2139 13.9539 10.1137 14.2475 9.03809 14.2502C7.96191 14.2528 6.83524 13.964 5.29297 13.3097C4.91166 13.148 4.47135 13.3259 4.30957 13.7072C4.1478 14.0885 4.32571 14.5288 4.70703 14.6906C6.3359 15.3816 7.67723 15.7535 9.04199 15.7502C10.4076 15.7468 11.7224 15.3676 13.2969 14.6886C13.6772 14.5246 13.8524 14.0836 13.6885 13.7033Z" fill="currentColor" />
+            <path fillRule="evenodd" clipRule="evenodd" d="M6.46973 0.909345C7.94217 -0.303114 10.0578 -0.303116 11.5303 0.909345L16.5303 5.02653C17.4605 5.79251 18 6.9396 18 8.15056V15.967C18 18.1944 16.2091 20.0002 14 20.0002H4C1.79086 20.0002 0 18.1944 0 15.967V8.15056C0 6.9396 0.539512 5.79251 1.46973 5.02653L6.46973 0.909345ZM13.6885 13.7033C13.5245 13.3229 13.0835 13.1477 12.7031 13.3117C11.2139 13.9539 10.1137 14.2475 9.03809 14.2502C7.96191 14.2528 6.83524 13.964 5.29297 13.3097C4.91166 13.148 4.47135 13.3259 4.30957 13.7072C4.1478 14.0885 4.32571 14.5288 4.70703 14.6906C6.3359 15.3816 7.67723 15.7535 9.04199 15.7502C10.4076 15.7468 11.7224 15.3676 13.2969 14.6886C13.6772 14.5246 13.8524 14.0836 13.6885 13.7033Z" fill="currentColor" />
         </svg>
     )
 }
@@ -21,10 +21,10 @@ export const SecondaryHome = (props: SVGProps<SVGSVGElement>) => {
 export const User = (props: SVGProps<SVGSVGElement>) => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none">
-            <ellipse cx="10" cy="17.5" rx="7" ry="3.5" stroke="white" stroke-width="1.5" stroke-linejoin="round" />
-            <circle cx="10" cy="7" r="4" stroke="white" stroke-width="1.5" stroke-linejoin="round" />
-            <path d="M21 11H17" stroke="white" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M19 9L19 13" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <ellipse cx="10" cy="17.5" rx="7" ry="3.5" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
+            <circle cx="10" cy="7" r="4" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
+            <path d="M21 11H17" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M19 9L19 13" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     )
 }
@@ -38,10 +38,10 @@ export const UserSecondary = (props: SVGProps<SVGSVGElement>) => {
 export const LeadIcon = (props: SVGProps<SVGSVGElement>) => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" {...props}>
-            <path d="M17 7L7 7" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M17 11L7 11" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M12 15L7 15" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M19 2H5C3.89543 2 3 2.89543 3 4V19.1543C3 20.5396 4.37412 21.5053 5.67744 21.0361L7.2392 20.4739C7.72721 20.2982 8.26439 20.319 8.73737 20.5318L11.1793 21.6307C11.7012 21.8655 12.2988 21.8655 12.8207 21.6307L15.2626 20.5318C15.7356 20.319 16.2728 20.2982 16.7608 20.4739L18.3226 21.0361C19.6259 21.5053 21 20.5396 21 19.1543V4C21 2.89543 20.1046 2 19 2Z" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M17 7L7 7" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M17 11L7 11" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M12 15L7 15" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M19 2H5C3.89543 2 3 2.89543 3 4V19.1543C3 20.5396 4.37412 21.5053 5.67744 21.0361L7.2392 20.4739C7.72721 20.2982 8.26439 20.319 8.73737 20.5318L11.1793 21.6307C11.7012 21.8655 12.2988 21.8655 12.8207 21.6307L15.2626 20.5318C15.7356 20.319 16.2728 20.2982 16.7608 20.4739L18.3226 21.0361C19.6259 21.5053 21 20.5396 21 19.1543V4C21 2.89543 20.1046 2 19 2Z" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     )
 }
@@ -55,11 +55,11 @@ export const LeadSecondaryIcon = (props: SVGProps<SVGSVGElement>) => {
 export const ConnectionIcon = (props: SVGProps<SVGSVGElement>) => {
     return (
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" {...props}>
-            <path d="M7 15C9.94583 13.6802 11.6997 13.6532 15 15" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <circle cx="3" cy="3" r="3" transform="matrix(1 0 0 -1 8 11)" stroke="white" stroke-width="1.5" stroke-linejoin="round" />
-            <path d="M19.777 13C19.9229 12.3568 20 11.6874 20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C11.6874 20 12.3568 19.9229 13 19.777" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-            <path d="M18 16V20" stroke="white" stroke-width="1.5" stroke-linecap="round" />
-            <path d="M20 18L16 18" stroke="white" stroke-width="1.5" stroke-linecap="round" />
+            <path d="M7 15C9.94583 13.6802 11.6997 13.6532 15 15" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <circle cx="3" cy="3" r="3" transform="matrix(1 0 0 -1 8 11)" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
+            <path d="M19.777 13C19.9229 12.3568 20 11.6874 20 11C20 6.02944 15.9706 2 11 2C6.02944 2 2 6.02944 2 11C2 15.9706 6.02944 20 11 20C11.6874 20 12.3568 19.9229 13 19.777" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            <path d="M18 16V20" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M20 18L16 18" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
         </svg>
     )
 }

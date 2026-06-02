@@ -1,6 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import { Country, City } from 'country-state-city'
+import { City } from 'country-state-city'
 import { toast } from 'react-hot-toast'
 import {
     Select,
@@ -41,16 +41,19 @@ type AppliedFeeData = {
     conversion_fee?: number;
 };
 
+const DEFAULT_COUNTRY = 'US';
+const DEFAULT_CITY = 'California';
 const emptyFormData: FormData = {
     user_name: '',
     phone: '',
     email: '',
     password: '',
     work: '',
-    country: '',
-    city: '',
+    country: DEFAULT_COUNTRY,
+    city: DEFAULT_CITY,
     trades: [],
 };
+
 type Trade = {
     id: string;
     name: string;
@@ -75,7 +78,7 @@ export default function UserHome() {
     const [showPassword, setShowPassword] = useState(false);
 
 
-    const { data, isLoading: isLoadingTrades } = useGetTradesQuery([]);
+    const { data, isLoading: isLoadingTrades } = useGetTradesQuery(undefined);
 
     useEffect(() => {
         if (data) {
@@ -147,27 +150,15 @@ export default function UserHome() {
     };
 
 
-    // For single-value selects (country, city, role)
+    // For single-value selects (city, role)
     const handleSelectChange = (field: keyof FormData, value: string) => {
         setUserField(field, value);
     };
 
-    const handleCountryChange = (value: string) => {
-        setFormData((prev) => {
-            if (prev.country === value) return prev; // prevent loop
-
-            return {
-                ...prev,
-                country: value,
-                city: '',
-            };
-        });
-    };
-    const countryOptions = Country.getAllCountries();
     const cityOptions = React.useMemo(() => {
-        if (!formData.country) return [];
-        return City.getCitiesOfCountry(formData.country) ?? [];
-    }, [formData.country]);
+        return City.getCitiesOfState('US', 'CA') ?? [];
+    }, []);
+
     // useEffect(() => {
     //     const loadTradeIds = async () => {
     //         const map = await UserService.getTradeIdMap();
@@ -207,10 +198,6 @@ export default function UserHome() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        const selectedCountry = countryOptions.find(
-            (country) => country.isoCode === formData.country
-        );
-
         const selectedTradesPayload = formData.trades
             .filter((trade) => trade !== "na")
             .map((trade) => tradeIdMap[trade] || trade);
@@ -222,7 +209,7 @@ export default function UserHome() {
             password: formData.password,
             work_at_company: formData.work.trim(),
             city: formData.city,
-            country: selectedCountry?.name || formData.country,
+            country: 'United States',
             qualified_leads_fee: feeFormData?.qualified_leads_fee || 0,
             conversion_fee: feeFormData?.conversion_fee || 0,
             type: "USER",
@@ -281,7 +268,7 @@ export default function UserHome() {
                 <h2 className=' text-2xl  text-[#111827] font-medium'>Create a User </h2>
                 <form action="" className=' mt-6 space-y-6' onSubmit={handleSubmit}>
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                        <div className='w-full lg:w-full'>
+                        <div className='w-full lg:w-full space-y-1'>
                             <div className=' flex flex-col gap-1.5'>
                                 <label htmlFor="user_name">User Name</label>
                                 <input type="text" name="" id="user_name" className=' py-2  px-2.5 rounded-[8px] border border-[#D2D2D5] w-full' value={formData.user_name} onChange={handleInputChange} />
@@ -366,18 +353,14 @@ export default function UserHome() {
                                     <label htmlFor="country">Country</label>
                                     <Select
                                         value={formData.country}
-                                        onValueChange={handleCountryChange}
+                                        onValueChange={(value) => setUserField('country', value)}
                                     >
-                                        <SelectTrigger className="w-full  py-5 mt-1.5 border-[#D2D2D5] cursor-pointer">
-                                            <SelectValue placeholder="Select a country" className=' text-base text-[#161721] font-medium placeholder:text-base placeholder:text-[#161721]' />
+                                        <SelectTrigger className="w-full py-5 px-2.5 mt-1.5 rounded-[8px] border border-[#D2D2D5] cursor-pointer">
+                                            <SelectValue placeholder="Select a country" className='text-base text-[#161721] font-medium' />
                                         </SelectTrigger>
                                         <SelectContent>
                                             <SelectGroup>
-                                                {countryOptions.map((country) => (
-                                                    <SelectItem key={country.isoCode} value={country.isoCode}>
-                                                        {country.name}
-                                                    </SelectItem>
-                                                ))}
+                                                <SelectItem value="US">United States</SelectItem>
                                             </SelectGroup>
                                         </SelectContent>
                                     </Select>
@@ -413,6 +396,7 @@ export default function UserHome() {
 
                                         <SelectContent>
                                             <SelectGroup>
+                                                <SelectItem value={DEFAULT_CITY}>{DEFAULT_CITY}</SelectItem>
                                                 {cityOptions?.length > 0 ? (
                                                     cityOptions.map((city) => (
                                                         <SelectItem
@@ -452,7 +436,7 @@ export default function UserHome() {
                                             <input
                                                 type="number"
                                                 id="qualified_leads_fee"
-                                                className="py-2 pl-7 pr-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium"
+                                                className="py-2 pl-7 pr-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-gray-400 placeholder:text-base font-medium"
                                                 placeholder="100"
                                                 value={feeFormData.qualified_leads_fee}
                                                 onChange={handleFeeInputChange}
@@ -472,7 +456,7 @@ export default function UserHome() {
                                             <input
                                                 type="number"
                                                 id="conversion_fee"
-                                                className="py-2 pl-7 pr-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-[#161721] placeholder:text-base font-medium"
+                                                className="py-2 pl-7 pr-2.5 rounded-[8px] border border-[#D2D2D5] w-full placeholder:text-gray-400 placeholder:text-base font-medium"
                                                 placeholder="500"
                                                 value={feeFormData.conversion_fee}
                                                 onChange={handleFeeInputChange}
