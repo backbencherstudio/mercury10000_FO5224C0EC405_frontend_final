@@ -48,7 +48,7 @@ export default function DynamicTable({
 
   return (
     <div className="w-full">
-      
+
       <div className="overflow-hidden rounded-t-lg"> {/* Changed from rounded-lg to rounded-t-lg */}
         <div className="overflow-x-auto bg-white">
           <table className="w-full min-w-[1000px] text-left border-separate border-spacing-0">
@@ -111,10 +111,10 @@ export default function DynamicTable({
                         >
                           {col.formatter
                             ? col.formatter(
-                                row[col.accessor],
-                                row,
-                                ((currentPage ?? 1) - 1) * (itemsPerPage ?? 10) + rowIndex
-                              )
+                              row[col.accessor],
+                              row,
+                              ((currentPage ?? 1) - 1) * (itemsPerPage ?? 10) + rowIndex
+                            )
                             : row[col.accessor]}
                         </td>
                       ))}
@@ -162,7 +162,7 @@ export default function DynamicTable({
                   >
                     {error ? (
                       <p className="text-red-500 text-lg capitalize font-semibold">
-                        {error} - please login again
+                        please login again
                       </p>
                     ) : (
                       <p className="text-lg text-gray-500 capitalize font-semibold">
@@ -197,7 +197,7 @@ export default function DynamicTable({
             totalPages={totalpage ?? 1}
             dataLength={data?.length || 0}
             totalItems={totalItems}
-            onPageChange={onPageChange ?? (() => {})}
+            onPageChange={onPageChange ?? (() => { })}
             currentPage={currentPage ?? 1}
             itemsPerPage={itemsPerPage ?? 10}
             setItemsPerPage={setItemsPerPage}
