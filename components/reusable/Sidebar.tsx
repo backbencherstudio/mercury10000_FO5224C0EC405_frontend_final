@@ -79,7 +79,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
   }, []);
 
   return (
-    <div className="h-screen  " style={{backgroundColor:'#07454B' }}>
+    <div className="h-screen  " style={{ backgroundColor: '#07454B' }}>
       <div
         className={`
           ${isOpen
@@ -100,7 +100,7 @@ const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             className={` flex items-center  transition-all duration-300 $`}
           >
             <h2 className="text-white text-[32px] font-semibold tracking-wide">
-              Agua Leads
+              Aqua Leads
             </h2>
           </Link>
         </div>

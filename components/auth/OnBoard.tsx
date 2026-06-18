@@ -11,7 +11,7 @@ export default function OnBoard() {
       <div>
         <div className=' flex flex-col items-center justify-center'>
           <Image src={onBoardImg} alt='onboard img' />
-          <h2 className=' text-white text-2xl lg:text-[32px] font-semibold mt-5'>Agua Leads</h2>
+          <h2 className=' text-white text-2xl lg:text-[32px] font-semibold mt-5'>Aqua Leads</h2>
           <p className=' text-white text-base font-medium mt-2 text-center'>Licensed Contractor Network</p>
         </div>
 

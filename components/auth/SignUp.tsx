@@ -12,7 +12,7 @@ export default function SignUp() {
       <div className=' w-full lg:flex-1 bg-[#e7f9fb] p-5  lg:h-screen'>
         <div className=' inline-flex flex-col items-center justify-center gap-3'>
           <Image src={logo} alt='logo' />
-          <h2 className=' text-black text-[32px] font-semibold '>Agua Leads</h2>
+          <h2 className=' text-black text-[32px] font-semibold '>Aqua Leads</h2>
         </div>
         <div className='  lg:mt-36 flex justify-center'>
           <Image src={authImg} alt=' auth img' className=' ' />

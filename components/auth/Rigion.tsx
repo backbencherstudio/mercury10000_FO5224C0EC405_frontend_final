@@ -13,12 +13,12 @@ import {
 import Link from 'next/link'
 
 export default function Rigion() {
-  return (
-     <div className=' flex   lg:flex-row flex-col  items-center justify-center '>
+    return (
+        <div className=' flex   lg:flex-row flex-col  items-center justify-center '>
             <div className=' w-full lg:flex-1 bg-[#e7f9fb]   p-5  lg:h-screen'>
                 <div className=' inline-flex flex-col items-center justify-center gap-3'>
                     <Image src={logo} alt='logo' />
-                    <h2 className=' text-black text-[32px] font-semibold '>Agua Leads</h2>
+                    <h2 className=' text-black text-[32px] font-semibold '>Aqua Leads</h2>
                 </div>
                 <div className='  lg:mt-36 flex justify-center'>
                     <Image src={authImg} alt=' auth img' className=' ' />
@@ -34,7 +34,7 @@ export default function Rigion() {
                             <label htmlFor="location" className=' text-base text-[#161721] '>Select a location</label>
                             <Select >
                                 <SelectTrigger className="w-full   py-5 mt-1.5 cursor-pointer ">
-                                    <SelectValue placeholder="United Kingdom"  className=' text-black' />
+                                    <SelectValue placeholder="United Kingdom" className=' text-black' />
                                 </SelectTrigger>
                                 <SelectContent>
                                     <SelectGroup>
@@ -44,8 +44,8 @@ export default function Rigion() {
                                     </SelectGroup>
                                 </SelectContent>
                             </Select>
-                             <Link href='/sign-up'   className=' py-3  bg-[#0e93a1] rounded-[8px] w-full block   text-white mt-5 cursor-pointer hover:bg-[#0e93a1]/90 transition ease-in-out duration-200   text-center'>Next</Link>
-                                
+                            <Link href='/sign-up' className=' py-3  bg-[#0e93a1] rounded-[8px] w-full block   text-white mt-5 cursor-pointer hover:bg-[#0e93a1]/90 transition ease-in-out duration-200   text-center'>Next</Link>
+
                         </div>
 
                     </div>
@@ -53,5 +53,5 @@ export default function Rigion() {
             </div>
 
         </div>
-  )
+    )
 }
