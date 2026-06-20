@@ -15,6 +15,17 @@ export const SettingsApi = baseApi.injectEndpoints({
 
         }),
 
+          getOnboarding: builder.query({
+            query: () => ({
+                url: "/onboarding",
+                method: "GET",
+                
+
+            }),
+            providesTags: ["onboarding"],
+
+        }),
+
         getSettingNotification: builder.query({
             query: () => ({
                 url: "/admin/notification/notification-settings",
@@ -46,4 +57,4 @@ export const SettingsApi = baseApi.injectEndpoints({
 });
 
 // hook export (naming important)
-export const { usePostOnboardingMutation, useGetSettingNotificationQuery, useUpdateSettingNotificationMutation, useUpdataStatusMutation } = SettingsApi;
+export const { usePostOnboardingMutation, useGetOnboardingQuery, useGetSettingNotificationQuery, useUpdateSettingNotificationMutation, useUpdataStatusMutation } = SettingsApi;
