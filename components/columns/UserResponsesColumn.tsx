@@ -34,6 +34,7 @@ interface ColumnConfig<T = any> {
 
 interface UserResponsesColumnProps {
     onEdit?: (row: UserResponse) => void;
+    currentData: UserResponse[];
 }
 
 interface ActionDropdownProps {
@@ -259,15 +260,23 @@ const UserNameCell = ({ value, row }: { value: string, row: UserResponse }) => {
     );
 };
 
-export function UserResponsesColumn({ onEdit }: UserResponsesColumnProps): ColumnConfig<UserResponse>[] {
+export function UserResponsesColumn({ onEdit, currentData }: UserResponsesColumnProps): ColumnConfig<UserResponse>[] {
     return [
         {
             label: "User ID",
             accessor: "user_id",
             width: "100px",
-            formatter: (value: string) => (
-                <span className="text-sm text-[#06030C]">{value}</span>
-            ),
+            formatter: (_: string, row: UserResponse) => {
+                const index = currentData.findIndex(
+                    item => item.user_id === row.user_id
+                );
+
+                return (
+                    <span className="text-sm text-[#06030C]">
+                        {index + 1}
+                    </span>
+                );
+            },
         },
         {
             label: "Lead ID",

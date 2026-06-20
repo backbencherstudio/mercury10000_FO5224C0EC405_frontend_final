@@ -52,9 +52,15 @@ export function RequestPoolColumn({
 			label: 'ID',
 			accessor: 'id',
 			width: '60px',
-			formatter: (value: string) => (
-				<span className="text-sm text-[#06030C]">{value}</span>
-			),
+			formatter: (_: string, row: any) => {
+				const index = currentData.findIndex(item => item.id === row.id);
+
+				return (
+					<span className="text-sm text-[#06030C]">
+						{index + 1}
+					</span>
+				);
+			},
 		},
 		{
 			label: 'City',

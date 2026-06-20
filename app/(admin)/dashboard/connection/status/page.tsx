@@ -110,7 +110,7 @@ export default function UserResponsesPage() {
             </div>
             <div className='overflow-x-auto'>
                 <DynamicTable
-                    columns={UserResponsesColumn({ onEdit: handleEdit })}
+                    columns={UserResponsesColumn({ onEdit: handleEdit, currentData })}
                     data={currentData}
                     currentPage={currentPage}
                     itemsPerPage={itemsPerPage}

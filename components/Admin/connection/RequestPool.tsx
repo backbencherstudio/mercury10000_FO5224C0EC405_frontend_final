@@ -262,6 +262,7 @@ export default function RequestPool() {
                             <FilterIcon />
                             <span className='hidden sm:inline'>Filter</span>
                         </button>
+
                         <div className='w-full sm:w-auto'>
                             <Select value={tradeFilter} onValueChange={value => { setTradeFilter(value); setCurrentPage(1); }}>
                                 <SelectTrigger className='w-full sm:w-[150px] bg-[#e9e9ea] rounded-[10px]'>
@@ -297,8 +298,9 @@ export default function RequestPool() {
                         open={sendDialogOpen}
                         onOpenChange={(open) => {
                             setSendDialogOpen(open);
-                            if (open && lockedTrade) {
-                                setUserTradeFilter(lockedTrade);
+
+                            if (open) {
+                                setUserTradeFilter('all');
                             }
                         }}
                     >
