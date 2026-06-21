@@ -43,7 +43,7 @@ const ActionDropdown = ({ row, onLeadProcess, onNotLead }: any) => {
         {
           label: "Not a Lead",
           onClick: () => onNotLead?.(row),
-          className: "bg-red-500 text-white",
+          className: "bg-red-500 text-white ",
         },
       ]}
       containerClassName="flex justify-center w-full"
@@ -119,14 +119,14 @@ export function DashboardUserColumn({
       },
     },
 
-  
+
     {
       label: "Lead ID",
       accessor: "lead_no",
       formatter: (value) => <span>{value}</span>,
     },
 
-   
+
     {
       label: "User Name",
       accessor: "user",
@@ -135,14 +135,14 @@ export function DashboardUserColumn({
       ),
     },
 
- 
+
     {
       label: "Homeowner Address",
       accessor: "address",
       formatter: (value) => <span>{value}</span>,
     },
 
- 
+
     {
       label: "Phone",
       accessor: "phone",
@@ -158,7 +158,7 @@ export function DashboardUserColumn({
       ),
     },
 
-    
+
     {
       label: "Created At",
       accessor: "updated_at",
