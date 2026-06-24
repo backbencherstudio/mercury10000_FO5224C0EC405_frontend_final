@@ -60,8 +60,8 @@ type Trade = {
 };
 
 const emptyFeeFormData: FeeFormData = {
-    qualified_leads_fee: '',
-    conversion_fee: '',
+    qualified_leads_fee: 100,
+    conversion_fee: 500,
 };
 
 
