@@ -236,7 +236,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
               )}
             </div>
             {/* Role */}
-            <div className="border-b pb-2 flex justify-between items-end">
+            {/* <div className="border-b pb-2 flex justify-between items-end">
               <div>
                 <h3 className="text-lg text-[#1D1F2C] font-semibold">Role</h3>
                 {editState.role ? (
@@ -252,7 +252,7 @@ export default function UserDetails({ user }: UserDetailsProps) {
               {!editState.role && (
                 <button className="text-base text-[#777980] cursor-pointer" onClick={() => handleEdit('role')}>Edit</button>
               )}
-            </div>
+            </div> */}
             {/* Work at Company */}
             <div className="border-b flex justify-between items-end">
               <div>
